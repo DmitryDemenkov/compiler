@@ -25,7 +25,7 @@ void delete_underlines(char* str, char* newStr);
 %{
 int lineCounter = 0;
 char literal[4096] = ""; 
-char buffer[1024] = "";
+char* buffer = 0;
 char digit[1024] = "";
 %}
 
@@ -44,10 +44,10 @@ new       { printf( "keyword: new\n" ); }
 as        { printf( "keyword: as\n" ); }
 is        { printf( "keyword: is\n" ); }
 
-public    { printf( "keyword: else\n" ); }
-internal  { printf( "keyword: else\n" ); }
-protected { printf( "keyword: else\n" ); }
-private   { printf( "keyword: else\n" ); }
+public    { printf( "keyword: public\n" ); }
+internal  { printf( "keyword: internal\n" ); }
+protected { printf( "keyword: protected\n" ); }
+private   { printf( "keyword: private\n" ); }
 
 do        { printf( "keyword: do\n" ); }
 if        { printf( "keyword: if\n"); }
@@ -63,8 +63,9 @@ string    { printf( "keyword: string\n" ); }
 
 
 \@?{ID} { 
-    if (yytext[0] == '@') { yytext++; }
-    printf( "identifier: %s\n", yytext ); 
+    buffer = yytext;
+    if (buffer[0] == '@') { buffer++; }
+    printf( "identifier: %s\n", buffer ); 
 }
 
 
@@ -104,20 +105,21 @@ string    { printf( "keyword: string\n" ); }
 
 
 {DIGIT}(_*{DIGIT})* {
-    delete_underlines(yytext, digit);
+    buffer = yytext;
+    delete_underlines(buffer, digit);
     printf( "integer_literal: %d\n", atoi(digit) ); 
 }
 
 (0x|0X)(_*{HEX_DIGIT})+ {
-    yytext+=2;
-    delete_underlines(yytext, digit);
+    buffer = yytext + 2;
+    delete_underlines(buffer, digit);
     char* a;
     printf( "hexadecimal_literal %d\n", strtol(digit, &a, 16) );
 }
 
 (0b|0B)(_*{BIN_DIGIT})+ {
-    yytext+=2;
-    delete_underlines(yytext, digit);
+    buffer = yytext + 2;
+    delete_underlines(buffer, digit);
     char* a;
     printf( "binary_literal %d\n", strtol(digit, &a, 2) );
 }
@@ -155,9 +157,9 @@ string    { printf( "keyword: string\n" ); }
 <STRING,CHAR>\\v   { strcat(literal, "\v");   }
 
 \@\"[^\"]*\" { 
-    yytext+=2;
-    yytext[strlen(yytext)-1]='\0';
-    printf("string_literal: %s\n", yytext); 
+    buffer = yytext + 2;
+    yytext[strlen(buffer)-1]='\0';
+    printf("string_literal: %s\n", buffer); 
 }
 
 

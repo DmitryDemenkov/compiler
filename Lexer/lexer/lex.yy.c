@@ -665,7 +665,7 @@ YY_DECL
 
 int lineCounter = 0;
 char literal[4096] = ""; 
-char buffer[1024] = "";
+char* buffer = 0;
 char digit[1024] = "";
 
 
@@ -815,22 +815,22 @@ YY_RULE_SETUP
 case 13:
 YY_RULE_SETUP
 #line 47 "./.l"
-{ printf( "keyword: else\n" ); }
+{ printf( "keyword: public\n" ); }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
 #line 48 "./.l"
-{ printf( "keyword: else\n" ); }
+{ printf( "keyword: internal\n" ); }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
 #line 49 "./.l"
-{ printf( "keyword: else\n" ); }
+{ printf( "keyword: protected\n" ); }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
 #line 50 "./.l"
-{ printf( "keyword: else\n" ); }
+{ printf( "keyword: private\n" ); }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
@@ -886,201 +886,203 @@ case 27:
 YY_RULE_SETUP
 #line 65 "./.l"
 { 
-    if (yytext[0] == '@') { yytext++; }
-    printf( "identifier: %s\n", yytext ); 
+    buffer = yytext;
+    if (buffer[0] == '@') { buffer++; }
+    printf( "identifier: %s\n", buffer ); 
 }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 71 "./.l"
+#line 72 "./.l"
 { printf( "curly_bracket_open\n" ); }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 72 "./.l"
+#line 73 "./.l"
 { printf( "curly_bracket_close\n" ); }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 73 "./.l"
+#line 74 "./.l"
 { printf( "square_brackets_open\n" ); }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 74 "./.l"
+#line 75 "./.l"
 { printf( "square_brackets_close\n" ); }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 75 "./.l"
+#line 76 "./.l"
 { printf( "round_bracket_open\n" ); }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 76 "./.l"
+#line 77 "./.l"
 { printf( "round_bracket_close\n" ); }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 78 "./.l"
+#line 79 "./.l"
 { printf( "dot\n" ); }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 79 "./.l"
+#line 80 "./.l"
 { printf( "comma\n" ); }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 80 "./.l"
+#line 81 "./.l"
 { printf( "colon\n" ); }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 81 "./.l"
+#line 82 "./.l"
 { printf( "semicolon\n" ); }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 83 "./.l"
+#line 84 "./.l"
 { printf( "plus\n" ); }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 84 "./.l"
+#line 85 "./.l"
 { printf( "minus\n" ); }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 85 "./.l"
+#line 86 "./.l"
 { printf( "increment\n" ); }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 86 "./.l"
+#line 87 "./.l"
 { printf( "decrement\n" ); }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 87 "./.l"
+#line 88 "./.l"
 { printf( "asterisk\n" ); }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 88 "./.l"
+#line 89 "./.l"
 { printf( "slash\n" ); }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 89 "./.l"
+#line 90 "./.l"
 { printf( "percent\n" ); }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 91 "./.l"
+#line 92 "./.l"
 { printf( "less\n" ); }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 92 "./.l"
+#line 93 "./.l"
 { printf( "greater\n" ); }
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 93 "./.l"
+#line 94 "./.l"
 { printf( "less_equal\n" ); }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 94 "./.l"
+#line 95 "./.l"
 { printf( "greater_equal\n" ); }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 95 "./.l"
+#line 96 "./.l"
 { printf( "equality\n" ); }
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 96 "./.l"
+#line 97 "./.l"
 { printf( "inequality\n" ); }
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 98 "./.l"
+#line 99 "./.l"
 { printf( "assignment\n" ); }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 99 "./.l"
+#line 100 "./.l"
 { printf( "assignment_increment\n" ); }
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 100 "./.l"
+#line 101 "./.l"
 { printf( "assignment_decrement\n" ); }
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 101 "./.l"
+#line 102 "./.l"
 { printf( "assignment_multiply\n" ); }
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 102 "./.l"
+#line 103 "./.l"
 { printf( "assignment_division\n" ); }
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 103 "./.l"
+#line 104 "./.l"
 { printf( "assignment_module\n" ); }
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 106 "./.l"
+#line 107 "./.l"
 {
-    delete_underlines(yytext, digit);
+    buffer = yytext;
+    delete_underlines(buffer, digit);
     printf( "integer_literal: %d\n", atoi(digit) ); 
 }
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 111 "./.l"
+#line 113 "./.l"
 {
-    yytext+=2;
-    delete_underlines(yytext, digit);
+    buffer = yytext + 2;
+    delete_underlines(buffer, digit);
     char* a;
     printf( "hexadecimal_literal %d\n", strtol(digit, &a, 16) );
 }
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 118 "./.l"
+#line 120 "./.l"
 {
-    yytext+=2;
-    delete_underlines(yytext, digit);
+    buffer = yytext + 2;
+    delete_underlines(buffer, digit);
     char* a;
     printf( "binary_literal %d\n", strtol(digit, &a, 2) );
 }
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 125 "./.l"
+#line 127 "./.l"
 { strcpy(literal, ""); BEGIN(CHAR); }
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 126 "./.l"
+#line 128 "./.l"
 { strcat(literal, yytext); }
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 127 "./.l"
+#line 129 "./.l"
 { printf("ERROR line#%d: incorrect symbol in char literal\n", lineCounter+1); }
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 128 "./.l"
+#line 130 "./.l"
 {
     if (strlen(literal) == 0)
         printf("ERROR line#%d: empty char literal\n", lineCounter+1);
@@ -1092,113 +1094,113 @@ YY_RULE_SETUP
 }
 	YY_BREAK
 case YY_STATE_EOF(CHAR):
-#line 137 "./.l"
+#line 139 "./.l"
 { printf("ERROR line#%d: no closed single quote\n", lineCounter+1); BEGIN(INITIAL); }
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 139 "./.l"
+#line 141 "./.l"
 { strcpy(literal, ""); BEGIN(STRING); }
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 140 "./.l"
+#line 142 "./.l"
 { strcat(literal, yytext); }
 	YY_BREAK
 case 66:
 YY_RULE_SETUP
-#line 141 "./.l"
+#line 143 "./.l"
 { printf("ERROR line#%d: incorrect symbol in string literal\n", lineCounter+1); }
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 142 "./.l"
+#line 144 "./.l"
 { printf("string_literal: %s\n", literal); BEGIN(INITIAL); }
 	YY_BREAK
 case YY_STATE_EOF(STRING):
-#line 143 "./.l"
+#line 145 "./.l"
 { printf("ERROR line#%d: no closed double quote\n", lineCounter+1); BEGIN(INITIAL); }
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 145 "./.l"
+#line 147 "./.l"
 { strcat(literal, "\'");   }
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 146 "./.l"
+#line 148 "./.l"
 { strcat(literal, "\"");   }
 	YY_BREAK
 case 70:
 YY_RULE_SETUP
-#line 147 "./.l"
+#line 149 "./.l"
 { strcat(literal, "\\");   }
 	YY_BREAK
 case 71:
 YY_RULE_SETUP
-#line 148 "./.l"
+#line 150 "./.l"
 { strcat(literal, "\0");   }
 	YY_BREAK
 case 72:
 YY_RULE_SETUP
-#line 149 "./.l"
+#line 151 "./.l"
 { strcat(literal, "\a");   }
 	YY_BREAK
 case 73:
 YY_RULE_SETUP
-#line 150 "./.l"
+#line 152 "./.l"
 { strcat(literal, "\b");   }
 	YY_BREAK
 case 74:
 YY_RULE_SETUP
-#line 151 "./.l"
+#line 153 "./.l"
 { strcat(literal, "\f");   }
 	YY_BREAK
 case 75:
 YY_RULE_SETUP
-#line 152 "./.l"
+#line 154 "./.l"
 { strcat(literal, "\n");   }
 	YY_BREAK
 case 76:
 YY_RULE_SETUP
-#line 153 "./.l"
+#line 155 "./.l"
 { strcat(literal, "\r");   }
 	YY_BREAK
 case 77:
 YY_RULE_SETUP
-#line 154 "./.l"
+#line 156 "./.l"
 { strcat(literal, "\t");   }
 	YY_BREAK
 case 78:
 YY_RULE_SETUP
-#line 155 "./.l"
+#line 157 "./.l"
 { strcat(literal, "\v");   }
 	YY_BREAK
 case 79:
 YY_RULE_SETUP
-#line 157 "./.l"
+#line 159 "./.l"
 { 
-    yytext+=2;
-    yytext[strlen(yytext)-1]='\0';
-    printf("string_literal: %s\n", yytext); 
+    buffer = yytext + 2;
+    yytext[strlen(buffer)-1]='\0';
+    printf("string_literal: %s\n", buffer); 
 }
 	YY_BREAK
 case 80:
 YY_RULE_SETUP
-#line 164 "./.l"
+#line 166 "./.l"
 { lineCounter++; }
 	YY_BREAK
 case 81:
 YY_RULE_SETUP
-#line 166 "./.l"
+#line 168 "./.l"
 { /* eat up whitespace */ }
 	YY_BREAK
 case 82:
 YY_RULE_SETUP
-#line 168 "./.l"
+#line 170 "./.l"
 ECHO;
 	YY_BREAK
-#line 1202 "lex.yy.c"
+#line 1204 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2058,7 +2060,7 @@ int main()
 	return 0;
 	}
 #endif
-#line 168 "./.l"
+#line 170 "./.l"
 
 
 void delete_underlines(char* str, char* newStr)
