@@ -86,8 +86,6 @@ string    { cout << "keyword: string" << endl; }
 
 "+"  { cout << "plus" << endl; }
 "-"  { cout << "minus" << endl; }
-"++" { cout << "increment" << endl; }
-"--" { cout << "decrement" << endl; }
 "*"  { cout << "asterisk" << endl; }
 "/"  { cout << "slash" << endl; }
 "%"  { cout << "percent" << endl; }
@@ -100,11 +98,6 @@ string    { cout << "keyword: string" << endl; }
 "!=" { cout << "inequality" << endl; }
 
 "="  { cout << "assignment" << endl; }
-"+=" { cout << "assignment_increment" << endl; }
-"-=" { cout << "assignment_decrement" << endl; }
-"*=" { cout << "assignment_multiply" << endl; }
-"/=" { cout << "assignment_division" << endl; }
-"%=" { cout << "assignment_module" << endl; }
 
 
 {DIGIT}(_*{DIGIT})* {
