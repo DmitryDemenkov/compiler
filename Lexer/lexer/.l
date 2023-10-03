@@ -151,6 +151,17 @@ string    { cout << "keyword: string" << endl; }
 <STRING,CHAR>\\r   { literal.push_back('\r'); }
 <STRING,CHAR>\\t   { literal.push_back('\t'); }
 <STRING,CHAR>\\v   { literal.push_back('\v'); }
+<STRING,CHAR>\\x{HEX_DIGIT}{1,4}|\\u{HEX_DIGIT}{4} {
+    buffer = yytext + 2;
+    char* a;
+    int num = strtol(buffer, &a, 16);
+    if (num < 127){
+        literal.push_back(num);
+    }
+    else{
+        printf("ERROR line%d: unsupported character 0x%s\n", lineCounter+1, buffer);
+    }
+}
 
 \@\"[^\"]*\" { 
     buffer = yytext + 2;
