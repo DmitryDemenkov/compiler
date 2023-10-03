@@ -13,6 +13,7 @@ using namespace std;
 
 %x STRING
 %x CHAR
+%x VERBATIM_STRING
 
 DIGIT     [0-9]
 ID        [A-Za-z_][A-Za-z0-9_]*
@@ -163,11 +164,11 @@ string    { cout << "keyword: string" << endl; }
     }
 }
 
-\@\"[^\"]*\" { 
-    buffer = yytext + 2;
-    buffer[strlen(buffer)-1]='\0';
-    printf("string_literal: %s\n", buffer); 
-}
+\@\" { literal = ""; BEGIN(VERBATIM_STRING); }
+<VERBATIM_STRING>[^\"]+ { literal += yytext; }
+<VERBATIM_STRING>\"\"   { literal.push_back('\"'); }
+<VERBATIM_STRING>\" { cout << "string_literal: " + literal << endl; BEGIN(INITIAL); }
+<VERBATIM_STRING><<EOF>> { printf("ERROR line#%d: no closed double quote\n", lineCounter+1); BEGIN(INITIAL); }
 
 
 [\r\n] { lineCounter++; }
