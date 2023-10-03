@@ -1,8 +1,11 @@
 %{
+#include <iostream>
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
 #include <stdlib.h>
+
+using namespace std;
 %}
 
 %option noyywrap
@@ -24,84 +27,84 @@ void delete_underlines(char* str, char* newStr);
 
 %{
 int lineCounter = 0;
-char literal[4096] = ""; 
+string literal = ""; 
 char* buffer = 0;
 char digit[1024] = "";
 %}
 
-abstract  { printf( "keyword: abstract\n" ); }
-virtual   { printf( "keyword: virtual\n" ); }
-override  { printf( "keyword: override\n"); }
+abstract  { cout << "keyword: abstract" << endl; }
+virtual   { cout << "keyword: virtual" << endl; }
+override  { cout << "keyword: override" << endl; }
 
-base      { printf( "keyword: base\n" ); }
-this      { printf( "keyword: this\n" ); }
-class     { printf( "keyword: class\n" ); }
-namespace { printf( "keyword: namespace\n" ); }
-static    { printf( "keyword: static\n" ); }
-return    { printf( "keyword: return\n" ); }
+base      { cout << "keyword: base" << endl; }
+this      { cout << "keyword: this" << endl; }
+class     { cout << "keyword: class" << endl; }
+namespace { cout << "keyword: namespace" << endl; }
+static    { cout << "keyword: static" << endl; }
+return    { cout << "keyword: return" << endl; }
 
-new       { printf( "keyword: new\n" ); }
-as        { printf( "keyword: as\n" ); }
-is        { printf( "keyword: is\n" ); }
+new       { cout << "keyword: new" << endl; }
+as        { cout << "keyword: as" << endl; }
+is        { cout << "keyword: is" << endl; }
 
-public    { printf( "keyword: public\n" ); }
-internal  { printf( "keyword: internal\n" ); }
-protected { printf( "keyword: protected\n" ); }
-private   { printf( "keyword: private\n" ); }
+public    { cout << "keyword: public" << endl; }
+internal  { cout << "keyword: internal" << endl; }
+protected { cout << "keyword: protected" << endl; }
+private   { cout << "keyword: private" << endl; }
 
-do        { printf( "keyword: do\n" ); }
-if        { printf( "keyword: if\n"); }
-else      { printf( "keyword: else\n" ); }
-for       { printf( "keyword: for\n" ); }
-foreach   { printf( "keyword: foreach\n" ); }
-while     { printf( "keyword: while\n" ); }
+do        { cout << "keyword: do" << endl; }
+if        { cout << "keyword: if" << endl; }
+else      { cout << "keyword: else" << endl; }
+for       { cout << "keyword: for" << endl; }
+foreach   { cout << "keyword: foreach" << endl; }
+while     { cout << "keyword: while" << endl; }
 
-void      { printf( "keyword: void\n" ); }
-int       { printf( "keyword: int\n" ); }
-char      { printf( "keyword: char\n" ); }
-string    { printf( "keyword: string\n" ); }
+void      { cout << "keyword: void" << endl; }
+int       { cout << "keyword: int" << endl; }
+char      { cout << "keyword: char" << endl; }
+string    { cout << "keyword: string" << endl; }
 
 
 \@?{ID} { 
     buffer = yytext;
     if (buffer[0] == '@') { buffer++; }
-    printf( "identifier: %s\n", buffer ); 
+    cout << "identifier: " << buffer << endl;
 }
 
 
-"{"  { printf( "curly_bracket_open\n" ); }
-"}"  { printf( "curly_bracket_close\n" ); }
-"["  { printf( "square_brackets_open\n" ); }
-"]"  { printf( "square_brackets_close\n" ); }
-"("  { printf( "round_bracket_open\n" ); }
-")"  { printf( "round_bracket_close\n" ); }
+"{"  { cout << "curly_bracket_open" << endl; }
+"}"  { cout << "curly_bracket_close" << endl; }
+"["  { cout << "square_brackets_open" << endl; }
+"]"  { cout << "square_brackets_close" << endl; }
+"("  { cout << "round_bracket_open" << endl; }
+")"  { cout << "round_bracket_close" << endl; }
 
-"."  { printf( "dot\n" ); }
-","  { printf( "comma\n" ); }
-":"  { printf( "colon\n" ); }
-";"  { printf( "semicolon\n" ); }
+"."  { cout << "dot" << endl; }
+","  { cout << "comma" << endl; }
+":"  { cout << "colon" << endl; }
+";"  { cout << "semicolon" << endl; }
 
-"+"  { printf( "plus\n" ); }
-"-"  { printf( "minus\n" ); }
-"++" { printf( "increment\n" ); }
-"--" { printf( "decrement\n" ); }
-"*"  { printf( "asterisk\n" ); }
-"/"  { printf( "slash\n" ); }
-"%"  { printf( "percent\n" ); }
+"+"  { cout << "plus" << endl; }
+"-"  { cout << "minus" << endl; }
+"++" { cout << "increment" << endl; }
+"--" { cout << "decrement" << endl; }
+"*"  { cout << "asterisk" << endl; }
+"/"  { cout << "slash" << endl; }
+"%"  { cout << "percent" << endl; }
 
-"<"  { printf( "less\n" ); }
-">"  { printf( "greater\n" ); }
-"<=" { printf( "less_equal\n" ); }
-">=" { printf( "greater_equal\n" ); }
-"==" { printf( "equality\n" ); }
-"!=" { printf( "inequality\n" ); }
+"<"  { cout << "less" << endl; }
+">"  { cout << "greater" << endl; }
+"<=" { cout << "less_equal" << endl; }
+">=" { cout << "greater_equal" << endl; }
+"==" { cout << "equality" << endl; }
+"!=" { cout << "inequality" << endl; }
 
-"="  { printf( "assignment\n" ); }
-"+=" { printf( "assignment_increment\n" ); }
-"-=" { printf( "assignment_decrement\n" ); }
-"*=" { printf( "assignment_multiply\n" ); }
-"/=" { printf( "assignment_division\n" ); }
-"%=" { printf( "assignment_module\n" ); }
+"="  { cout << "assignment" << endl; }
+"+=" { cout << "assignment_increment" << endl; }
+"-=" { cout << "assignment_decrement" << endl; }
+"*=" { cout << "assignment_multiply" << endl; }
+"/=" { cout << "assignment_division" << endl; }
+"%=" { cout << "assignment_module" << endl; }
 
 
 {DIGIT}(_*{DIGIT})* {
@@ -124,13 +127,13 @@ string    { printf( "keyword: string\n" ); }
     printf( "binary_literal %d\n", strtol(digit, &a, 2) );
 }
 
-\' { strcpy(literal, ""); BEGIN(CHAR); }
-<CHAR>[^\'\\\r\n]+ { strcat(literal, yytext); }
+\' { literal = ""; BEGIN(CHAR); }
+<CHAR>[^\'\\\r\n]+ { literal += yytext; }
 <CHAR>[\r\n] { printf("ERROR line#%d: incorrect symbol in char literal\n", lineCounter+1); }
 <CHAR>\' {
-    if (strlen(literal) == 0)
+    if (literal.size() == 0)
         printf("ERROR line#%d: empty char literal\n", lineCounter+1);
-    else if (strlen(literal) == 1) 
+    else if (literal.size() == 1) 
         printf("char_literal: %c\n", literal[0]);
     else
         printf("ERROR line#%d: too long char literal\n", lineCounter+1); 
@@ -138,27 +141,27 @@ string    { printf( "keyword: string\n" ); }
 }
 <CHAR><<EOF>> { printf("ERROR line#%d: no closed single quote\n", lineCounter+1); BEGIN(INITIAL); }
 
-\" { strcpy(literal, ""); BEGIN(STRING); }
-<STRING>[^\"\\\r\n]+ { strcat(literal, yytext); }
+\" { literal = ""; BEGIN(STRING); }
+<STRING>[^\"\\\r\n]+ { literal += yytext; }
 <STRING>[\r\n] { printf("ERROR line#%d: incorrect symbol in string literal\n", lineCounter+1); }
-<STRING>\" { printf("string_literal: %s\n", literal); BEGIN(INITIAL); }
+<STRING>\" { cout << "string_literal: " + literal << endl; BEGIN(INITIAL); }
 <STRING><<EOF>> { printf("ERROR line#%d: no closed double quote\n", lineCounter+1); BEGIN(INITIAL); }
 
-<STRING,CHAR>\\\'  { strcat(literal, "\'");   }
-<STRING,CHAR>\\\"  { strcat(literal, "\"");   }
-<STRING,CHAR>\\\\  { strcat(literal, "\\");   }
-<STRING,CHAR>\\0   { strcat(literal, "\0");   }
-<STRING,CHAR>\\a   { strcat(literal, "\a");   }
-<STRING,CHAR>\\b   { strcat(literal, "\b");   }
-<STRING,CHAR>\\f   { strcat(literal, "\f");   }
-<STRING,CHAR>\\n   { strcat(literal, "\n");   }
-<STRING,CHAR>\\r   { strcat(literal, "\r");   }
-<STRING,CHAR>\\t   { strcat(literal, "\t");   }
-<STRING,CHAR>\\v   { strcat(literal, "\v");   }
+<STRING,CHAR>\\\'  { literal.push_back('\''); }
+<STRING,CHAR>\\\"  { literal.push_back('\"'); }
+<STRING,CHAR>\\\\  { literal.push_back('\\'); }
+<STRING,CHAR>\\0   { literal.push_back('\0'); }
+<STRING,CHAR>\\a   { literal.push_back('\a'); }
+<STRING,CHAR>\\b   { literal.push_back('\b'); }
+<STRING,CHAR>\\f   { literal.push_back('\f'); }
+<STRING,CHAR>\\n   { literal.push_back('\n'); }
+<STRING,CHAR>\\r   { literal.push_back('\r'); }
+<STRING,CHAR>\\t   { literal.push_back('\t'); }
+<STRING,CHAR>\\v   { literal.push_back('\v'); }
 
 \@\"[^\"]*\" { 
     buffer = yytext + 2;
-    yytext[strlen(buffer)-1]='\0';
+    buffer[strlen(buffer)-1]='\0';
     printf("string_literal: %s\n", buffer); 
 }
 

@@ -22,7 +22,7 @@
     <ClInclude Include="unistd.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="lexer\lex.yy.c" />
+    <ClCompile Include="lex.yy.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
