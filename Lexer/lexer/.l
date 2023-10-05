@@ -117,6 +117,11 @@ false     { cout << "boolean_literal: false" << endl; }
     printf( "integer_literal: %d\n", atoi(digit) ); 
 }
 
+{DIGIT}(_*{DIGIT})*_+ {
+    buffer = yytext;
+    printf( "ERROR line#%d: invalid integer literal: %s\n", lineCounter+1, buffer ); 
+}
+
 (0x|0X)(_*{HEX_DIGIT})+ {
     buffer = yytext + 2;
     delete_underlines(buffer, digit);
@@ -124,11 +129,21 @@ false     { cout << "boolean_literal: false" << endl; }
     printf( "hexadecimal_literal %d\n", strtol(digit, &a, 16) );
 }
 
+(0x|0X)(_*{HEX_DIGIT})*_* {
+    buffer = yytext;
+    printf( "ERROR line#%d: invalid integer literal: %s\n", lineCounter+1, buffer ); 
+}
+
 (0b|0B)(_*{BIN_DIGIT})+ {
     buffer = yytext + 2;
     delete_underlines(buffer, digit);
     char* a;
     printf( "binary_literal %d\n", strtol(digit, &a, 2) );
+}
+
+(0b|0B)(_*{BIN_DIGIT})*_* {
+    buffer = yytext;
+    printf( "ERROR line#%d: invalid integer literal: %s\n", lineCounter+1, buffer ); 
 }
 
 \' { literal = ""; BEGIN(CHAR); }
