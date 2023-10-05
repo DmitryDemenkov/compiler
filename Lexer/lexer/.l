@@ -14,6 +14,7 @@ using namespace std;
 %x STRING
 %x CHAR
 %x VERBATIM_STRING
+%x COMMENT
 
 DIGIT     [0-9]
 ID        [A-Za-z_][A-Za-z0-9_]*
@@ -28,7 +29,8 @@ void delete_underlines(char* str, char* newStr);
 
 %{
 int lineCounter = 0;
-string literal = ""; 
+string literal = "";
+string comment = ""; 
 char* buffer = 0;
 char digit[1024] = "";
 %}
@@ -169,6 +171,19 @@ string    { cout << "keyword: string" << endl; }
 <VERBATIM_STRING>\"\"   { literal.push_back('\"'); }
 <VERBATIM_STRING>\" { cout << "string_literal: " + literal << endl; BEGIN(INITIAL); }
 <VERBATIM_STRING><<EOF>> { printf("ERROR line#%d: no closed double quote\n", lineCounter+1); BEGIN(INITIAL); }
+
+
+"//"[^\r\n]* {
+    buffer = yytext + 2; 
+    printf("single_line_comment: %s\n", buffer);
+}
+
+"/*" { comment = ""; BEGIN(COMMENT); }
+<COMMENT>[^*\r\n]*       { comment += yytext; }
+<COMMENT>"*"+[^*\/\r\n]* { comment += yytext; }
+<COMMENT>[\r\n]          { comment.push_back('\n'); }
+<COMMENT>"*"+"/"         { cout << "delimited_comment: " << comment << endl; BEGIN(INITIAL); }
+<COMMENT><<EOF>>         { printf("ERROR line#%d: no closed delimited comment", lineCounter+1); BEGIN(INITIAL); }
 
 
 [\r\n] { lineCounter++; }
