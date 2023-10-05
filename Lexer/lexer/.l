@@ -106,6 +106,10 @@ false     { cout << "boolean_literal: false" << endl; }
 
 "="  { cout << "assignment" << endl; }
 
+"!"  { cout << "inversion" << endl; }
+"&&" { cout << "conjunction" << endl; }
+"||" { cout << "disjunction" << endl; }
+
 
 {DIGIT}(_*{DIGIT})* {
     buffer = yytext;
