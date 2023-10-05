@@ -148,14 +148,14 @@ false     { cout << "boolean_literal: false" << endl; }
 
 \' { literal = ""; BEGIN(CHAR); }
 <CHAR>[^\'\\\r\n]+ { literal += yytext; }
-<CHAR>[\r\n] { printf("ERROR line#%d: incorrect symbol in char literal\n", lineCounter+1); }
+<CHAR>[\r\n] { printf("ERROR line#%d: incorrect character in char literal\n", lineCounter+1); }
 <CHAR>\' {
     if (literal.size() == 0)
         printf("ERROR line#%d: empty char literal\n", lineCounter+1);
     else if (literal.size() == 1) 
         printf("char_literal: %c\n", literal[0]);
     else
-        printf("ERROR line#%d: too long char literal\n", lineCounter+1); 
+        printf("ERROR line#%d: too long char literal: %s\n", lineCounter+1, literal.data()); 
     BEGIN(INITIAL); 
 }
 <CHAR><<EOF>> { printf("ERROR line#%d: no closed single quote\n", lineCounter+1); BEGIN(INITIAL); }

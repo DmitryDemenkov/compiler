@@ -1138,7 +1138,7 @@ YY_RULE_SETUP
 case 64:
 YY_RULE_SETUP
 #line 151 "./.l"
-{ printf("ERROR line#%d: incorrect symbol in char literal\n", lineCounter+1); }
+{ printf("ERROR line#%d: incorrect character in char literal\n", lineCounter+1); }
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
@@ -1149,7 +1149,7 @@ YY_RULE_SETUP
     else if (literal.size() == 1) 
         printf("char_literal: %c\n", literal[0]);
     else
-        printf("ERROR line#%d: too long char literal\n", lineCounter+1); 
+        printf("ERROR line#%d: too long char literal: %s\n", lineCounter+1, literal.data()); 
     BEGIN(INITIAL); 
 }
 	YY_BREAK
