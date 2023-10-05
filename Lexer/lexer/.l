@@ -66,6 +66,10 @@ void      { cout << "keyword: void" << endl; }
 int       { cout << "keyword: int" << endl; }
 char      { cout << "keyword: char" << endl; }
 string    { cout << "keyword: string" << endl; }
+bool      { cout << "keyword: bool" << endl; }
+
+true      { cout << "boolean_literal: true" << endl; }
+false     { cout << "boolean_literal: false" << endl; }
 
 
 \@?{ID} { 
