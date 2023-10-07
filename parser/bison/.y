@@ -39,6 +39,18 @@
 
 %token ID
 
+%right '='
+%left  OR
+%left  AND
+%left  EQUALITY INEQUALITY
+%left  '<' '>' LESS_EQUAL GREATER_EQUAL IS AS
+%left  '+' '-'
+%left  '*' '/' '%'
+%right '!' UNMINUS
+%left  '.' '[' ']'
+%right NEW
+%nonassoc '(' ')'
+
 %%
 /* Rules */
 %%
