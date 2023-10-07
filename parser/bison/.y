@@ -1,0 +1,8 @@
+%{
+/* Prologue */
+%}
+/* Declaration */
+%%
+/* Rules */
+%%
+/* Code */

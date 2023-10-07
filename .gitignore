@@ -363,3 +363,6 @@ MigrationBackup/
 FodyWeavers.xsd
 
 flex.exe
+bison.exe
+bison.hairy
+bison.simple
