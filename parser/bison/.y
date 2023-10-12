@@ -62,6 +62,8 @@ field_declaration: modifier_list_em type ID ';'
                  | modifier_list_em type ID '=' expr ';'
                  | modifier_list_em type_name ID ';'
                  | modifier_list_em type_name ID '=' expr ';'
+                 | modifier_list_em array_type ID ';'
+                 | modifier_list_em array_type ID '=' expr ';'
                  ;
 
 
@@ -71,6 +73,8 @@ method_declaration: modifier_list_em type ID '(' expr_list_em ')' '{' stmt_list_
                   | modifier_list_em type_name ID '(' expr_list_em ')' ';'
                   | modifier_list_em VOID ID '(' expr_list_em ')' '{' stmt_list_em '}'
                   | modifier_list_em VOID ID '(' expr_list_em ')' ';'
+                  | modifier_list_em array_type ID '(' expr_list_em ')' '{' stmt_list_em '}'
+                  | modifier_list_em array_type ID '(' expr_list_em ')' ';'
                   ;
 
 
@@ -135,8 +139,10 @@ expr: INT_LITERAL
     | '(' expr ')'
     | type '.' ID
     | type_name
+    | type_name '[' argm_list ']'
     | expr '(' argm_list_em ')'
-    | expr '[' argm_list ']'
+    | expr '(' argm_list_em ')' '[' argm_list ']'
+    | '(' expr ')' '[' argm_list ']'
     | THIS
     | BASE '.' ID
     | BASE '[' argm_list ']'
@@ -145,9 +151,8 @@ expr: INT_LITERAL
     | '-' expr %prec UNMINUS
     | '!' expr
     | '(' type ')' expr
-    | '(' type '[' ']' ')' expr
-    | '(' expr ')' expr         /* '(' type_name ')' expr */
-    | '(' expr '[' ']' ')' expr /* '(' type_name '[' ']' ')' expr */
+    | '(' array_type ')' expr
+    | '(' expr ')' expr
     | expr '*' expr
     | expr '/' expr
     | expr '%' expr
@@ -158,32 +163,27 @@ expr: INT_LITERAL
     | expr LESS_EQUAL expr
     | expr GREATER_EQUAL expr
     | expr IS type
-    | expr IS type '[' ']'
-    | expr AS type
-    | expr AS type '[' ']'
     | expr IS type_name
-    | expr IS type_name '[' ']'
+    | expr IS array_type
+    | expr AS type
     | expr AS type_name
-    | expr AS type_name '[' ']'
+    | expr AS array_type
     | expr EQUALITY expr
     | expr INEQUALITY expr
     | expr AND expr
     | expr OR expr
     | type ID
-    | type '[' ']' ID
     | type_name ID
-    | expr '[' ']' ID  /* type_name '[' ']' ID */
+    | array_type ID
     | expr '=' expr
     ;
 
 
-array_creation_expr: NEW type '[' ']'
+array_creation_expr: NEW array_type
+                   | NEW array_type array_initializer
                    | NEW type '[' expr ']'
-                   | NEW type '[' ']' array_initializer
                    | NEW type '[' expr ']' array_initializer
-                   | NEW type_name '[' ']'
                    | NEW type_name '[' expr ']'
-                   | NEW type_name '[' ']' array_initializer
                    | NEW type_name '[' expr ']' array_initializer
                    ;
 
@@ -247,6 +247,11 @@ argm_list: argm
 argm: expr
     | ID ':' expr
     ;
+
+
+array_type: type '[' ']'
+          | type_name '[' ']'
+          ;
 
 
 type: INT
