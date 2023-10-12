@@ -53,6 +53,81 @@
 
 %%
 
+class_member_declaration: field_declaration
+                        | method_declaration
+                        ;
+
+
+field_declaration: modifier_list_em type ID ';'
+                 | modifier_list_em type ID '=' expr ';'
+                 | modifier_list_em type_name ID ';'
+                 | modifier_list_em type_name ID '=' expr ';'
+                 ;
+
+
+method_declaration: modifier_list_em type ID '(' expr_list_em ')' '{' stmt_list_em '}'
+                  | modifier_list_em type ID '(' expr_list_em ')' ';'
+                  | modifier_list_em type_name ID '(' expr_list_em ')' '{' stmt_list_em '}'
+                  | modifier_list_em type_name ID '(' expr_list_em ')' ';'
+                  | modifier_list_em VOID ID '(' expr_list_em ')' '{' stmt_list_em '}'
+                  | modifier_list_em VOID ID '(' expr_list_em ')' ';'
+                  ;
+
+
+modifier_list_em: /* empty*/
+                | modifier_list
+                ;
+
+
+modifier_list: modifier
+             | modifier_list modifier
+             ;
+
+
+modifier: PRIVATE
+        | PROTECTED
+        | PUBLIC
+        | INTERNAL
+        | ABSTRACT
+        | STATIC
+        | OVERRIDE
+        | VIRTUAL
+        ;
+
+
+stmt: ';'
+    | expr ';'
+    | if_stmt
+    | while_stmt
+    | return_stmt
+    | '{' stmt_list_em '}'
+    ;
+
+
+stmt_list_em: /* empty*/
+            | stmt_list
+            ;
+
+
+stmt_list: stmt
+         | stmt_list stmt
+         ;
+
+
+return_stmt: RETURN ';'
+           | RETURN expr ';'
+           ; 
+
+
+while_stmt: WHILE '(' expr ')' stmt
+          ;
+
+
+if_stmt: IF '(' expr ')' stmt
+       | IF '(' expr ')' stmt ELSE stmt
+       ;
+
+
 expr: INT_LITERAL
     | CHAR_LITERAL
     | STRING_LITERAL
@@ -115,6 +190,7 @@ array_creation_expr: NEW type '[' ']'
 
 array_initializer: '{' expr_list_em '}'
                  | '{' expr_list ',' '}'
+                 ;
 
 
 expr_list: expr
@@ -143,6 +219,7 @@ obj_initializer: '{' member_initializer_list_em '}'
 
 member_initializer_list_em: /* empty */
                           | member_initializer_list
+                          ;
 
 
 member_initializer_list: member_initializer
@@ -154,6 +231,7 @@ member_initializer: ID '=' expr
                   | '[' argm_list ']' '=' expr
                   | ID '=' obj_initializer
                   | '[' argm_list ']' '=' obj_initializer
+                  ;
 
 
 argm_list_em: /* empty */
