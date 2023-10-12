@@ -53,9 +53,35 @@
 
 %%
 
+class_declaration: modifier_list_em CLASS ID '{' class_member_declaration_list_em '}'
+                 | modifier_list_em CLASS ID ':' type_name '{' class_member_declaration_list_em '}'
+                 ;
+
+
+class_member_declaration_list_em: /* empty */
+                                | class_member_declaration_list
+                                ;
+
+
+class_member_declaration_list: class_member_declaration
+                             | class_member_declaration_list class_member_declaration
+                             ;
+
+
 class_member_declaration: field_declaration
                         | method_declaration
+                        | constructor_declaration
+                        | class_declaration
                         ;
+
+
+constructor_declaration: modifier_list_em ID '(' expr_list_em ')' ';'
+                       | modifier_list_em ID '(' expr_list_em ')' '{' stmt_list_em '}'
+                       | modifier_list_em ID '(' expr_list_em ')' ':' BASE '(' argm_list_em ')' ';'
+                       | modifier_list_em ID '(' expr_list_em ')' ':' BASE '(' argm_list_em ')' '{' stmt_list_em '}'
+                       | modifier_list_em ID '(' expr_list_em ')' ':' THIS '(' argm_list_em ')' ';'
+                       | modifier_list_em ID '(' expr_list_em ')' ':' THIS '(' argm_list_em ')' '{' stmt_list_em '}'
+                       ;
 
 
 field_declaration: modifier_list_em type ID ';'
