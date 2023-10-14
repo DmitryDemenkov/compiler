@@ -20,7 +20,6 @@
 
 %token DO
 %token IF
-%token ELSE
 %token FOR
 %token FOREACH
 %token IN
@@ -50,6 +49,8 @@
 %left  '.' '[' ']'
 %right NEW
 %nonassoc '(' ')'
+%nonassoc THEN
+%nonassoc ELSE
 
 %%
 
@@ -153,7 +154,7 @@ while_stmt: WHILE '(' expr ')' stmt
           ;
 
 
-if_stmt: IF '(' expr ')' stmt
+if_stmt: IF '(' expr ')' stmt %prec THEN
        | IF '(' expr ')' stmt ELSE stmt
        ;
 
