@@ -76,12 +76,12 @@ class_member_declaration: field_declaration
                         ;
 
 
-constructor_declaration: modifier_list_em ID '(' expr_list_em ')' ';'
-                       | modifier_list_em ID '(' expr_list_em ')' '{' stmt_list_em '}'
-                       | modifier_list_em ID '(' expr_list_em ')' ':' BASE '(' argm_list_em ')' ';'
-                       | modifier_list_em ID '(' expr_list_em ')' ':' BASE '(' argm_list_em ')' '{' stmt_list_em '}'
-                       | modifier_list_em ID '(' expr_list_em ')' ':' THIS '(' argm_list_em ')' ';'
-                       | modifier_list_em ID '(' expr_list_em ')' ':' THIS '(' argm_list_em ')' '{' stmt_list_em '}'
+constructor_declaration: modifier_list_em ID '(' param_list_em ')' ';'
+                       | modifier_list_em ID '(' param_list_em ')' '{' stmt_list_em '}'
+                       | modifier_list_em ID '(' param_list_em ')' ':' BASE '(' argm_list_em ')' ';'
+                       | modifier_list_em ID '(' param_list_em ')' ':' BASE '(' argm_list_em ')' '{' stmt_list_em '}'
+                       | modifier_list_em ID '(' param_list_em ')' ':' THIS '(' argm_list_em ')' ';'
+                       | modifier_list_em ID '(' param_list_em ')' ':' THIS '(' argm_list_em ')' '{' stmt_list_em '}'
                        ;
 
 
@@ -94,14 +94,14 @@ field_declaration: modifier_list_em type ID ';'
                  ;
 
 
-method_declaration: modifier_list_em type ID '(' expr_list_em ')' '{' stmt_list_em '}'
-                  | modifier_list_em type ID '(' expr_list_em ')' ';'
-                  | modifier_list_em type_name ID '(' expr_list_em ')' '{' stmt_list_em '}'
-                  | modifier_list_em type_name ID '(' expr_list_em ')' ';'
-                  | modifier_list_em VOID ID '(' expr_list_em ')' '{' stmt_list_em '}'
-                  | modifier_list_em VOID ID '(' expr_list_em ')' ';'
-                  | modifier_list_em array_type ID '(' expr_list_em ')' '{' stmt_list_em '}'
-                  | modifier_list_em array_type ID '(' expr_list_em ')' ';'
+method_declaration: modifier_list_em type ID '(' param_list_em ')' '{' stmt_list_em '}'
+                  | modifier_list_em type ID '(' param_list_em ')' ';'
+                  | modifier_list_em type_name ID '(' param_list_em ')' '{' stmt_list_em '}'
+                  | modifier_list_em type_name ID '(' param_list_em ')' ';'
+                  | modifier_list_em VOID ID '(' param_list_em ')' '{' stmt_list_em '}'
+                  | modifier_list_em VOID ID '(' param_list_em ')' ';'
+                  | modifier_list_em array_type ID '(' param_list_em ')' '{' stmt_list_em '}'
+                  | modifier_list_em array_type ID '(' param_list_em ')' ';'
                   ;
 
 
@@ -126,8 +126,20 @@ modifier: PRIVATE
         ;
 
 
+param_list_em: /* empty */
+             | param_list
+             ;
+
+
+param_list: var_declarator
+          | param_list ',' var_declarator
+          ;
+
+
 stmt: ';'
     | expr ';'
+    | var_declarator ';'
+    | var_declarator_list ';'
     | if_stmt
     | while_stmt
     | return_stmt
@@ -157,6 +169,18 @@ while_stmt: WHILE '(' expr ')' stmt
 if_stmt: IF '(' expr ')' stmt %prec THEN
        | IF '(' expr ')' stmt ELSE stmt
        ;
+
+
+var_declarator_list: var_declarator ',' expr
+                   | var_declarator '=' expr ',' expr
+                   | var_declarator_list ',' expr
+                   ;
+
+
+var_declarator: type ID
+              | type_name ID
+              | array_type ID
+              ;
 
 
 expr: INT_LITERAL
@@ -199,9 +223,6 @@ expr: INT_LITERAL
     | expr INEQUALITY expr
     | expr AND expr
     | expr OR expr
-    | type ID
-    | type_name ID
-    | array_type ID
     | expr '=' expr
     ;
 
