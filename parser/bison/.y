@@ -168,6 +168,7 @@ stmt: ';'
     | var_declarator_list ';'
     | if_stmt
     | while_stmt
+    | do_stmt
     | return_stmt
     | '{' stmt_list_em '}'
     ;
@@ -186,6 +187,10 @@ stmt_list: stmt
 return_stmt: RETURN ';'
            | RETURN expr ';'
            ; 
+
+
+do_stmt: DO stmt WHILE '(' expr ')' ';'
+       ;
 
 
 while_stmt: WHILE '(' expr ')' stmt
