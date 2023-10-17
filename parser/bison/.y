@@ -169,6 +169,7 @@ stmt: ';'
     | if_stmt
     | while_stmt
     | do_stmt
+    | foreach_stmt
     | return_stmt
     | '{' stmt_list_em '}'
     ;
@@ -187,6 +188,10 @@ stmt_list: stmt
 return_stmt: RETURN ';'
            | RETURN expr ';'
            ; 
+
+
+foreach_stmt: FOREACH '(' var_declarator IN expr ')' stmt
+	        ;
 
 
 do_stmt: DO stmt WHILE '(' expr ')' ';'
