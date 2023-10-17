@@ -52,7 +52,32 @@
 %nonassoc THEN
 %nonassoc ELSE
 
+%start program
+
 %%
+
+program: namespace_member_declaration_list_em
+       ;
+
+
+namespace_declaration: NAMESPACE type_name '{' namespace_member_declaration_list_em '}'
+                     ;
+
+
+namespace_member_declaration_list_em: /* empty */
+                                    | namespace_member_declaration_list
+                                    ;
+
+
+namespace_member_declaration_list: namespace_member_declaration
+                                 | namespace_member_declaration_list namespace_member_declaration
+                                 ;
+
+
+namespace_member_declaration: namespace_declaration
+                            | class_declaration
+                            ;
+
 
 class_declaration: modifier_list_em CLASS ID '{' class_member_declaration_list_em '}'
                  | modifier_list_em CLASS ID ':' type_name '{' class_member_declaration_list_em '}'
