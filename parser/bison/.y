@@ -139,6 +139,7 @@ param_list: var_declarator
 stmt: ';'
     | expr ';'
     | var_declarator ';'
+    | var_declarator '=' expr ';'
     | var_declarator_list ';'
     | if_stmt
     | while_stmt
