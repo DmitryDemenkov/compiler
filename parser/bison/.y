@@ -188,17 +188,11 @@ expr: INT_LITERAL
     | STRING_LITERAL
     | BOOLEAN_LITERAL
     | '(' expr ')'
-    | type '.' ID
-    | type_name
-    | type_name '[' argm_list ']'
-    | expr '(' argm_list_em ')'
-    | expr '(' argm_list_em ')' '[' argm_list ']'
-    | '(' expr ')' '[' argm_list ']'
-    | THIS
-    | BASE '.' ID
-    | BASE '[' argm_list ']'
+    | member_access
+    | invocation_expression
     | obj_creation_expr
     | array_creation_expr
+    | element_access;
     | '-' expr %prec UNMINUS
     | '!' expr
     | '(' type ')' expr
@@ -225,6 +219,40 @@ expr: INT_LITERAL
     | expr OR expr
     | expr '=' expr
     ;
+
+
+member_access: type_name
+             | type '.' type_name
+             | THIS
+             | THIS '.' type_name
+             | BASE '.' type_name
+             | invocation_expression '.' type_name
+             | '(' expr ')' '.' type_name
+             | obj_creation_expr '.' type_name
+             | array_creation_expr '.' type_name
+             | element_access '.' type_name
+             ;
+
+
+invocation_expression: member_access '(' argm_list_em ')'
+                     ;
+
+
+element_access: type_name '[' argm_list ']'
+              | type '.' type_name '[' argm_list ']'
+              | THIS '[' argm_list ']'
+              | THIS '.' type_name '[' argm_list ']'
+              | BASE '.' type_name '[' argm_list ']'
+              | invocation_expression '.' type_name '[' argm_list ']'
+              | '(' expr ')' '.' type_name '[' argm_list ']'
+              | obj_creation_expr '.' type_name '[' argm_list ']'
+              | array_creation_expr '.' type_name '[' argm_list ']'
+              | element_access '.' type_name '[' argm_list ']'
+              | obj_creation_expr '[' argm_list ']'
+              | invocation_expression '[' argm_list ']'
+              | element_access '[' argm_list ']'
+              | '(' expr ')' '[' argm_list ']'
+              ;
 
 
 array_creation_expr: NEW array_type
