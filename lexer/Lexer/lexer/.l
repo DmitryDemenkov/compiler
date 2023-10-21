@@ -11,10 +11,10 @@ using namespace std;
 %option noyywrap
 %option never-interactive
 
-%x STRING
-%x CHAR
-%x VERBATIM_STRING
-%x COMMENT
+%x STRING_STATE
+%x CHAR_STATE
+%x VERBATIM_STRING_STATE
+%x COMMENT_STATE
 
 DIGIT     [0-9]
 ID        [A-Za-z_][A-Za-z0-9_]*
@@ -148,10 +148,10 @@ false     { cout << "boolean_literal: false" << endl; }
     printf( "ERROR line#%d: invalid integer literal: %s\n", lineCounter+1, buffer ); 
 }
 
-\' { literal = ""; lastState = lineCounter+1; BEGIN(CHAR); }
-<CHAR>[^\'\\\r\n]+ { literal += yytext; }
-<CHAR>[\r\n] { printf("ERROR line#%d: incorrect character in a char literal\n", lineCounter+1); lineCounter++; }
-<CHAR>\' {
+\' { literal = ""; lastState = lineCounter+1; BEGIN(CHAR_STATE); }
+<CHAR_STATE>[^\'\\\r\n]+ { literal += yytext; }
+<CHAR_STATE>[\r\n] { printf("ERROR line#%d: incorrect character in a char literal\n", lineCounter+1); lineCounter++; }
+<CHAR_STATE>\' {
     if (literal.size() == 0)
         printf("ERROR line#%d: empty char literal\n", lineCounter+1);
     else if (literal.size() == 1) 
@@ -160,26 +160,26 @@ false     { cout << "boolean_literal: false" << endl; }
         printf("ERROR line#%d: too long char literal: %s\n", lineCounter+1, literal.data()); 
     BEGIN(INITIAL); 
 }
-<CHAR><<EOF>> { printf("ERROR line#%d: no closing single quote\n", lastState); BEGIN(INITIAL); }
+<CHAR_STATE><<EOF>> { printf("ERROR line#%d: no closing single quote\n", lastState); BEGIN(INITIAL); }
 
-\" { literal = ""; lastState = lineCounter+1; BEGIN(STRING); }
-<STRING>[^\"\\\r\n]+ { literal += yytext; }
-<STRING>[\r\n] { printf("ERROR line#%d: incorrect character in a string literal\n", lineCounter+1); lineCounter++; }
-<STRING>\" { cout << "string_literal: " + literal << endl; BEGIN(INITIAL); }
-<STRING><<EOF>> { printf("ERROR line#%d: no closing double quote\n", lastState); BEGIN(INITIAL); }
+\" { literal = ""; lastState = lineCounter+1; BEGIN(STRING_STATE); }
+<STRING_STATE>[^\"\\\r\n]+ { literal += yytext; }
+<STRING_STATE>[\r\n] { printf("ERROR line#%d: incorrect character in a string literal\n", lineCounter+1); lineCounter++; }
+<STRING_STATE>\" { cout << "string_literal: " + literal << endl; BEGIN(INITIAL); }
+<STRING_STATE><<EOF>> { printf("ERROR line#%d: no closing double quote\n", lastState); BEGIN(INITIAL); }
 
-<STRING,CHAR>\\\'  { literal.push_back('\''); }
-<STRING,CHAR>\\\"  { literal.push_back('\"'); }
-<STRING,CHAR>\\\\  { literal.push_back('\\'); }
-<STRING,CHAR>\\0   { literal.push_back('\0'); }
-<STRING,CHAR>\\a   { literal.push_back('\a'); }
-<STRING,CHAR>\\b   { literal.push_back('\b'); }
-<STRING,CHAR>\\f   { literal.push_back('\f'); }
-<STRING,CHAR>\\n   { literal.push_back('\n'); }
-<STRING,CHAR>\\r   { literal.push_back('\r'); }
-<STRING,CHAR>\\t   { literal.push_back('\t'); }
-<STRING,CHAR>\\v   { literal.push_back('\v'); }
-<STRING,CHAR>\\x{HEX_DIGIT}{1,4}|\\u{HEX_DIGIT}{4} {
+<STRING_STATE,CHAR_STATE>\\\'  { literal.push_back('\''); }
+<STRING_STATE,CHAR_STATE>\\\"  { literal.push_back('\"'); }
+<STRING_STATE,CHAR_STATE>\\\\  { literal.push_back('\\'); }
+<STRING_STATE,CHAR_STATE>\\0   { literal.push_back('\0'); }
+<STRING_STATE,CHAR_STATE>\\a   { literal.push_back('\a'); }
+<STRING_STATE,CHAR_STATE>\\b   { literal.push_back('\b'); }
+<STRING_STATE,CHAR_STATE>\\f   { literal.push_back('\f'); }
+<STRING_STATE,CHAR_STATE>\\n   { literal.push_back('\n'); }
+<STRING_STATE,CHAR_STATE>\\r   { literal.push_back('\r'); }
+<STRING_STATE,CHAR_STATE>\\t   { literal.push_back('\t'); }
+<STRING_STATE,CHAR_STATE>\\v   { literal.push_back('\v'); }
+<STRING_STATE,CHAR_STATE>\\x{HEX_DIGIT}{1,4}|\\u{HEX_DIGIT}{4} {
     buffer = yytext + 2;
     char* a;
     int num = strtol(buffer, &a, 16);
@@ -191,11 +191,11 @@ false     { cout << "boolean_literal: false" << endl; }
     }
 }
 
-\@\" { literal = ""; lastState = lineCounter+1; BEGIN(VERBATIM_STRING); }
-<VERBATIM_STRING>[^\"]+ { literal += yytext; }
-<VERBATIM_STRING>\"\"   { literal.push_back('\"'); }
-<VERBATIM_STRING>\" { cout << "string_literal: " + literal << endl; BEGIN(INITIAL); }
-<VERBATIM_STRING><<EOF>> { printf("ERROR line#%d: no closing double quote\n", lastState); BEGIN(INITIAL); }
+\@\" { literal = ""; lastState = lineCounter+1; BEGIN(VERBATIM_STRING_STATE); }
+<VERBATIM_STRING_STATE>[^\"]+ { literal += yytext; }
+<VERBATIM_STRING_STATE>\"\"   { literal.push_back('\"'); }
+<VERBATIM_STRING_STATE>\" { cout << "string_literal: " + literal << endl; BEGIN(INITIAL); }
+<VERBATIM_STRING_STATE><<EOF>> { printf("ERROR line#%d: no closing double quote\n", lastState); BEGIN(INITIAL); }
 
 
 "//"[^\r\n]* {
@@ -203,12 +203,12 @@ false     { cout << "boolean_literal: false" << endl; }
     printf("single_line_comment: %s\n", buffer);
 }
 
-"/*" { comment = ""; lastState = lineCounter+1; BEGIN(COMMENT); }
-<COMMENT>[^*\r\n]*       { comment += yytext; }
-<COMMENT>"*"+[^*\/\r\n]* { comment += yytext; }
-<COMMENT>[\r\n]          { comment.push_back('\n'); lineCounter++; }
-<COMMENT>"*"+"/"         { cout << "delimited_comment: " << comment << endl; BEGIN(INITIAL); }
-<COMMENT><<EOF>>         { printf("ERROR line#%d: no closing delimited comment", lastState); BEGIN(INITIAL); }
+"/*" { comment = ""; lastState = lineCounter+1; BEGIN(COMMENT_STATE); }
+<COMMENT_STATE>[^*\r\n]*       { comment += yytext; }
+<COMMENT_STATE>"*"+[^*\/\r\n]* { comment += yytext; }
+<COMMENT_STATE>[\r\n]          { comment.push_back('\n'); lineCounter++; }
+<COMMENT_STATE>"*"+"/"         { cout << "delimited_comment: " << comment << endl; BEGIN(INITIAL); }
+<COMMENT_STATE><<EOF>>         { printf("ERROR line#%d: no closing delimited comment", lastState); BEGIN(INITIAL); }
 
 
 [\r\n] { lineCounter++; }

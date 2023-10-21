@@ -547,13 +547,13 @@ char* yytext;
 
 using namespace std;
 #define YY_NEVER_INTERACTIVE 1
-#define STRING 1
+#define STRING_STATE 1
 
-#define CHAR 2
+#define CHAR_STATE 2
 
-#define VERBATIM_STRING 3
+#define VERBATIM_STRING_STATE 3
 
-#define COMMENT 4
+#define COMMENT_STATE 4
 
 #line 25 "./.l"
 void delete_underlines(char* str, char* newStr);
@@ -1138,7 +1138,7 @@ do_action:	/* This label is used only to access EOF actions. */
 	case 63:
 	YY_RULE_SETUP
 	#line 151 "./.l"
-	{ literal = ""; lastState = lineCounter + 1; BEGIN(CHAR); }
+	{ literal = ""; lastState = lineCounter + 1; BEGIN(CHAR_STATE); }
 		YY_BREAK
 	case 64:
 	YY_RULE_SETUP
@@ -1163,14 +1163,14 @@ do_action:	/* This label is used only to access EOF actions. */
 		BEGIN(INITIAL);
 	}
 		YY_BREAK
-	case YY_STATE_EOF(CHAR):
+	case YY_STATE_EOF(CHAR_STATE):
 	#line 163 "./.l"
 	{ printf("ERROR line#%d: no closing single quote\n", lastState); BEGIN(INITIAL); }
 		YY_BREAK
 	case 67:
 	YY_RULE_SETUP
 	#line 165 "./.l"
-	{ literal = ""; lastState = lineCounter + 1; BEGIN(STRING); }
+	{ literal = ""; lastState = lineCounter + 1; BEGIN(STRING_STATE); }
 		YY_BREAK
 	case 68:
 	YY_RULE_SETUP
@@ -1187,7 +1187,7 @@ do_action:	/* This label is used only to access EOF actions. */
 	#line 168 "./.l"
 	{ cout << "string_literal: " + literal << endl; BEGIN(INITIAL); }
 		YY_BREAK
-	case YY_STATE_EOF(STRING):
+	case YY_STATE_EOF(STRING_STATE):
 	#line 169 "./.l"
 	{ printf("ERROR line#%d: no closing double quote\n", lastState); BEGIN(INITIAL); }
 		YY_BREAK
@@ -1264,7 +1264,7 @@ do_action:	/* This label is used only to access EOF actions. */
 	case 83:
 	YY_RULE_SETUP
 	#line 194 "./.l"
-	{ literal = ""; lastState = lineCounter + 1; BEGIN(VERBATIM_STRING); }
+	{ literal = ""; lastState = lineCounter + 1; BEGIN(VERBATIM_STRING_STATE); }
 		YY_BREAK
 	case 84:
 	YY_RULE_SETUP
@@ -1281,7 +1281,7 @@ do_action:	/* This label is used only to access EOF actions. */
 	#line 197 "./.l"
 	{ cout << "string_literal: " + literal << endl; BEGIN(INITIAL); }
 		YY_BREAK
-	case YY_STATE_EOF(VERBATIM_STRING):
+	case YY_STATE_EOF(VERBATIM_STRING_STATE):
 	#line 198 "./.l"
 	{ printf("ERROR line#%d: no closing double quote\n", lastState); BEGIN(INITIAL); }
 		YY_BREAK
@@ -1296,7 +1296,7 @@ do_action:	/* This label is used only to access EOF actions. */
 	case 88:
 	YY_RULE_SETUP
 	#line 206 "./.l"
-	{ comment = ""; lastState = lineCounter + 1; BEGIN(COMMENT); }
+	{ comment = ""; lastState = lineCounter + 1; BEGIN(COMMENT_STATE); }
 		YY_BREAK
 	case 89:
 	YY_RULE_SETUP
@@ -1318,7 +1318,7 @@ do_action:	/* This label is used only to access EOF actions. */
 	#line 210 "./.l"
 	{ cout << "delimited_comment: " << comment << endl; BEGIN(INITIAL); }
 		YY_BREAK
-	case YY_STATE_EOF(COMMENT):
+	case YY_STATE_EOF(COMMENT_STATE):
 	#line 211 "./.l"
 	{ printf("ERROR line#%d: no closing delimited comment", lastState); BEGIN(INITIAL); }
 		YY_BREAK
