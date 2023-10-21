@@ -163,8 +163,6 @@ param_list: var_declarator
 
 stmt: ';'
     | expr ';'
-    | var_declarator ';'
-    | var_declarator '=' expr ';'
     | var_declarator_list ';'
     | if_stmt
     | while_stmt
@@ -192,8 +190,6 @@ return_stmt: RETURN ';'
 
 
 for_stmt: FOR '(' for_expr ';' for_expr ';' for_expr ')' stmt
-	    | FOR '(' var_declarator ';' for_expr ';' for_expr ')' stmt
-	    | FOR '(' var_declarator '=' expr ';' for_expr ';' for_expr ')' stmt
         | FOR '(' var_declarator_list ';' for_expr ';' for_expr ')' stmt
     	;
 
@@ -220,9 +216,10 @@ if_stmt: IF '(' expr ')' stmt %prec THEN
        ;
 
 
-var_declarator_list: var_declarator ',' expr
-                   | var_declarator '=' expr ',' expr
-                   | var_declarator_list ',' expr
+var_declarator_list: var_declarator
+                   | var_declarator '=' expr
+                   | var_declarator_list ',' ID
+                   | var_declarator_list ',' ID '=' expr
                    ;
 
 
