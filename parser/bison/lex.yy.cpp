@@ -801,147 +801,147 @@ do_action:	/* This label is used only to access EOF actions. */
 	case 2:
 	YY_RULE_SETUP
 	#line 35 "./.l"
-	{ cout << "keyword: virtual" << endl; }
+	{ return VIRTUAL; }
 		YY_BREAK
 	case 3:
 	YY_RULE_SETUP
 	#line 36 "./.l"
-	{ cout << "keyword: override" << endl; }
+	{ return OVERRIDE; }
 		YY_BREAK
 	case 4:
 	YY_RULE_SETUP
 	#line 38 "./.l"
-	{ cout << "keyword: base" << endl; }
+	{ return BASE; }
 		YY_BREAK
 	case 5:
 	YY_RULE_SETUP
 	#line 39 "./.l"
-	{ cout << "keyword: this" << endl; }
+	{ return THIS; }
 		YY_BREAK
 	case 6:
 	YY_RULE_SETUP
 	#line 40 "./.l"
-	{ cout << "keyword: class" << endl; }
+	{ return CLASS; }
 		YY_BREAK
 	case 7:
 	YY_RULE_SETUP
 	#line 41 "./.l"
-	{ cout << "keyword: namespace" << endl; }
+	{ return NAMESPACE; }
 		YY_BREAK
 	case 8:
 	YY_RULE_SETUP
 	#line 42 "./.l"
-	{ cout << "keyword: static" << endl; }
+	{ return STATIC; }
 		YY_BREAK
 	case 9:
 	YY_RULE_SETUP
 	#line 43 "./.l"
-	{ cout << "keyword: return" << endl; }
+	{ return RETURN; }
 		YY_BREAK
 	case 10:
 	YY_RULE_SETUP
 	#line 45 "./.l"
-	{ cout << "keyword: new" << endl; }
+	{ return NEW; }
 		YY_BREAK
 	case 11:
 	YY_RULE_SETUP
 	#line 46 "./.l"
-	{ cout << "keyword: as" << endl; }
+	{ return AS; }
 		YY_BREAK
 	case 12:
 	YY_RULE_SETUP
 	#line 47 "./.l"
-	{ cout << "keyword: is" << endl; }
+	{ return IS; }
 		YY_BREAK
 	case 13:
 	YY_RULE_SETUP
 	#line 48 "./.l"
-	{ cout << "keyword: in" << endl; }
+	{ return IN; }
 		YY_BREAK
 	case 14:
 	YY_RULE_SETUP
 	#line 50 "./.l"
-	{ cout << "keyword: public" << endl; }
+	{ return PUBLIC; }
 		YY_BREAK
 	case 15:
 	YY_RULE_SETUP
 	#line 51 "./.l"
-	{ cout << "keyword: internal" << endl; }
+	{ return INTERNAL; }
 		YY_BREAK
 	case 16:
 	YY_RULE_SETUP
 	#line 52 "./.l"
-	{ cout << "keyword: protected" << endl; }
+	{ return PROTECTED; }
 		YY_BREAK
 	case 17:
 	YY_RULE_SETUP
 	#line 53 "./.l"
-	{ cout << "keyword: private" << endl; }
+	{ return PRIVATE; }
 		YY_BREAK
 	case 18:
 	YY_RULE_SETUP
 	#line 55 "./.l"
-	{ cout << "keyword: do" << endl; }
+	{ return DO; }
 		YY_BREAK
 	case 19:
 	YY_RULE_SETUP
 	#line 56 "./.l"
-	{ cout << "keyword: if" << endl; }
+	{ return IF; }
 		YY_BREAK
 	case 20:
 	YY_RULE_SETUP
 	#line 57 "./.l"
-	{ cout << "keyword: else" << endl; }
+	{ return ELSE; }
 		YY_BREAK
 	case 21:
 	YY_RULE_SETUP
 	#line 58 "./.l"
-	{ cout << "keyword: for" << endl; }
+	{ return FOR; }
 		YY_BREAK
 	case 22:
 	YY_RULE_SETUP
 	#line 59 "./.l"
-	{ cout << "keyword: foreach" << endl; }
+	{ return FOREACH; }
 		YY_BREAK
 	case 23:
 	YY_RULE_SETUP
 	#line 60 "./.l"
-	{ cout << "keyword: while" << endl; }
+	{ return WHILE; }
 		YY_BREAK
 	case 24:
 	YY_RULE_SETUP
 	#line 62 "./.l"
-	{ cout << "keyword: void" << endl; }
+	{ return VOID; }
 		YY_BREAK
 	case 25:
 	YY_RULE_SETUP
 	#line 63 "./.l"
-	{ cout << "keyword: int" << endl; }
+	{ return INT; }
 		YY_BREAK
 	case 26:
 	YY_RULE_SETUP
 	#line 64 "./.l"
-	{ cout << "keyword: char" << endl; }
+	{ return CHAR; }
 		YY_BREAK
 	case 27:
 	YY_RULE_SETUP
 	#line 65 "./.l"
-	{ cout << "keyword: string" << endl; }
+	{ return STRING; }
 		YY_BREAK
 	case 28:
 	YY_RULE_SETUP
 	#line 66 "./.l"
-	{ cout << "keyword: bool" << endl; }
+	{ return BOOL; }
 		YY_BREAK
 	case 29:
 	YY_RULE_SETUP
 	#line 68 "./.l"
-	{ cout << "boolean_literal: true" << endl; }
+	{ yylval.boolean_literal = true; return BOOLEAN_LITERAL; }
 		YY_BREAK
 	case 30:
 	YY_RULE_SETUP
 	#line 69 "./.l"
-	{ cout << "boolean_literal: false" << endl; }
+	{ yylval.boolean_literal = false; return BOOLEAN_LITERAL; }
 		YY_BREAK
 	case 31:
 	YY_RULE_SETUP
@@ -961,122 +961,122 @@ do_action:	/* This label is used only to access EOF actions. */
 	case 33:
 	YY_RULE_SETUP
 	#line 81 "./.l"
-	{ cout << "curly_bracket_close" << endl; }
+	{ return '}'; }
 		YY_BREAK
 	case 34:
 	YY_RULE_SETUP
 	#line 82 "./.l"
-	{ cout << "square_brackets_open" << endl; }
+	{ return '['; }
 		YY_BREAK
 	case 35:
 	YY_RULE_SETUP
 	#line 83 "./.l"
-	{ cout << "square_brackets_close" << endl; }
+	{ return ']'; }
 		YY_BREAK
 	case 36:
 	YY_RULE_SETUP
 	#line 84 "./.l"
-	{ cout << "round_bracket_open" << endl; }
+	{ return '('; }
 		YY_BREAK
 	case 37:
 	YY_RULE_SETUP
 	#line 85 "./.l"
-	{ cout << "round_bracket_close" << endl; }
+	{ return ')'; }
 		YY_BREAK
 	case 38:
 	YY_RULE_SETUP
 	#line 87 "./.l"
-	{ cout << "dot" << endl; }
+	{ return '.'; }
 		YY_BREAK
 	case 39:
 	YY_RULE_SETUP
 	#line 88 "./.l"
-	{ cout << "comma" << endl; }
+	{ return ','; }
 		YY_BREAK
 	case 40:
 	YY_RULE_SETUP
 	#line 89 "./.l"
-	{ cout << "colon" << endl; }
+	{ return ':'; }
 		YY_BREAK
 	case 41:
 	YY_RULE_SETUP
 	#line 90 "./.l"
-	{ cout << "semicolon" << endl; }
+	{ return ';'; }
 		YY_BREAK
 	case 42:
 	YY_RULE_SETUP
 	#line 92 "./.l"
-	{ cout << "plus" << endl; }
+	{ return '+'; }
 		YY_BREAK
 	case 43:
 	YY_RULE_SETUP
 	#line 93 "./.l"
-	{ cout << "minus" << endl; }
+	{ return '-'; }
 		YY_BREAK
 	case 44:
 	YY_RULE_SETUP
 	#line 94 "./.l"
-	{ cout << "asterisk" << endl; }
+	{ return '*'; }
 		YY_BREAK
 	case 45:
 	YY_RULE_SETUP
 	#line 95 "./.l"
-	{ cout << "slash" << endl; }
+	{ return '/'; }
 		YY_BREAK
 	case 46:
 	YY_RULE_SETUP
 	#line 96 "./.l"
-	{ cout << "percent" << endl; }
+	{ return '%'; }
 		YY_BREAK
 	case 47:
 	YY_RULE_SETUP
 	#line 98 "./.l"
-	{ cout << "less" << endl; }
+	{ return '<'; }
 		YY_BREAK
 	case 48:
 	YY_RULE_SETUP
 	#line 99 "./.l"
-	{ cout << "greater" << endl; }
+	{ return '>'; }
 		YY_BREAK
 	case 49:
 	YY_RULE_SETUP
 	#line 100 "./.l"
-	{ cout << "less_equal" << endl; }
+	{ return LESS_EQUAL; }
 		YY_BREAK
 	case 50:
 	YY_RULE_SETUP
 	#line 101 "./.l"
-	{ cout << "greater_equal" << endl; }
+	{ return GREATER_EQUAL; }
 		YY_BREAK
 	case 51:
 	YY_RULE_SETUP
 	#line 102 "./.l"
-	{ cout << "equality" << endl; }
+	{ return EQUALITY; }
 		YY_BREAK
 	case 52:
 	YY_RULE_SETUP
 	#line 103 "./.l"
-	{ cout << "inequality" << endl; }
+	{ return INEQUALITY; }
 		YY_BREAK
 	case 53:
 	YY_RULE_SETUP
 	#line 105 "./.l"
-	{ cout << "assignment" << endl; }
+	{ return '='; }
 		YY_BREAK
 	case 54:
 	YY_RULE_SETUP
 	#line 107 "./.l"
-	{ cout << "inversion" << endl; }
+	{ return '!'; }
 		YY_BREAK
 	case 55:
 	YY_RULE_SETUP
 	#line 108 "./.l"
-	{ cout << "conjunction" << endl; }
+	{ return AND; }
 		YY_BREAK
 	case 56:
 	YY_RULE_SETUP
 	#line 109 "./.l"
-	{ cout << "disjunction" << endl; }
+	{ return OR; }
 		YY_BREAK
 	case 57:
 	YY_RULE_SETUP
@@ -1084,167 +1084,179 @@ do_action:	/* This label is used only to access EOF actions. */
 	{
 		buffer = yytext;
 		delete_underlines(buffer, digit);
-		printf("integer_literal: %d\n", atoi(digit));
+		yylval.int_literal = atoi(digit);
+		return INT_LITERAL;
 	}
 		YY_BREAK
 	case 58:
 	YY_RULE_SETUP
-	#line 118 "./.l"
+	#line 119 "./.l"
 	{
 		buffer = yytext;
 		printf("ERROR line#%d: invalid integer literal: %s\n", lineCounter + 1, buffer);
+		return -1;
 	}
 		YY_BREAK
 	case 59:
 	YY_RULE_SETUP
-	#line 123 "./.l"
+	#line 125 "./.l"
 	{
 		buffer = yytext + 2;
 		delete_underlines(buffer, digit);
 		char* a;
-		printf("hexadecimal_literal %d\n", strtol(digit, &a, 16));
+		yylval.int_literal = strtol(digit, &a, 16);
+		return INT_LITERAL;
 	}
 		YY_BREAK
 	case 60:
 	YY_RULE_SETUP
-	#line 130 "./.l"
+	#line 133 "./.l"
 	{
 		buffer = yytext;
 		printf("ERROR line#%d: invalid integer literal: %s\n", lineCounter + 1, buffer);
+		return -1;
 	}
 		YY_BREAK
 	case 61:
 	YY_RULE_SETUP
-	#line 135 "./.l"
+	#line 139 "./.l"
 	{
 		buffer = yytext + 2;
 		delete_underlines(buffer, digit);
 		char* a;
-		printf("binary_literal %d\n", strtol(digit, &a, 2));
+		yylval.int_literal = strtol(digit, &a, 2);
+		return INT_LITERAL;
+
 	}
 		YY_BREAK
 	case 62:
 	YY_RULE_SETUP
-	#line 142 "./.l"
+	#line 148 "./.l"
 	{
 		buffer = yytext;
 		printf("ERROR line#%d: invalid integer literal: %s\n", lineCounter + 1, buffer);
+		return -1;
 	}
 		YY_BREAK
 	case 63:
 	YY_RULE_SETUP
-	#line 147 "./.l"
+	#line 154 "./.l"
 	{ literal = ""; lastState = lineCounter + 1; BEGIN(CHAR_STATE); }
 		YY_BREAK
 	case 64:
 	YY_RULE_SETUP
-	#line 148 "./.l"
+	#line 155 "./.l"
 	{ literal += yytext; }
 		YY_BREAK
 	case 65:
 	YY_RULE_SETUP
-	#line 149 "./.l"
-	{ printf("ERROR line#%d: incorrect character in a char literal\n", lineCounter + 1); lineCounter++; }
+	#line 156 "./.l"
+	{ printf("ERROR line#%d: incorrect character in a char literal\n", lineCounter + 1); lineCounter++; return -1; }
 		YY_BREAK
 	case 66:
 	YY_RULE_SETUP
-	#line 150 "./.l"
+	#line 157 "./.l"
 	{
-		if (literal.size() == 0)
+		if (literal.size() == 0) {
 			printf("ERROR line#%d: empty char literal\n", lineCounter + 1);
-		else if (literal.size() == 1)
-			printf("char_literal: %c\n", literal[0]);
-		else
+			return -1;
+		}
+		else if (literal.size() == 1) {
+			yylval.char_literal = literal[0];
+			return CHAR_LITERAL;
+		}
+		else {
 			printf("ERROR line#%d: too long char literal: %s\n", lineCounter + 1, literal.data());
-		BEGIN(INITIAL);
+			return -1;
+		}
 	}
 		YY_BREAK
 	case YY_STATE_EOF(CHAR_STATE):
-	#line 159 "./.l"
-	{ printf("ERROR line#%d: no closing single quote\n", lastState); BEGIN(INITIAL); }
+	#line 171 "./.l"
+	{ printf("ERROR line#%d: no closing single quote\n", lastState); return -1; }
 		YY_BREAK
 	case 67:
 	YY_RULE_SETUP
-	#line 161 "./.l"
+	#line 173 "./.l"
 	{ literal = ""; lastState = lineCounter + 1; BEGIN(STRING_STATE); }
 		YY_BREAK
 	case 68:
 	YY_RULE_SETUP
-	#line 162 "./.l"
+	#line 174 "./.l"
 	{ literal += yytext; }
 		YY_BREAK
 	case 69:
 	YY_RULE_SETUP
-	#line 163 "./.l"
-	{ printf("ERROR line#%d: incorrect character in a string literal\n", lineCounter + 1); lineCounter++; }
+	#line 175 "./.l"
+	{ printf("ERROR line#%d: incorrect character in a string literal\n", lineCounter + 1); lineCounter++; return -1; }
 		YY_BREAK
 	case 70:
 	YY_RULE_SETUP
-	#line 164 "./.l"
-	{ cout << "string_literal: " + literal << endl; BEGIN(INITIAL); }
+	#line 176 "./.l"
+	{ yylval.string_literal = new string(literal); return STRING_LITERAL; }
 		YY_BREAK
 	case YY_STATE_EOF(STRING_STATE):
-	#line 165 "./.l"
-	{ printf("ERROR line#%d: no closing double quote\n", lastState); BEGIN(INITIAL); }
+	#line 177 "./.l"
+	{ printf("ERROR line#%d: no closing double quote\n", lastState); return -1; }
 		YY_BREAK
 	case 71:
 	YY_RULE_SETUP
-	#line 167 "./.l"
+	#line 179 "./.l"
 	{ literal.push_back('\''); }
 		YY_BREAK
 	case 72:
 	YY_RULE_SETUP
-	#line 168 "./.l"
+	#line 180 "./.l"
 	{ literal.push_back('\"'); }
 		YY_BREAK
 	case 73:
 	YY_RULE_SETUP
-	#line 169 "./.l"
+	#line 181 "./.l"
 	{ literal.push_back('\\'); }
 		YY_BREAK
 	case 74:
 	YY_RULE_SETUP
-	#line 170 "./.l"
+	#line 182 "./.l"
 	{ literal.push_back('\0'); }
 		YY_BREAK
 	case 75:
 	YY_RULE_SETUP
-	#line 171 "./.l"
+	#line 183 "./.l"
 	{ literal.push_back('\a'); }
 		YY_BREAK
 	case 76:
 	YY_RULE_SETUP
-	#line 172 "./.l"
+	#line 184 "./.l"
 	{ literal.push_back('\b'); }
 		YY_BREAK
 	case 77:
 	YY_RULE_SETUP
-	#line 173 "./.l"
+	#line 185 "./.l"
 	{ literal.push_back('\f'); }
 		YY_BREAK
 	case 78:
 	YY_RULE_SETUP
-	#line 174 "./.l"
+	#line 186 "./.l"
 	{ literal.push_back('\n'); }
 		YY_BREAK
 	case 79:
 	YY_RULE_SETUP
-	#line 175 "./.l"
+	#line 187 "./.l"
 	{ literal.push_back('\r'); }
 		YY_BREAK
 	case 80:
 	YY_RULE_SETUP
-	#line 176 "./.l"
+	#line 188 "./.l"
 	{ literal.push_back('\t'); }
 		YY_BREAK
 	case 81:
 	YY_RULE_SETUP
-	#line 177 "./.l"
+	#line 189 "./.l"
 	{ literal.push_back('\v'); }
 		YY_BREAK
 	case 82:
 	YY_RULE_SETUP
-	#line 178 "./.l"
+	#line 190 "./.l"
 	{
 		buffer = yytext + 2;
 		char* a;
@@ -1254,220 +1266,218 @@ do_action:	/* This label is used only to access EOF actions. */
 		}
 		else {
 			printf("ERROR line%d: unsupported character 0x%s\n", lineCounter + 1, buffer);
+			return -1;
 		}
 	}
 		YY_BREAK
 	case 83:
 	YY_RULE_SETUP
-	#line 190 "./.l"
+	#line 203 "./.l"
 	{ literal = ""; lastState = lineCounter + 1; BEGIN(VERBATIM_STRING_STATE); }
 		YY_BREAK
 	case 84:
 	YY_RULE_SETUP
-	#line 191 "./.l"
+	#line 204 "./.l"
 	{ literal += yytext; }
 		YY_BREAK
 	case 85:
 	YY_RULE_SETUP
-	#line 192 "./.l"
+	#line 205 "./.l"
 	{ literal.push_back('\"'); }
 		YY_BREAK
 	case 86:
 	YY_RULE_SETUP
-	#line 193 "./.l"
-	{ cout << "string_literal: " + literal << endl; BEGIN(INITIAL); }
+	#line 206 "./.l"
+	{ yylval.string_literal = new string(literal); return STRING_LITERAL; }
 		YY_BREAK
 	case YY_STATE_EOF(VERBATIM_STRING_STATE):
-	#line 194 "./.l"
-	{ printf("ERROR line#%d: no closing double quote\n", lastState); BEGIN(INITIAL); }
+	#line 207 "./.l"
+	{ printf("ERROR line#%d: no closing double quote\n", lastState); return -1; }
 		YY_BREAK
 	case 87:
 	YY_RULE_SETUP
-	#line 197 "./.l"
-	{
-		buffer = yytext + 2;
-		printf("single_line_comment: %s\n", buffer);
-	}
-		YY_BREAK
-	case 88:
-	YY_RULE_SETUP
-	#line 202 "./.l"
-	{ comment = ""; lastState = lineCounter + 1; BEGIN(COMMENT_STATE); }
-		YY_BREAK
-	case 89:
-	YY_RULE_SETUP
-	#line 203 "./.l"
-	{ comment += yytext; }
-		YY_BREAK
-	case 90:
-	YY_RULE_SETUP
-	#line 204 "./.l"
-	{ comment += yytext; }
-		YY_BREAK
-	case 91:
-	YY_RULE_SETUP
-	#line 205 "./.l"
-	{ comment.push_back('\n'); lineCounter++; }
-		YY_BREAK
-	case 92:
-	YY_RULE_SETUP
-	#line 206 "./.l"
-	{ cout << "delimited_comment: " << comment << endl; BEGIN(INITIAL); }
-		YY_BREAK
-	case YY_STATE_EOF(COMMENT_STATE):
-	#line 207 "./.l"
-	{ printf("ERROR line#%d: no closing delimited comment", lastState); BEGIN(INITIAL); }
-		YY_BREAK
-	case 93:
-	YY_RULE_SETUP
 	#line 210 "./.l"
-	{ lineCounter++; }
-		YY_BREAK
-	case 94:
-	YY_RULE_SETUP
-	#line 212 "./.l"
-	{ /* eat up whitespace */ }
-		YY_BREAK
-	case 95:
-	YY_RULE_SETUP
-	#line 214 "./.l"
-	{ printf("ERROR line#%d: unrecognized character: %s\n", lineCounter + 1, yytext); }
-		YY_BREAK
-	case 96:
-	YY_RULE_SETUP
-	#line 216 "./.l"
-	ECHO;
-		YY_BREAK
-	#line 1343 "lex.yy.c"
-	case YY_STATE_EOF(INITIAL):
-		yyterminate();
+		/* eat up single line comments */
+			YY_BREAK
+		case 88:
+		YY_RULE_SETUP
+		#line 212 "./.l"
+		{ comment = ""; lastState = lineCounter + 1; BEGIN(COMMENT_STATE); }
+			YY_BREAK
+		case 89:
+		YY_RULE_SETUP
+		#line 213 "./.l"
+		{ comment += yytext; }
+			YY_BREAK
+		case 90:
+		YY_RULE_SETUP
+		#line 214 "./.l"
+		{ comment += yytext; }
+			YY_BREAK
+		case 91:
+		YY_RULE_SETUP
+		#line 215 "./.l"
+		{ comment.push_back('\n'); lineCounter++; }
+			YY_BREAK
+		case 92:
+		YY_RULE_SETUP
+		#line 216 "./.l"
+		{ BEGIN(INITIAL); }
+			YY_BREAK
+		case YY_STATE_EOF(COMMENT_STATE):
+		#line 217 "./.l"
+		{ printf("ERROR line#%d: no closing delimited comment", lastState); return -1; }
+			YY_BREAK
+		case 93:
+		YY_RULE_SETUP
+		#line 220 "./.l"
+		{ lineCounter++; }
+			YY_BREAK
+		case 94:
+		YY_RULE_SETUP
+		#line 222 "./.l"
+		{ /* eat up whitespace */ }
+			YY_BREAK
+		case 95:
+		YY_RULE_SETUP
+		#line 224 "./.l"
+		{ printf("ERROR line#%d: unrecognized character: %s\n", lineCounter + 1, yytext); return -1; }
+			YY_BREAK
+		case 96:
+		YY_RULE_SETUP
+		#line 226 "./.l"
+		ECHO;
+			YY_BREAK
+		#line 1353 "lex.yy.c"
+		case YY_STATE_EOF(INITIAL):
+			yyterminate();
 
-		case YY_END_OF_BUFFER:
-			{
-			/* Amount of text matched not including the EOB char. */
-			int yy_amount_of_matched_text = (int)(yy_cp - yytext_ptr) - 1;
-
-			/* Undo the effects of YY_DO_BEFORE_ACTION. */
-			*yy_cp = yy_hold_char;
-
-			if (yy_current_buffer->yy_buffer_status == YY_BUFFER_NEW)
+			case YY_END_OF_BUFFER:
 				{
-				/* We're scanning a new file or input source.  It's
-				 * possible that this happened because the user
-				 * just pointed yyin at a new source and called
-				 * yylex().  If so, then we have to assure
-				 * consistency between yy_current_buffer and our
-				 * globals.  Here is the right place to do so, because
-				 * this is the first action (other than possibly a
-				 * back-up) that will match for the new input source.
-				 */
-				yy_n_chars = yy_current_buffer->yy_n_chars;
-				yy_current_buffer->yy_input_file = yyin;
-				yy_current_buffer->yy_buffer_status = YY_BUFFER_NORMAL;
-				}
+				/* Amount of text matched not including the EOB char. */
+				int yy_amount_of_matched_text = (int)(yy_cp - yytext_ptr) - 1;
 
-			/* Note that here we test for yy_c_buf_p "<=" to the position
-			 * of the first EOB in the buffer, since yy_c_buf_p will
-			 * already have been incremented past the NUL character
-			 * (since all states make transitions on EOB to the
-			 * end-of-buffer state).  Contrast this with the test
-			 * in input().
-			 */
-			if (yy_c_buf_p <= &yy_current_buffer->yy_ch_buf[yy_n_chars])
-				{ /* This was really a NUL. */
-				yy_state_type yy_next_state;
+				/* Undo the effects of YY_DO_BEFORE_ACTION. */
+				*yy_cp = yy_hold_char;
 
-				yy_c_buf_p = yytext_ptr + yy_amount_of_matched_text;
-
-				yy_current_state = yy_get_previous_state();
-
-				/* Okay, we're now positioned to make the NUL
-				 * transition.  We couldn't have
-				 * yy_get_previous_state() go ahead and do it
-				 * for us because it doesn't know how to deal
-				 * with the possibility of jamming (and we don't
-				 * want to build jamming into it because then it
-				 * will run more slowly).
-				 */
-
-				yy_next_state = yy_try_NUL_trans(yy_current_state);
-
-				yy_bp = yytext_ptr + YY_MORE_ADJ;
-
-				if (yy_next_state)
+				if (yy_current_buffer->yy_buffer_status == YY_BUFFER_NEW)
 					{
-					/* Consume the NUL. */
-					yy_cp = ++yy_c_buf_p;
-					yy_current_state = yy_next_state;
-					goto yy_match;
+					/* We're scanning a new file or input source.  It's
+					 * possible that this happened because the user
+					 * just pointed yyin at a new source and called
+					 * yylex().  If so, then we have to assure
+					 * consistency between yy_current_buffer and our
+					 * globals.  Here is the right place to do so, because
+					 * this is the first action (other than possibly a
+					 * back-up) that will match for the new input source.
+					 */
+					yy_n_chars = yy_current_buffer->yy_n_chars;
+					yy_current_buffer->yy_input_file = yyin;
+					yy_current_buffer->yy_buffer_status = YY_BUFFER_NORMAL;
 					}
 
-				else
-					{
-					yy_cp = yy_c_buf_p;
-					goto yy_find_action;
-					}
-				}
+				/* Note that here we test for yy_c_buf_p "<=" to the position
+				 * of the first EOB in the buffer, since yy_c_buf_p will
+				 * already have been incremented past the NUL character
+				 * (since all states make transitions on EOB to the
+				 * end-of-buffer state).  Contrast this with the test
+				 * in input().
+				 */
+				if (yy_c_buf_p <= &yy_current_buffer->yy_ch_buf[yy_n_chars])
+					{ /* This was really a NUL. */
+					yy_state_type yy_next_state;
 
-			else switch (yy_get_next_buffer())
-				{
-				case EOB_ACT_END_OF_FILE:
-					{
-					yy_did_buffer_switch_on_eof = 0;
+					yy_c_buf_p = yytext_ptr + yy_amount_of_matched_text;
 
-					if (yywrap())
+					yy_current_state = yy_get_previous_state();
+
+					/* Okay, we're now positioned to make the NUL
+					 * transition.  We couldn't have
+					 * yy_get_previous_state() go ahead and do it
+					 * for us because it doesn't know how to deal
+					 * with the possibility of jamming (and we don't
+					 * want to build jamming into it because then it
+					 * will run more slowly).
+					 */
+
+					yy_next_state = yy_try_NUL_trans(yy_current_state);
+
+					yy_bp = yytext_ptr + YY_MORE_ADJ;
+
+					if (yy_next_state)
 						{
-						/* Note: because we've taken care in
-						 * yy_get_next_buffer() to have set up
-						 * yytext, we can now set up
-						 * yy_c_buf_p so that if some total
-						 * hoser (like flex itself) wants to
-						 * call the scanner after we return the
-						 * YY_NULL, it'll still work - another
-						 * YY_NULL will get returned.
-						 */
-						yy_c_buf_p = yytext_ptr + YY_MORE_ADJ;
-
-						yy_act = YY_STATE_EOF(YY_START);
-						goto do_action;
+						/* Consume the NUL. */
+						yy_cp = ++yy_c_buf_p;
+						yy_current_state = yy_next_state;
+						goto yy_match;
 						}
 
 					else
 						{
-						if (!yy_did_buffer_switch_on_eof)
-							YY_NEW_FILE;
+						yy_cp = yy_c_buf_p;
+						goto yy_find_action;
 						}
-					break;
 					}
 
-				case EOB_ACT_CONTINUE_SCAN:
-					yy_c_buf_p =
-						yytext_ptr + yy_amount_of_matched_text;
+				else switch (yy_get_next_buffer())
+					{
+					case EOB_ACT_END_OF_FILE:
+						{
+						yy_did_buffer_switch_on_eof = 0;
 
-					yy_current_state = yy_get_previous_state();
+						if (yywrap())
+							{
+							/* Note: because we've taken care in
+							 * yy_get_next_buffer() to have set up
+							 * yytext, we can now set up
+							 * yy_c_buf_p so that if some total
+							 * hoser (like flex itself) wants to
+							 * call the scanner after we return the
+							 * YY_NULL, it'll still work - another
+							 * YY_NULL will get returned.
+							 */
+							yy_c_buf_p = yytext_ptr + YY_MORE_ADJ;
 
-					yy_cp = yy_c_buf_p;
-					yy_bp = yytext_ptr + YY_MORE_ADJ;
-					goto yy_match;
+							yy_act = YY_STATE_EOF(YY_START);
+							goto do_action;
+							}
 
-				case EOB_ACT_LAST_MATCH:
-					yy_c_buf_p =
-					&yy_current_buffer->yy_ch_buf[yy_n_chars];
+						else
+							{
+							if (!yy_did_buffer_switch_on_eof)
+								YY_NEW_FILE;
+							}
+						break;
+						}
 
-					yy_current_state = yy_get_previous_state();
+					case EOB_ACT_CONTINUE_SCAN:
+						yy_c_buf_p =
+							yytext_ptr + yy_amount_of_matched_text;
 
-					yy_cp = yy_c_buf_p;
-					yy_bp = yytext_ptr + YY_MORE_ADJ;
-					goto yy_find_action;
+						yy_current_state = yy_get_previous_state();
+
+						yy_cp = yy_c_buf_p;
+						yy_bp = yytext_ptr + YY_MORE_ADJ;
+						goto yy_match;
+
+					case EOB_ACT_LAST_MATCH:
+						yy_c_buf_p =
+						&yy_current_buffer->yy_ch_buf[yy_n_chars];
+
+						yy_current_state = yy_get_previous_state();
+
+						yy_cp = yy_c_buf_p;
+						yy_bp = yytext_ptr + YY_MORE_ADJ;
+						goto yy_find_action;
+					}
+				break;
 				}
-			break;
-			}
 
-		default:
-			YY_FATAL_ERROR(
-				"fatal flex scanner internal error--no action found");
-		} /* end of action switch */
-			} /* end of scanning one token */
+			default:
+				YY_FATAL_ERROR(
+					"fatal flex scanner internal error--no action found");
+			} /* end of action switch */
+				} /* end of scanning one token */
 } /* end of yylex */
 
 
@@ -2198,7 +2208,7 @@ int main()
 	return 0;
 }
 #endif
-#line 216 "./.l"
+#line 226 "./.l"
 
 
 void delete_underlines(char* str, char* newStr)

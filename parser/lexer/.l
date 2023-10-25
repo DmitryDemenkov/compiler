@@ -32,41 +32,41 @@ char digit[1024] = "";
 %}
 
 abstract  { return ABSTRACT; }
-virtual   { cout << "keyword: virtual" << endl; }
-override  { cout << "keyword: override" << endl; }
+virtual   { return VIRTUAL; }
+override  { return OVERRIDE; }
 
-base      { cout << "keyword: base" << endl; }
-this      { cout << "keyword: this" << endl; }
-class     { cout << "keyword: class" << endl; }
-namespace { cout << "keyword: namespace" << endl; }
-static    { cout << "keyword: static" << endl; }
-return    { cout << "keyword: return" << endl; }
+base      { return BASE; }
+this      { return THIS; }
+class     { return CLASS; }
+namespace { return NAMESPACE; }
+static    { return STATIC; }
+return    { return RETURN; }
 
-new       { cout << "keyword: new" << endl; }
-as        { cout << "keyword: as" << endl; }
-is        { cout << "keyword: is" << endl; }
-in        { cout << "keyword: in" << endl; }
+new       { return NEW; }
+as        { return AS; }
+is        { return IS; }
+in        { return IN; }
 
-public    { cout << "keyword: public" << endl; }
-internal  { cout << "keyword: internal" << endl; }
-protected { cout << "keyword: protected" << endl; }
-private   { cout << "keyword: private" << endl; }
+public    { return PUBLIC; }
+internal  { return INTERNAL; }
+protected { return PROTECTED; }
+private   { return PRIVATE; }
 
-do        { cout << "keyword: do" << endl; }
-if        { cout << "keyword: if" << endl; }
-else      { cout << "keyword: else" << endl; }
-for       { cout << "keyword: for" << endl; }
-foreach   { cout << "keyword: foreach" << endl; }
-while     { cout << "keyword: while" << endl; }
+do        { return DO; }
+if        { return IF; }
+else      { return ELSE; }
+for       { return FOR; }
+foreach   { return FOREACH; }
+while     { return WHILE; }
 
-void      { cout << "keyword: void" << endl; }
-int       { cout << "keyword: int" << endl; }
-char      { cout << "keyword: char" << endl; }
-string    { cout << "keyword: string" << endl; }
-bool      { cout << "keyword: bool" << endl; }
+void      { return VOID; }
+int       { return INT; }
+char      { return CHAR; }
+string    { return STRING; }
+bool      { return BOOL; }
 
-true      { cout << "boolean_literal: true" << endl; }
-false     { cout << "boolean_literal: false" << endl; }
+true      { yylval.boolean_literal = true; return BOOLEAN_LITERAL; }
+false     { yylval.boolean_literal = false; return BOOLEAN_LITERAL; }
 
 
 \@?{ID} { 
@@ -78,91 +78,103 @@ false     { cout << "boolean_literal: false" << endl; }
 
 
 "{"  { return '{'; }
-"}"  { cout << "curly_bracket_close" << endl; }
-"["  { cout << "square_brackets_open" << endl; }
-"]"  { cout << "square_brackets_close" << endl; }
-"("  { cout << "round_bracket_open" << endl; }
-")"  { cout << "round_bracket_close" << endl; }
+"}"  { return '}'; }
+"["  { return '['; }
+"]"  { return ']'; }
+"("  { return '('; }
+")"  { return ')'; }
 
-"."  { cout << "dot" << endl; }
-","  { cout << "comma" << endl; }
-":"  { cout << "colon" << endl; }
-";"  { cout << "semicolon" << endl; }
+"."  { return '.'; }
+","  { return ','; }
+":"  { return ':'; }
+";"  { return ';'; }
 
-"+"  { cout << "plus" << endl; }
-"-"  { cout << "minus" << endl; }
-"*"  { cout << "asterisk" << endl; }
-"/"  { cout << "slash" << endl; }
-"%"  { cout << "percent" << endl; }
+"+"  { return '+'; }
+"-"  { return '-'; }
+"*"  { return '*'; }
+"/"  { return '/'; }
+"%"  { return '%'; }
 
-"<"  { cout << "less" << endl; }
-">"  { cout << "greater" << endl; }
-"<=" { cout << "less_equal" << endl; }
-">=" { cout << "greater_equal" << endl; }
-"==" { cout << "equality" << endl; }
-"!=" { cout << "inequality" << endl; }
+"<"  { return '<'; }
+">"  { return '>'; }
+"<=" { return LESS_EQUAL;}
+">=" { return GREATER_EQUAL;}
+"==" { return EQUALITY;}
+"!=" { return INEQUALITY;}
 
-"="  { cout << "assignment" << endl; }
+"="  { return '='; }
 
-"!"  { cout << "inversion" << endl; }
-"&&" { cout << "conjunction" << endl; }
-"||" { cout << "disjunction" << endl; }
+"!"  { return '!'; }
+"&&" { return AND; }
+"||" { return OR; }
 
 
 {DIGIT}(_*{DIGIT})* {
     buffer = yytext;
     delete_underlines(buffer, digit);
-    printf( "integer_literal: %d\n", atoi(digit) ); 
+	yylval.int_literal = atoi(digit);
+	return INT_LITERAL;
 }
 
 {DIGIT}(_*{DIGIT})*_+ {
     buffer = yytext;
-    printf( "ERROR line#%d: invalid integer literal: %s\n", lineCounter+1, buffer ); 
+	printf( "ERROR line#%d: invalid integer literal: %s\n", lineCounter+1, buffer ); 
+	return -1;
 }
 
 (0x|0X)(_*{HEX_DIGIT})+ {
     buffer = yytext + 2;
     delete_underlines(buffer, digit);
     char* a;
-    printf( "hexadecimal_literal %d\n", strtol(digit, &a, 16) );
+	yylval.int_literal = strtol(digit, &a, 16);
+	return INT_LITERAL;
 }
 
 (0x|0X)(_*{HEX_DIGIT})*_* {
     buffer = yytext;
-    printf( "ERROR line#%d: invalid integer literal: %s\n", lineCounter+1, buffer ); 
+    printf( "ERROR line#%d: invalid integer literal: %s\n", lineCounter+1, buffer );
+	return -1;
 }
 
 (0b|0B)(_*{BIN_DIGIT})+ {
     buffer = yytext + 2;
     delete_underlines(buffer, digit);
     char* a;
-    printf( "binary_literal %d\n", strtol(digit, &a, 2) );
+	yylval.int_literal = strtol(digit, &a, 2);
+	return INT_LITERAL;
+	
 }
 
 (0b|0B)(_*{BIN_DIGIT})*_* {
     buffer = yytext;
     printf( "ERROR line#%d: invalid integer literal: %s\n", lineCounter+1, buffer ); 
+	return -1;
 }
 
 \' { literal = ""; lastState = lineCounter+1; BEGIN(CHAR_STATE); }
 <CHAR_STATE>[^\'\\\r\n]+ { literal += yytext; }
-<CHAR_STATE>[\r\n] { printf("ERROR line#%d: incorrect character in a char literal\n", lineCounter+1); lineCounter++; }
+<CHAR_STATE>[\r\n] { printf("ERROR line#%d: incorrect character in a char literal\n", lineCounter+1); lineCounter++; return -1; }
 <CHAR_STATE>\' {
-    if (literal.size() == 0)
+    if (literal.size() == 0) {
         printf("ERROR line#%d: empty char literal\n", lineCounter+1);
-    else if (literal.size() == 1) 
-        printf("char_literal: %c\n", literal[0]);
-    else
+		return -1;
+    }
+    else if (literal.size() == 1) {
+		yylval.char_literal = literal[0];
+		return CHAR_LITERAL;
+    }
+    else {
         printf("ERROR line#%d: too long char literal: %s\n", lineCounter+1, literal.data()); 
-    BEGIN(INITIAL); 
+		return -1; 
+    }
 }
-<CHAR_STATE><<EOF>> { printf("ERROR line#%d: no closing single quote\n", lastState); BEGIN(INITIAL); }
+<CHAR_STATE><<EOF>> { printf("ERROR line#%d: no closing single quote\n", lastState); return -1; }
 
 \" { literal = ""; lastState = lineCounter+1; BEGIN(STRING_STATE); }
 <STRING_STATE>[^\"\\\r\n]+ { literal += yytext; }
-<STRING_STATE>[\r\n] { printf("ERROR line#%d: incorrect character in a string literal\n", lineCounter+1); lineCounter++; }
-<STRING_STATE>\" { cout << "string_literal: " + literal << endl; BEGIN(INITIAL); }
-<STRING_STATE><<EOF>> { printf("ERROR line#%d: no closing double quote\n", lastState); BEGIN(INITIAL); }
+<STRING_STATE>[\r\n] { printf("ERROR line#%d: incorrect character in a string literal\n", lineCounter+1); lineCounter++; return -1; }
+<STRING_STATE>\" { yylval.string_literal = new string(literal); return STRING_LITERAL; }
+<STRING_STATE><<EOF>> { printf("ERROR line#%d: no closing double quote\n", lastState); return -1; }
 
 <STRING_STATE,CHAR_STATE>\\\'  { literal.push_back('\''); }
 <STRING_STATE,CHAR_STATE>\\\"  { literal.push_back('\"'); }
@@ -184,34 +196,32 @@ false     { cout << "boolean_literal: false" << endl; }
     }
     else{
         printf("ERROR line%d: unsupported character 0x%s\n", lineCounter+1, buffer);
+		return -1;
     }
 }
 
 \@\" { literal = ""; lastState = lineCounter+1; BEGIN(VERBATIM_STRING_STATE); }
 <VERBATIM_STRING_STATE>[^\"]+ { literal += yytext; }
 <VERBATIM_STRING_STATE>\"\"   { literal.push_back('\"'); }
-<VERBATIM_STRING_STATE>\" { cout << "string_literal: " + literal << endl; BEGIN(INITIAL); }
-<VERBATIM_STRING_STATE><<EOF>> { printf("ERROR line#%d: no closing double quote\n", lastState); BEGIN(INITIAL); }
+<VERBATIM_STRING_STATE>\" { yylval.string_literal = new string(literal); return STRING_LITERAL; }
+<VERBATIM_STRING_STATE><<EOF>> { printf("ERROR line#%d: no closing double quote\n", lastState); return -1; }
 
 
-"//"[^\r\n]* {
-    buffer = yytext + 2; 
-    printf("single_line_comment: %s\n", buffer);
-}
+"//"[^\r\n]* /* eat up single line comments */
 
 "/*" { comment = ""; lastState = lineCounter+1; BEGIN(COMMENT_STATE); }
 <COMMENT_STATE>[^*\r\n]*       { comment += yytext; }
 <COMMENT_STATE>"*"+[^*\/\r\n]* { comment += yytext; }
 <COMMENT_STATE>[\r\n]          { comment.push_back('\n'); lineCounter++; }
-<COMMENT_STATE>"*"+"/"         { cout << "delimited_comment: " << comment << endl; BEGIN(INITIAL); }
-<COMMENT_STATE><<EOF>>         { printf("ERROR line#%d: no closing delimited comment", lastState); BEGIN(INITIAL); }
+<COMMENT_STATE>"*"+"/"         { BEGIN(INITIAL); }
+<COMMENT_STATE><<EOF>>         { printf("ERROR line#%d: no closing delimited comment", lastState); return -1; }
 
 
 [\r\n] { lineCounter++; }
 
 [ \t]+ { /* eat up whitespace */ }
 
-. { printf( "ERROR line#%d: unrecognized character: %s\n", lineCounter+1, yytext ); }
+. { printf( "ERROR line#%d: unrecognized character: %s\n", lineCounter+1, yytext ); return -1; }
 
 %%
 
