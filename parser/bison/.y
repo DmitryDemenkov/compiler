@@ -1,6 +1,18 @@
 %{
-/* Prologue */
+#include <iostream>
+void yyerror(char const* s);
+extern int yylex(void);
+
+using namespace std;
 %}
+
+%union {
+    int int_literal;
+    char char_literal;
+    bool boolean_literal;
+    string *string_literal;
+    string *identifier;
+}
 
 %token ABSTRACT 
 %token VIRTUAL 
@@ -390,4 +402,8 @@ type_name: ID
 
 
 %%
-/* Code */
+
+void yyerror(char const* s)
+{
+    cout << s << endl;
+}
