@@ -362,17 +362,17 @@ obj_creation_expr: NEW type '(' argm_list_em ')'
                  ;
                  
 
-obj_initializer: '{' member_initializer_list_em '}' { $$ = ObjectInitializer::ObjectInitializer(initializers); }
+obj_initializer: '{' member_initializer_list_em '}' { $$ = new ObjectInitializer::ObjectInitializer(initializers); }
                | '{' member_initializer_list ',' '}' { $$ = ObjectInitializer::ObjectInitializer(initializers); }
                ;
 
 
 member_initializer_list_em: /* empty */ { $$ = null; }
-                          | member_initializer_list { $$ = MemberInitializerList::MemberInitializerList(memberInitializer); }
+                          | member_initializer_list { $$ = new MemberInitializerList::MemberInitializerList(MemberInitializerList); }
                           ;
 
 
-member_initializer_list: member_initializer { $$ = MemberInitializerList::MemberInitializerList(memberInitializer); }
+member_initializer_list: member_initializer { $$ = new MemberInitializerList::MemberInitializerList(memberInitializer); }
                        | member_initializer_list ',' member_initializer { $$ = MemberInitializerList::Append(list, memberInitializer); }
                        ;
 
@@ -385,34 +385,34 @@ member_initializer: ID '=' expr { $$ = MemberInitializer::MemberInitializer(iden
 
 
 argm_list_em: /* empty */ { $$ = null; }
-            | argm_list { $$ = $1; }
+            | argm_list { $$ = new ArgumentList::ArgumentList(ArgumentList);}
             ;
 
 
-argm_list: argm { $$ = $1; } { $$ = ArgumentList::ArgumentList(list, argument);}
+argm_list: argm { $$ = new ArgumentList::ArgumentList(argument);}
          | argm_list ',' argm { $$ = ArgumentList::Append(list, argument);}
          ;
 
 
-argm: expr { $$ = Argument::Argument(expression,identifier); }
+argm: expr { $$ = new Argument::Argument(expression,identifier); }
     | ID ':' expr { $$ = Argument::Argument(expression,identifier); }
     ;
 
 
-array_type: type '[' ']'
+array_type: type '[' ']' { $$ = new ArrayType::ArrayType(SimpleType); }
           | type_name '[' ']' { $$ = ArrayType::ArrayType(t_TYPE_NAME); }
           ;
 
 
-type: INT { $$ = SimpleType::SimpleType(t_INT);}
-    | CHAR { $$ = SimpleType::SimpleType(t_CHAR);}
-    | STRING { $$ = SimpleType::SimpleType(t_STRING);}
-    | BOOL { $$ = SimpleType::SimpleType(t_BOOL);}
+type: INT { $$ = new SimpleType::SimpleType(t_INT);}
+    | CHAR { $$ = new SimpleType::SimpleType(t_CHAR);}
+    | STRING { $$ = new SimpleType::SimpleType(t_STRING);}
+    | BOOL { $$ = new SimpleType::SimpleType(t_BOOL);}
     ;
 
 
-type_name: ID { $$ = $1; }
-         | type_name '.' ID { $$ = TypeName::TypeName(identifier); }
+type_name: ID { $$ = new TypeName::TypeName(identifier); }
+         | type_name '.' ID { $$ = TypeName::Append(SimpleType,identifier); }
          ;
 
 
