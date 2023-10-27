@@ -12,7 +12,6 @@ using namespace std;
     bool boolean_literal;
     string *string_literal;
     string *identifier;
-	string* name;
 	SimpleType* SimpleType;
 	TypeName* TypeName;
 	ArrayType* ArrayType;
