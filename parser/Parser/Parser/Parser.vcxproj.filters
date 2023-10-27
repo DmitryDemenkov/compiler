@@ -21,9 +21,15 @@
     <ClCompile Include="..\..\bison\_tab.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\bison\classes.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\bison\_tab.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\bison\classes.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
