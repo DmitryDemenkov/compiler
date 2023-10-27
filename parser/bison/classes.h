@@ -64,8 +64,8 @@ class Argument
 {
 public:
     int id;
-    string* identifier;
-    Expression* expression;
+    string* identifier = NULL;
+    Expression* expression = NULL;
 
     Argument(Expression* expression, string* identifier = NULL);
 
@@ -76,7 +76,7 @@ class ArgumentList
 {
 public:
     int id;
-    list<Argument*>* arguments;
+    list<Argument*>* arguments = NULL;
 
     ArgumentList(Argument* argument);
     static void Append(ArgumentList* list, Argument* argument);
@@ -88,7 +88,7 @@ class ObjectInitializer
 {
 public:
     int id;
-    MemberInitializerList* initializers;
+    MemberInitializerList* initializers = NULL;
 
     ObjectInitializer(MemberInitializerList* initializers);
 
@@ -99,10 +99,10 @@ class MemberInitializer
 {
 public:
     int id;
-    string* identifier;
-    Expression* expression;
-    ArgumentList* argumentList;
-    ObjectInitializer* objectInitializer;
+    string* identifier = NULL;
+    Expression* expression = NULL;
+    ArgumentList* argumentList = NULL;
+    ObjectInitializer* objectInitializer = NULL;
 
     MemberInitializer(string* identifier, Expression* expression);
     MemberInitializer(string* identifier, ObjectInitializer* objectInitializer);
@@ -116,7 +116,7 @@ class MemberInitializerList
 {
 public:
     int id;
-    list<MemberInitializer*>* list;
+    list<MemberInitializer*>* initializers = NULL;
 
     MemberInitializerList(MemberInitializer* memberInitializer);
     static void Append(MemberInitializerList* list, MemberInitializer* memberInitializer);
@@ -169,24 +169,24 @@ public:
 
     int id;
     Type type;
-    int intLiteral;
-    bool boolLiteral;
-    char charLiteral;
-    string* name;
-    SimpleType* simpleType;
-    TypeName* typeName;
-    ArrayType* arrayType;
-    ArgumentList* argumentList;
-    ObjectInitializer* objInitializer;
-    ArrayInitializer* arrayInitializer;
-    Expression* left;
-    Expression* right;
+    int intLiteral = 0;
+    bool boolLiteral = false;
+    char charLiteral = 0;
+    string* name = NULL;
+    SimpleType* simpleType = NULL;
+    TypeName* typeName = NULL;
+    ArrayType* arrayType = NULL;
+    ArgumentList* argumentList = NULL;
+    ObjectInitializer* objInitializer = NULL;
+    ArrayInitializer* arrayInitializer = NULL;
+    Expression* left = NULL;
+    Expression* right = NULL;
 
     Expression(Type type, string* name = NULL);
-    Expression(int literal);
-    Expression(char literal);
-    Expression(string* literal);
-    Expression(bool literal);
+    Expression(int intLiteral);
+    Expression(char charLiteral);
+    Expression(string* stringliteral);
+    Expression(bool boolLiteral);
     Expression(Type type, SimpleType* simpleType, Expression* expr = NULL);
     Expression(Type type, ArrayType* arrayType, Expression* expr = NULL);
     Expression(Type type, TypeName* typeName, Expression* expr = NULL);
@@ -199,7 +199,7 @@ public:
 class ObjectCreation : public Expression
 {
 public:
-    ObjectCreation(SimpleType* simleType,
+    ObjectCreation(SimpleType* simpleType,
         ArgumentList* argumentList = NULL, ObjectInitializer* objInit = NULL);
 
     ObjectCreation(TypeName* typeName,
@@ -209,7 +209,8 @@ public:
 class ExpressionList
 {
 public:
-    list<Expression*>* list;
+    int id;
+    list<Expression*>* expressions = NULL;
 
     ExpressionList(Expression* expression);
     static void Append(ExpressionList* list, Expression* expression);
@@ -220,7 +221,7 @@ public:
 class ArrayInitializer
 {
 public:
-    ExpressionList* expressions;
+    ExpressionList* expressions = NULL;
 
     ArrayInitializer(ExpressionList* expressions);
 
