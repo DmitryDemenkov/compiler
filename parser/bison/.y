@@ -12,22 +12,22 @@ using namespace std;
     bool boolean_literal;
     string *string_literal;
     string *identifier;
-	SimpleType* simpleType;
-	TypeName* typeName;
-	ArrayType* arrayType;
-	Argument* argument;
-	ArgumentList* argumentList;
-	ObjectInitializer* objectInitializer;
-	ObjectCreation* objectCreation;
-	MemberInitializer* memberInitializer;
-	MemberInitializerList* memberInitializerList;
-	Expression* expression;
-	ExpressionList* expressionList;
-	ArrayInitializer* arrayInitializer;
-	ArrayCreation* arrayCreation;
-	MemberAccess* memberAccess;
-	ElementAccess* elementAccess;
-	InvocationExpression* invocationExpression;
+	SimpleType* SimpleType;
+	TypeName* TypeName;
+	ArrayType* ArrayType;
+	Argument* Argument;
+	ArgumentList* ArgumentList;
+	ObjectInitializer* ObjectInitializer;
+	ObjectCreation* ObjectCreation;
+	MemberInitializer* MemberInitializer;
+	MemberInitializerList* MemberInitializerList;
+	Expression* Expression;
+	ExpressionList* ExpressionList;
+	ArrayInitializer* ArrayInitializer;
+	ArrayCreation* ArrayCreation;
+	MemberAccess* MemberAccess;
+	ElementAccess* ElementAccess;
+	InvocationExpression* InvocationExpression;
 }
 
 %token ABSTRACT 
@@ -329,77 +329,77 @@ element_access: type_name '[' argm_list ']'
               ;
 
 
-array_creation_expr: NEW array_type { $$ = new ArrayType::ArrayType(arrayType); }
-                   | NEW array_type array_initializer { $$ = new ArrayCreation::ArrayCreation(arrayType,arrayInitializer); }
-                   | NEW type '[' expr ']' { $$ = new ArrayCreation::ArrayCreation(simpleType,expression); }
-                   | NEW type '[' expr ']' array_initializer { $$ = new ArrayCreation::ArrayCreation(simpleType, expression,arrayInitializer); }
-                   | NEW type_name '[' expr ']' { $$ = new ArrayCreation::ArrayCreation(typeName, expression); }
-                   | NEW type_name '[' expr ']' array_initializer { $$ = new ArrayCreation::ArrayCreation(typeName, expression,arrayInitializer); }
+array_creation_expr: NEW array_type { $$ = new ArrayType::ArrayType($1); }
+                   | NEW array_type array_initializer { $$ = new ArrayCreation::ArrayCreation($2,$3); }
+                   | NEW type '[' expr ']' { $$ = new ArrayCreation::ArrayCreation($2,$4); }
+                   | NEW type '[' expr ']' array_initializer { $$ = new ArrayCreation::ArrayCreation($2,$4,$6); }
+                   | NEW type_name '[' expr ']' { $$ = new ArrayCreation::ArrayCreation($2, $4); }
+                   | NEW type_name '[' expr ']' array_initializer { $$ = new ArrayCreation::ArrayCreation($2,$4,$6); }
                    ;
 
 
-array_initializer: '{' expr_list_em '}' { $$ = ExpressionList::ExpressionList(expression); }
-                 | '{' expr_list ',' '}' { $$ = ArrayInitializer::ArrayInitializer(expression); }
+array_initializer: '{' expr_list_em '}' { $$ = ExpressionList::ExpressionList($1); }
+                 | '{' expr_list ',' '}' { $$ = ArrayInitializer::ArrayInitializer($1); }
                  ;
 
 
-expr_list: expr { $$ = ExpressionList::ExpressionList(expression); }
-         | expr_list ',' expr { $$ = ExpressionList::Append(expressionList, expression); }
+expr_list: expr { $$ = ExpressionList::ExpressionList($1); }
+         | expr_list ',' expr { $$ = ExpressionList::Append($1, $3); }
          ;
 
 
 expr_list_em: /* empty*/ { $$ = null; }
-            | expr_list { $$ = ExpressionList::ExpressionList(expression); }
+            | expr_list { $$ = ExpressionList::ExpressionList($1); }
             ;
 
 
-obj_creation_expr: NEW type '(' argm_list_em ')' { $$ = new ObjectCreation::ObjectCreation(simpleType,argumentList); }
-                 | NEW type '(' argm_list_em ')' obj_initializer { $$ = new ObjectCreation::ObjectCreation(simpleType,argumentList,objectInitializer); }
-                 | NEW type obj_initializer { $$ = new ObjectCreation::ObjectCreation(simpleType, objectInitializer); }
-                 | NEW type_name '(' argm_list_em ')' { $$ = new ObjectCreation::ObjectCreation(typeName,argumentList); }
-                 | NEW type_name '(' argm_list_em ')' obj_initializer { $$ = new ObjectCreation::ObjectCreation(typeName,argumentList,objectInitializer); }
-                 | NEW type_name obj_initializer { $$ = new ObjectCreation::ObjectCreation(); }
+obj_creation_expr: NEW type '(' argm_list_em ')' { $$ = new ObjectCreation::ObjectCreation($2,$4); }
+                 | NEW type '(' argm_list_em ')' obj_initializer { $$ = new ObjectCreation::ObjectCreation($2,$4,$6); }
+                 | NEW type obj_initializer { $$ = new ObjectCreation::ObjectCreation($2,$3); }
+                 | NEW type_name '(' argm_list_em ')' { $$ = new ObjectCreation::ObjectCreation($2,$4); }
+                 | NEW type_name '(' argm_list_em ')' obj_initializer { $$ = new ObjectCreation::ObjectCreation($2,$4,$6); }
+                 | NEW type_name obj_initializer { $$ = new ObjectCreation::ObjectCreation($2,$3); }
                  ;
                  
 
-obj_initializer: '{' member_initializer_list_em '}' { $$ = new ObjectInitializer::ObjectInitializer(objectInitializer); }
-               | '{' member_initializer_list ',' '}' { $$ = ObjectInitializer::ObjectInitializer(objectInitializer); }
+obj_initializer: '{' member_initializer_list_em '}' { $$ = new ObjectInitializer::ObjectInitializer($1); }
+               | '{' member_initializer_list ',' '}' { $$ = ObjectInitializer::ObjectInitializer($1); }
                ;
 
 
 member_initializer_list_em: /* empty */ { $$ = null; }
-                          | member_initializer_list { $$ = new MemberInitializerList::MemberInitializerList(memberInitializerList); }
+                          | member_initializer_list { $$ = new MemberInitializerList::MemberInitializerList($1); }
                           ;
 
 
-member_initializer_list: member_initializer { $$ = new MemberInitializerList::MemberInitializerList(memberInitializer); }
-                       | member_initializer_list ',' member_initializer { $$ = MemberInitializerList::Append(memberInitializerList, memberInitializer); }
+member_initializer_list: member_initializer { $$ = new MemberInitializerList::MemberInitializerList($1); }
+                       | member_initializer_list ',' member_initializer { $$ = MemberInitializerList::Append($1, $3); }
                        ;
 
 
-member_initializer: ID '=' expr { $$ = MemberInitializer::MemberInitializer(identifier,expression); }
-                  | '[' argm_list ']' '=' expr { $$ = MemberInitializer::MemberInitializer(argumentList,expression); }
-                  | ID '=' obj_initializer { $$ = MemberInitializer::MemberInitializer(identifier,objectInitializer); }
-                  | '[' argm_list ']' '=' obj_initializer { $$ = MemberInitializer::MemberInitializer(argumentList,objectInitializer); }
+member_initializer: ID '=' expr { $$ = MemberInitializer::MemberInitializer($1,$3); }
+                  | '[' argm_list ']' '=' expr { $$ = MemberInitializer::MemberInitializer($2,$5); }
+                  | ID '=' obj_initializer { $$ = MemberInitializer::MemberInitializer($1,$3); }
+                  | '[' argm_list ']' '=' obj_initializer { $$ = MemberInitializer::MemberInitializer($2,$5); }
                   ;
 
 
 argm_list_em: /* empty */ { $$ = null; }
-            | argm_list { $$ = new ArgumentList::ArgumentList(argumentList);}
+            | argm_list { $$ = new ArgumentList::ArgumentList($1);}
             ;
 
 
-argm_list: argm { $$ = new ArgumentList::ArgumentList(argument);}
-         | argm_list ',' argm { $$ = ArgumentList::Append(argumentList, argument);}
+argm_list: argm { $$ = new ArgumentList::ArgumentList($1);}
+         | argm_list ',' argm { $$ = ArgumentList::Append($1,$3);}
          ;
 
 
-argm: expr { $$ = new Argument::Argument(expression,identifier); }
-    | ID ':' expr { $$ = Argument::Argument(expression,identifier); }
+argm: expr { $$ = new Argument::Argument($1); }
+    | ID ':' expr { $$ = Argument::Argument($1,$3); }
     ;
 
 
-array_type: type '[' ']' { $$ = new ArrayType::ArrayType(SimpleType); }
+array_type: type '[' ']' { $$ = new ArrayType::ArrayType($1); }
           | type_name '[' ']' { $$ = ArrayType::ArrayType(t_TYPE_NAME); }
           ;
 
@@ -411,8 +411,8 @@ type: INT { $$ = new SimpleType::SimpleType(t_INT);}
     ;
 
 
-type_name: ID { $$ = new TypeName::TypeName(identifier); }
-         | type_name '.' ID { $$ = TypeName::Append(SimpleType,identifier); }
+type_name: ID { $$ = new TypeName::TypeName($1); }
+         | type_name '.' ID { $$ = TypeName::Append($1,$3); }
          ;
 
 
