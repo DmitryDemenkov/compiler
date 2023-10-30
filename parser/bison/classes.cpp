@@ -145,24 +145,28 @@ Expression::Expression(Type type, string* name)
 Expression::Expression(int intLiteral)
 {
 	this->id = ++maxId;
+	this->type = Expression::t_INT_LITER;
 	this->intLiteral = intLiteral;
 }
 
 Expression::Expression(char charLiteral)
 {
 	this->id = ++maxId;
+	this->type = Expression::t_CHAR_LITER;
 	this->charLiteral = charLiteral;
 }
 
 Expression::Expression(string* stringliteral)
 {
 	this->id = ++maxId;
+	this->type = Expression::t_STRING_LITER;
 	this->name = stringliteral;
 }
 
 Expression::Expression(bool boolLiteral)
 {
 	this->id = ++maxId;
+	this->type = Expression::t_BOOL_LITER;
 	this->boolLiteral = boolLiteral;
 }
 
@@ -193,8 +197,9 @@ Expression::Expression(Type type, TypeName* typeName, Expression* expr)
 Expression::Expression(Type type, Expression* left, Expression* right)
 {
 	this->id = ++maxId;
+	this->type = type;
 	this->left = left;
-	this->right - right;
+	this->right = right;
 }
 
 Expression::Expression(Type type, Expression* left, ArgumentList* arguments)
