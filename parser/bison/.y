@@ -1,5 +1,6 @@
 %{
 #include <iostream>
+#include "classes.h"
 void yyerror(char const* s);
 extern int yylex(void);
 
@@ -12,22 +13,21 @@ using namespace std;
     bool boolean_literal;
     string *string_literal;
     string *identifier;
-	SimpleType* SimpleType;
-	TypeName* TypeName;
-	ArrayType* ArrayType;
-	Argument* Argument;
-	ArgumentList* ArgumentList;
-	ObjectInitializer* ObjectInitializer;
-	ObjectCreation* ObjectCreation;
-	MemberInitializer* MemberInitializer;
-	MemberInitializerList* MemberInitializerList;
-	Expression* Expression;
-	ExpressionList* ExpressionList;
-	ArrayInitializer* ArrayInitializer;
-	ArrayCreation* ArrayCreation;
-	MemberAccess* MemberAccess;
-	ElementAccess* ElementAccess;
-	InvocationExpression* InvocationExpression;
+	SimpleType* simpleType;
+	TypeName* typeName;
+	ArrayType* arrayType;
+	Argument* argument;
+	ArgumentList* argumentList;
+	ObjectInitializer* objectInitializer;
+	ObjectCreation* objectCreation;
+	MemberInitializer* memberInitializer;
+	MemberInitializerList* memberInitializerList;
+	Expression* expression;
+	ExpressionList* expressionList;
+	ArrayInitializer* arrayInitializer;
+	ArrayCreation* arrayCreation;
+	ElementAccess* elementAccess;
+	InvocationExpression* invocationExpression;
 }
 
 %token ABSTRACT 
@@ -59,12 +59,12 @@ using namespace std;
 %token STRING
 %token BOOL
 
-%token INT_LITERAL
-%token CHAR_LITERAL
-%token STRING_LITERAL
-%token BOOLEAN_LITERAL
+%token <int_literal>INT_LITERAL
+%token <char_literal>CHAR_LITERAL
+%token <string_literal>STRING_LITERAL
+%token <boolean_literal>BOOLEAN_LITERAL
 
-%token ID
+%token <identifier>ID
 
 %right '='
 %left  OR
@@ -81,6 +81,22 @@ using namespace std;
 %nonassoc ELSE
 
 %start program
+
+%type <simpleType>type
+%type <typeName>type_name
+%type <arrayType>array_type
+%type <argument>argm
+%type <argumentList>argm_list argm_list_em
+%type <memberInitializer>member_initializer
+%type <memberInitializerList>member_initializer_list member_initializer_list_em
+%type <objectInitializer>obj_initializer
+%type <objectCreation>obj_creation_expr
+%type <expression>expr member_access
+%type <expressionList>expr_list expr_list_em
+%type <arrayInitializer>array_initializer
+%type <arrayCreation>array_creation_expr
+%type <elementAccess>element_access
+%type <invocationExpression>invocation_expression
 
 %%
 
@@ -112,7 +128,7 @@ class_declaration: modifier_list_em CLASS ID '{' class_member_declaration_list_e
                  ;
 
 
-class_member_declaration_list_em: /* empty */ { $$ = null; }
+class_member_declaration_list_em: /* empty */
                                 | class_member_declaration_list
                                 ;
 
@@ -158,7 +174,7 @@ method_declaration: modifier_list_em type ID '(' param_list_em ')' '{' stmt_list
                   ;
 
 
-modifier_list_em: /* empty*/ { $$ = null; }
+modifier_list_em: /* empty*/
                 | modifier_list
                 ;
 
@@ -179,7 +195,7 @@ modifier: PRIVATE
         ;
 
 
-param_list_em: /* empty */ { $$ = null; }
+param_list_em: /* empty */
              | param_list
              ;
 
@@ -202,7 +218,7 @@ stmt: ';'
     ;
 
 
-stmt_list_em: /* empty*/ { $$ = null; }
+stmt_list_em: /* empty*/
             | stmt_list
             ;
 
@@ -222,7 +238,7 @@ for_stmt: FOR '(' for_expr ';' for_expr ';' for_expr ')' stmt
     	;
 
 
-for_expr: /*empty*/ { $$ = null; }
+for_expr: /*empty*/
 	    | expr
 	    ;
 
@@ -257,79 +273,79 @@ var_declarator: type ID
               ;
 
 
-expr: INT_LITERAL { $$ = new Expression(t_INT_LITER); }
-    | CHAR_LITERAL { $$ = new Expression(t_CHAR_LITER); }
-    | STRING_LITERAL { $$ = new Expression(t_STRING_LITER); }
-    | BOOLEAN_LITERAL { $$ = new Expression(t_BOOL_LITER); }
-    | '(' expr ')' { $$ = Expression($2); }
-    | member_access { $$ = new Expression(t_MEMBER_ACCESS); }
-    | invocation_expression { $$ = Expression(t_INVOCATION); }
-    | obj_creation_expr { $$ = new Expression(t_OBJ_CREATION); }
-    | array_creation_expr { $$ = new Expression(t_ARR_CREATION); }
-    | element_access { $$ = new Expression(t_ELEMENT_ACCESS); }
-    | '-' expr %prec UNMINUS { $$ = Expression(t_UNMINUS, $2); }  
-    | '!' expr { $$ = Expression(t_NOT, $2); }
-    | '(' type ')' expr { $$ = Expression($2, $4); }
-    | '(' array_type ')' expr { $$ = Expression($2, $4); }
-    | '(' expr ')' expr { $$ = Expression($2, $4); }
-    | expr '*' expr { $$ = Expression($1,t_MUL, $3); }
-    | expr '/' expr { $$ = Expression($1,t_DIV, $3); }
-    | expr '%' expr	{ $$ = Expression($1,t_MOD, $3); }
-    | expr '+' expr { $$ = Expression($1,t_SUM, $3); }
-    | expr '-' expr { $$ = Expression($1,t_SUB, $3); }
-    | expr '<' expr { $$ = Expression($1,t_LESS, $3); }
-    | expr '>' expr	{ $$ = Expression($1,t_GREATER, $3); }
-    | expr LESS_EQUAL expr { $$ = Expression($1,t_LESS_EQUAL, $3); }
-    | expr GREATER_EQUAL expr { $$ = Expression($1,t_GREATER_EQUAL, $3); }
-    | expr IS type { $$ = Expression($1,t_IS,$3); }
-    | expr IS type_name { $$ = Expression($1,t_IS,$3); }
-    | expr IS array_type { $$ = Expression($1,t_IS,$3); }
-    | expr AS type { $$ = Expression($1,t_AS,$3); }
-    | expr AS type_name { $$ = Expression($1,t_AS,$3); }
-    | expr AS array_type { $$ = Expression($1,t_AS,$3); }
-    | expr EQUALITY expr { $$ = Expression($1,t_EQUALITY,$3); }
-    | expr INEQUALITY expr { $$ = Expression($1,t_INEQUALITY,$3); }
-    | expr AND expr { $$ = Expression($1,t_AND,$3); }
-    | expr OR expr { $$ = Expression($1,t_OR,$3); }
-    | expr '=' expr { $$ = Expression($1,t_IS,$3); }
+expr: INT_LITERAL { $$ = new Expression(Expression::t_INT_LITER); }
+    | CHAR_LITERAL { $$ = new Expression(Expression::t_CHAR_LITER); }
+    | STRING_LITERAL { $$ = new Expression(Expression::t_STRING_LITER); }
+    | BOOLEAN_LITERAL { $$ = new Expression(Expression::t_BOOL_LITER); }
+    | '(' expr ')' { $$ = new Expression(Expression::t_PARENTHESIZED, $2); }
+    | member_access { $$ = $1; }
+    | invocation_expression { $$ = $1; }
+    | obj_creation_expr { $$ = $1; }
+    | array_creation_expr { $$ = $1; }
+    | element_access { $$ = $1; }
+    | '-' expr %prec UNMINUS { $$ = new Expression(Expression::t_UNMINUS, $2); }  
+    | '!' expr { $$ = new Expression(Expression::t_NOT, $2); }
+    | '(' type ')' expr { $$ = new Expression(Expression::t_SIMPLE_TYPE_CAST, $2, $4); }
+    | '(' array_type ')' expr { $$ = new Expression(Expression::t_ARRAY_CAST, $2, $4); }
+    | '(' expr ')' expr { $$ = new Expression(Expression::t_TYPENAME_CAST, $2, $4); }
+    | expr '*' expr { $$ = new Expression(Expression::t_MUL, $1, $3); }
+    | expr '/' expr { $$ = new Expression(Expression::t_DIV, $1, $3); }
+    | expr '%' expr	{ $$ = new Expression(Expression::t_MOD, $1, $3); }
+    | expr '+' expr { $$ = new Expression(Expression::t_SUM, $1, $3); }
+    | expr '-' expr { $$ = new Expression(Expression::t_SUB, $1, $3); }
+    | expr '<' expr { $$ = new Expression(Expression::t_LESS, $1, $3); }
+    | expr '>' expr	{ $$ = new Expression(Expression::t_GREATER, $1, $3); }
+    | expr LESS_EQUAL expr { $$ = new Expression(Expression::t_LESS_EQUAL, $1, $3); }
+    | expr GREATER_EQUAL expr { $$ = new Expression(Expression::t_GREATER_EQUAL, $1, $3); }
+    | expr IS type { $$ = new Expression(Expression::t_IS, $3, $1); }
+    | expr IS type_name { $$ = new Expression(Expression::t_IS, $3, $1); }
+    | expr IS array_type { $$ = new Expression(Expression::t_IS, $3, $1); }
+    | expr AS type { $$ = new Expression(Expression::t_AS, $3, $1); }
+    | expr AS type_name { $$ = new Expression(Expression::t_AS, $3, $1); }
+    | expr AS array_type { $$ = new Expression(Expression::t_AS, $3, $1); }
+    | expr EQUALITY expr { $$ = new Expression(Expression::t_EQUALITY, $1 ,$3); }
+    | expr INEQUALITY expr { $$ = new Expression(Expression::t_INEQUALITY, $1 ,$3); }
+    | expr AND expr { $$ = new Expression(Expression::t_AND, $1, $3); }
+    | expr OR expr { $$ = new Expression(Expression::t_OR, $1, $3); }
+    | expr '=' expr { $$ = new Expression(Expression::t_IS, $1, $3); }
     ;
 
 
-member_access: type_name
-             | type '.' type_name
-             | THIS
-             | THIS '.' type_name
-             | BASE '.' type_name
-             | invocation_expression '.' type_name
-             | '(' expr ')' '.' type_name
-             | obj_creation_expr '.' type_name
-             | array_creation_expr '.' type_name
-             | element_access '.' type_name
+member_access: type_name { $$ = MemberAccess::FromTypeName($1); }
+             | type '.' type_name { $$ = MemberAccess::FromTypeName($3, new Expression(Expression::t_SIMPLE_TYPE, $1)); }
+             | THIS { $$ = new Expression(Expression::t_THIS); }
+             | THIS '.' type_name { $$ = MemberAccess::FromTypeName($3, new Expression(Expression::t_THIS)); }
+             | BASE '.' type_name { $$ = MemberAccess::FromTypeName($3, new Expression(Expression::t_BASE)); }
+             | invocation_expression '.' type_name { $$ = MemberAccess::FromTypeName($3, $1); }
+             | '(' expr ')' '.' type_name { $$ = MemberAccess::FromTypeName($5, new Expression(Expression::t_PARENTHESIZED, $2)); }
+             | obj_creation_expr '.' type_name { $$ = MemberAccess::FromTypeName($3, $1); }
+             | array_creation_expr '.' type_name { $$ = MemberAccess::FromTypeName($3, $1); }
+             | element_access '.' type_name { $$ = MemberAccess::FromTypeName($3, $1); }
              ;
 
 
-invocation_expression: member_access '(' argm_list_em ')'
+invocation_expression: member_access '(' argm_list_em ')' { $$ = new InvocationExpression($1, $3); }
                      ;
 
 
-element_access: type_name '[' argm_list ']'
-              | type '.' type_name '[' argm_list ']'
-              | THIS '[' argm_list ']'
-              | THIS '.' type_name '[' argm_list ']'
-              | BASE '.' type_name '[' argm_list ']'
-              | invocation_expression '.' type_name '[' argm_list ']'
-              | '(' expr ')' '.' type_name '[' argm_list ']'
-              | obj_creation_expr '.' type_name '[' argm_list ']'
-              | array_creation_expr '.' type_name '[' argm_list ']'
-              | element_access '.' type_name '[' argm_list ']'
-              | obj_creation_expr '[' argm_list ']'
-              | invocation_expression '[' argm_list ']'
-              | element_access '[' argm_list ']'
-              | '(' expr ')' '[' argm_list ']'
+element_access: type_name '[' argm_list ']' { $$ = new ElementAccess(MemberAccess::FromTypeName($1), $3); }
+              | type '.' type_name '[' argm_list ']' { $$ = new ElementAccess(MemberAccess::FromTypeName($3, new Expression(Expression::t_SIMPLE_TYPE, $1)), $5); }
+              | THIS '[' argm_list ']' { $$ = new ElementAccess(new Expression(Expression::t_THIS), $3); }
+              | THIS '.' type_name '[' argm_list ']' { $$ = new ElementAccess(MemberAccess::FromTypeName($3, new Expression(Expression::t_THIS)), $5); }
+              | BASE '.' type_name '[' argm_list ']' { $$ = new ElementAccess(MemberAccess::FromTypeName($3, new Expression(Expression::t_BASE)), $5); }
+              | invocation_expression '.' type_name '[' argm_list ']' { $$ = new ElementAccess(MemberAccess::FromTypeName($3, $1), $5); }
+              | '(' expr ')' '.' type_name '[' argm_list ']' { $$ = new ElementAccess(MemberAccess::FromTypeName($5, new Expression(Expression::t_PARENTHESIZED, $2)), $7); }
+              | obj_creation_expr '.' type_name '[' argm_list ']' { $$ = new ElementAccess(MemberAccess::FromTypeName($3, $1), $5); }
+              | array_creation_expr '.' type_name '[' argm_list ']' { $$ = new ElementAccess(MemberAccess::FromTypeName($3, $1), $5); }
+              | element_access '.' type_name '[' argm_list ']' { $$ = new ElementAccess(MemberAccess::FromTypeName($3, $1), $5); }
+              | obj_creation_expr '[' argm_list ']' { $$ = new ElementAccess($1, $3); }
+              | invocation_expression '[' argm_list ']' { $$ = new ElementAccess($1, $3); }
+              | element_access '[' argm_list ']' { $$ = new ElementAccess($1, $3); }
+              | '(' expr ')' '[' argm_list ']' { $$ = new ElementAccess(new Expression(Expression::t_PARENTHESIZED, $2), $5); }
               ;
 
 
-array_creation_expr: NEW array_type { $$ = new ArrayType($1); }
+array_creation_expr: NEW array_type { $$ = new ArrayCreation($2); }
                    | NEW array_type array_initializer { $$ = new ArrayCreation($2,$3); }
                    | NEW type '[' expr ']' { $$ = new ArrayCreation($2,$4); }
                    | NEW type '[' expr ']' array_initializer { $$ = new ArrayCreation($2,$4,$6); }
@@ -338,81 +354,81 @@ array_creation_expr: NEW array_type { $$ = new ArrayType($1); }
                    ;
 
 
-array_initializer: '{' expr_list_em '}' { $$ = new ArrayInitializer($1); }
-                 | '{' expr_list ',' '}' { $$ = ArrayInitializer($1); }
+array_initializer: '{' expr_list_em '}' { $$ = new ArrayInitializer($2); }
+                 | '{' expr_list ',' '}' { $$ = new ArrayInitializer($2); }
                  ;
 
 
 expr_list: expr { $$ = new ExpressionList($1); }
-         | expr_list ',' expr { $$ = ExpressionList::Append($1, $3); }
+         | expr_list ',' expr { ExpressionList::Append($1, $3); }
          ;
 
 
-expr_list_em: /* empty*/ { $$ = null; }
-            | expr_list { $$ = new ExpressionList($1); }
+expr_list_em: /* empty*/ { $$ = NULL; }
+            | expr_list { $$ = $1; }
             ;
 
 
 obj_creation_expr: NEW type '(' argm_list_em ')' { $$ = new ObjectCreation($2,$4); }
                  | NEW type '(' argm_list_em ')' obj_initializer { $$ = new ObjectCreation($2,$4,$6); }
-                 | NEW type obj_initializer { $$ = new ObjectCreation($2,$3); }
+                 | NEW type obj_initializer { $$ = new ObjectCreation($2,NULL,$3); }
                  | NEW type_name '(' argm_list_em ')' { $$ = new ObjectCreation($2,$4); }
                  | NEW type_name '(' argm_list_em ')' obj_initializer { $$ = new ObjectCreation($2,$4,$6); }
-                 | NEW type_name obj_initializer { $$ = new ObjectCreation($2,$3); }
+                 | NEW type_name obj_initializer { $$ = new ObjectCreation($2,NULL,$3); }
                  ;
                  
 
-obj_initializer: '{' member_initializer_list_em '}' { $$ = new ObjectInitializer($1); }
-               | '{' member_initializer_list ',' '}' { $$ = ObjectInitializer($1); }
+obj_initializer: '{' member_initializer_list_em '}' { $$ = new ObjectInitializer($2); }
+               | '{' member_initializer_list ',' '}' { $$ = new ObjectInitializer($2); }
                ;
 
 
-member_initializer_list_em: /* empty */ { $$ = null; }
-                          | member_initializer_list { $$ = new MemberInitializerList($1); }
+member_initializer_list_em: /* empty */ { $$ = NULL; }
+                          | member_initializer_list { $$ = $1; }
                           ;
 
 
 member_initializer_list: member_initializer { $$ = new MemberInitializerList($1); }
-                       | member_initializer_list ',' member_initializer { $$ = MemberInitializerList::Append($1, $3); }
+                       | member_initializer_list ',' member_initializer { MemberInitializerList::Append($1, $3); }
                        ;
 
 
-member_initializer: ID '=' expr { $$ = MemberInitializer($1,$3); }
-                  | '[' argm_list ']' '=' expr { $$ = MemberInitializer($2,$5); }
-                  | ID '=' obj_initializer { $$ = MemberInitializer($1,$3); }
-                  | '[' argm_list ']' '=' obj_initializer { $$ = MemberInitializer($2,$5); }
+member_initializer: ID '=' expr { $$ = new MemberInitializer($1,$3); }
+                  | '[' argm_list ']' '=' expr { $$ = new MemberInitializer($2,$5); }
+                  | ID '=' obj_initializer { $$ = new MemberInitializer($1,$3); }
+                  | '[' argm_list ']' '=' obj_initializer { $$ = new MemberInitializer($2,$5); }
                   ;
 
 
-argm_list_em: /* empty */ { $$ = null; }
-            | argm_list { $$ = new ArgumentList($1);}
+argm_list_em: /* empty */ { $$ = NULL; }
+            | argm_list { $$ = $1;}
             ;
 
 
 argm_list: argm { $$ = new ArgumentList($1);}
-         | argm_list ',' argm { $$ = ArgumentList::Append($1,$3);}
+         | argm_list ',' argm { ArgumentList::Append($1,$3);}
          ;
 
 
 argm: expr { $$ = new Argument($1); }
-    | ID ':' expr { $$ = Argument($1,$3); }
+    | ID ':' expr { $$ = new Argument($3,$1); }
     ;
 
 
 array_type: type '[' ']' { $$ = new ArrayType($1); }
-          | type_name '[' ']' { $$ = new ArrayType(t_TYPE_NAME); }
+          | type_name '[' ']' { $$ = new ArrayType($1); }
           ;
 
 
-type: INT { $$ = new SimpleType(t_INT);}
-    | CHAR { $$ = new SimpleType(t_CHAR);}
-    | STRING { $$ = new SimpleType(t_STRING);}
-    | BOOL { $$ = new SimpleType(t_BOOL);}
+type: INT { $$ = new SimpleType(SimpleType::t_INT);}
+    | CHAR { $$ = new SimpleType(SimpleType::t_CHAR);}
+    | STRING { $$ = new SimpleType(SimpleType::t_STRING);}
+    | BOOL { $$ = new SimpleType(SimpleType::t_BOOL);}
     ;
 
 
 type_name: ID { $$ = new TypeName($1); }
-         | type_name '.' ID { $$ = TypeName::Append($1,$3); }
+         | type_name '.' ID { TypeName::Append($1,$3); }
          ;
 
 

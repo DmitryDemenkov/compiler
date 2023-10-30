@@ -49,18 +49,34 @@
 #line 1 "./.y"
 
 #include <iostream>
+#include "classes.h"
 void yyerror(char const* s);
 extern int yylex(void);
 
 using namespace std;
 
-#line 9 "./.y"
+#line 10 "./.y"
 typedef union {
     int int_literal;
     char char_literal;
     bool boolean_literal;
     string *string_literal;
     string *identifier;
+	SimpleType* simpleType;
+	TypeName* typeName;
+	ArrayType* arrayType;
+	Argument* argument;
+	ArgumentList* argumentList;
+	ObjectInitializer* objectInitializer;
+	ObjectCreation* objectCreation;
+	MemberInitializer* memberInitializer;
+	MemberInitializerList* memberInitializerList;
+	Expression* expression;
+	ExpressionList* expressionList;
+	ArrayInitializer* arrayInitializer;
+	ArrayCreation* arrayCreation;
+	ElementAccess* elementAccess;
+	InvocationExpression* invocationExpression;
 } YYSTYPE;
 
 #ifndef YYLTYPE
@@ -238,25 +254,25 @@ static const short yyrhs[] = {    65,
 
 #if YYDEBUG != 0
 static const short yyrline[] = { 0,
-    71,    75,    79,    80,    84,    85,    89,    90,    94,    95,
-    99,   100,   104,   105,   109,   110,   111,   112,   116,   117,
-   118,   119,   120,   121,   125,   126,   127,   128,   129,   130,
-   134,   135,   136,   137,   138,   139,   140,   141,   145,   146,
-   150,   151,   155,   156,   157,   158,   159,   160,   161,   162,
-   166,   167,   171,   172,   176,   177,   178,   179,   180,   181,
-   182,   183,   184,   185,   189,   190,   194,   195,   199,   200,
-   204,   205,   209,   210,   214,   218,   222,   226,   227,   231,
-   232,   233,   234,   238,   239,   240,   244,   245,   246,   247,
-   248,   249,   250,   251,   252,   253,   254,   255,   256,   257,
-   258,   259,   260,   261,   262,   263,   264,   265,   266,   267,
-   268,   269,   270,   271,   272,   273,   274,   275,   276,   277,
-   278,   282,   283,   284,   285,   286,   287,   288,   289,   290,
-   291,   295,   299,   300,   301,   302,   303,   304,   305,   306,
-   307,   308,   309,   310,   311,   312,   316,   317,   318,   319,
-   320,   321,   325,   326,   330,   331,   335,   336,   340,   341,
-   342,   343,   344,   345,   349,   350,   354,   355,   359,   360,
-   364,   365,   366,   367,   371,   372,   376,   377,   381,   382,
-   386,   387,   391,   392,   393,   394,   398,   399
+   103,   107,   111,   112,   116,   117,   121,   122,   126,   127,
+   131,   132,   136,   137,   141,   142,   143,   144,   148,   149,
+   150,   151,   152,   153,   157,   158,   159,   160,   161,   162,
+   166,   167,   168,   169,   170,   171,   172,   173,   177,   178,
+   182,   183,   187,   188,   189,   190,   191,   192,   193,   194,
+   198,   199,   203,   204,   208,   209,   210,   211,   212,   213,
+   214,   215,   216,   217,   221,   222,   226,   227,   231,   232,
+   236,   237,   241,   242,   246,   250,   254,   258,   259,   263,
+   264,   265,   266,   270,   271,   272,   276,   277,   278,   279,
+   280,   281,   282,   283,   284,   285,   286,   287,   288,   289,
+   290,   291,   292,   293,   294,   295,   296,   297,   298,   299,
+   300,   301,   302,   303,   304,   305,   306,   307,   308,   309,
+   310,   314,   315,   316,   317,   318,   319,   320,   321,   322,
+   323,   327,   331,   332,   333,   334,   335,   336,   337,   338,
+   339,   340,   341,   342,   343,   344,   348,   349,   350,   351,
+   352,   353,   357,   358,   362,   363,   367,   368,   372,   373,
+   374,   375,   376,   377,   381,   382,   386,   387,   391,   392,
+   396,   397,   398,   399,   403,   404,   408,   409,   413,   414,
+   418,   419,   423,   424,   425,   426,   430,   431
 };
 
 static const char * const yytname[] = {   "$","error","$undefined.","ABSTRACT",
@@ -1136,6 +1152,414 @@ yyreduce:
 
   switch (yyn) {
 
+case 87:
+#line 276 "./.y"
+{ yyval.expression = new Expression(Expression::t_INT_LITER); ;
+    break;}
+case 88:
+#line 277 "./.y"
+{ yyval.expression = new Expression(Expression::t_CHAR_LITER); ;
+    break;}
+case 89:
+#line 278 "./.y"
+{ yyval.expression = new Expression(Expression::t_STRING_LITER); ;
+    break;}
+case 90:
+#line 279 "./.y"
+{ yyval.expression = new Expression(Expression::t_BOOL_LITER); ;
+    break;}
+case 91:
+#line 280 "./.y"
+{ yyval.expression = new Expression(Expression::t_PARENTHESIZED, yyvsp[-1].expression); ;
+    break;}
+case 92:
+#line 281 "./.y"
+{ yyval.expression = yyvsp[0].expression; ;
+    break;}
+case 93:
+#line 282 "./.y"
+{ yyval.expression = yyvsp[0].invocationExpression; ;
+    break;}
+case 94:
+#line 283 "./.y"
+{ yyval.expression = yyvsp[0].objectCreation; ;
+    break;}
+case 95:
+#line 284 "./.y"
+{ yyval.expression = yyvsp[0].arrayCreation; ;
+    break;}
+case 96:
+#line 285 "./.y"
+{ yyval.expression = yyvsp[0].elementAccess; ;
+    break;}
+case 97:
+#line 286 "./.y"
+{ yyval.expression = new Expression(Expression::t_UNMINUS, yyvsp[0].expression); ;
+    break;}
+case 98:
+#line 287 "./.y"
+{ yyval.expression = new Expression(Expression::t_NOT, yyvsp[0].expression); ;
+    break;}
+case 99:
+#line 288 "./.y"
+{ yyval.expression = new Expression(Expression::t_SIMPLE_TYPE_CAST, yyvsp[-2].simpleType, yyvsp[0].expression); ;
+    break;}
+case 100:
+#line 289 "./.y"
+{ yyval.expression = new Expression(Expression::t_ARRAY_CAST, yyvsp[-2].arrayType, yyvsp[0].expression); ;
+    break;}
+case 101:
+#line 290 "./.y"
+{ yyval.expression = new Expression(Expression::t_TYPENAME_CAST, yyvsp[-2].expression, yyvsp[0].expression); ;
+    break;}
+case 102:
+#line 291 "./.y"
+{ yyval.expression = new Expression(Expression::t_MUL, yyvsp[-2].expression, yyvsp[0].expression); ;
+    break;}
+case 103:
+#line 292 "./.y"
+{ yyval.expression = new Expression(Expression::t_DIV, yyvsp[-2].expression, yyvsp[0].expression); ;
+    break;}
+case 104:
+#line 293 "./.y"
+{ yyval.expression = new Expression(Expression::t_MOD, yyvsp[-2].expression, yyvsp[0].expression); ;
+    break;}
+case 105:
+#line 294 "./.y"
+{ yyval.expression = new Expression(Expression::t_SUM, yyvsp[-2].expression, yyvsp[0].expression); ;
+    break;}
+case 106:
+#line 295 "./.y"
+{ yyval.expression = new Expression(Expression::t_SUB, yyvsp[-2].expression, yyvsp[0].expression); ;
+    break;}
+case 107:
+#line 296 "./.y"
+{ yyval.expression = new Expression(Expression::t_LESS, yyvsp[-2].expression, yyvsp[0].expression); ;
+    break;}
+case 108:
+#line 297 "./.y"
+{ yyval.expression = new Expression(Expression::t_GREATER, yyvsp[-2].expression, yyvsp[0].expression); ;
+    break;}
+case 109:
+#line 298 "./.y"
+{ yyval.expression = new Expression(Expression::t_LESS_EQUAL, yyvsp[-2].expression, yyvsp[0].expression); ;
+    break;}
+case 110:
+#line 299 "./.y"
+{ yyval.expression = new Expression(Expression::t_GREATER_EQUAL, yyvsp[-2].expression, yyvsp[0].expression); ;
+    break;}
+case 111:
+#line 300 "./.y"
+{ yyval.expression = new Expression(Expression::t_IS, yyvsp[0].simpleType, yyvsp[-2].expression); ;
+    break;}
+case 112:
+#line 301 "./.y"
+{ yyval.expression = new Expression(Expression::t_IS, yyvsp[0].typeName, yyvsp[-2].expression); ;
+    break;}
+case 113:
+#line 302 "./.y"
+{ yyval.expression = new Expression(Expression::t_IS, yyvsp[0].arrayType, yyvsp[-2].expression); ;
+    break;}
+case 114:
+#line 303 "./.y"
+{ yyval.expression = new Expression(Expression::t_AS, yyvsp[0].simpleType, yyvsp[-2].expression); ;
+    break;}
+case 115:
+#line 304 "./.y"
+{ yyval.expression = new Expression(Expression::t_AS, yyvsp[0].typeName, yyvsp[-2].expression); ;
+    break;}
+case 116:
+#line 305 "./.y"
+{ yyval.expression = new Expression(Expression::t_AS, yyvsp[0].arrayType, yyvsp[-2].expression); ;
+    break;}
+case 117:
+#line 306 "./.y"
+{ yyval.expression = new Expression(Expression::t_EQUALITY, yyvsp[-2].expression ,yyvsp[0].expression); ;
+    break;}
+case 118:
+#line 307 "./.y"
+{ yyval.expression = new Expression(Expression::t_INEQUALITY, yyvsp[-2].expression ,yyvsp[0].expression); ;
+    break;}
+case 119:
+#line 308 "./.y"
+{ yyval.expression = new Expression(Expression::t_AND, yyvsp[-2].expression, yyvsp[0].expression); ;
+    break;}
+case 120:
+#line 309 "./.y"
+{ yyval.expression = new Expression(Expression::t_OR, yyvsp[-2].expression, yyvsp[0].expression); ;
+    break;}
+case 121:
+#line 310 "./.y"
+{ yyval.expression = new Expression(Expression::t_IS, yyvsp[-2].expression, yyvsp[0].expression); ;
+    break;}
+case 122:
+#line 314 "./.y"
+{ yyval.expression = MemberAccess::FromTypeName(yyvsp[0].typeName); ;
+    break;}
+case 123:
+#line 315 "./.y"
+{ yyval.expression = MemberAccess::FromTypeName(yyvsp[0].typeName, new Expression(Expression::t_SIMPLE_TYPE, yyvsp[-2].simpleType)); ;
+    break;}
+case 124:
+#line 316 "./.y"
+{ yyval.expression = new Expression(Expression::t_THIS); ;
+    break;}
+case 125:
+#line 317 "./.y"
+{ yyval.expression = MemberAccess::FromTypeName(yyvsp[0].typeName, new Expression(Expression::t_THIS)); ;
+    break;}
+case 126:
+#line 318 "./.y"
+{ yyval.expression = MemberAccess::FromTypeName(yyvsp[0].typeName, new Expression(Expression::t_BASE)); ;
+    break;}
+case 127:
+#line 319 "./.y"
+{ yyval.expression = MemberAccess::FromTypeName(yyvsp[0].typeName, yyvsp[-2].invocationExpression); ;
+    break;}
+case 128:
+#line 320 "./.y"
+{ yyval.expression = MemberAccess::FromTypeName(yyvsp[0].typeName, new Expression(Expression::t_PARENTHESIZED, yyvsp[-3].expression)); ;
+    break;}
+case 129:
+#line 321 "./.y"
+{ yyval.expression = MemberAccess::FromTypeName(yyvsp[0].typeName, yyvsp[-2].objectCreation); ;
+    break;}
+case 130:
+#line 322 "./.y"
+{ yyval.expression = MemberAccess::FromTypeName(yyvsp[0].typeName, yyvsp[-2].arrayCreation); ;
+    break;}
+case 131:
+#line 323 "./.y"
+{ yyval.expression = MemberAccess::FromTypeName(yyvsp[0].typeName, yyvsp[-2].elementAccess); ;
+    break;}
+case 132:
+#line 327 "./.y"
+{ yyval.invocationExpression = new InvocationExpression(yyvsp[-3].expression, yyvsp[-1].argumentList); ;
+    break;}
+case 133:
+#line 331 "./.y"
+{ yyval.elementAccess = new ElementAccess(MemberAccess::FromTypeName(yyvsp[-3].typeName), yyvsp[-1].argumentList); ;
+    break;}
+case 134:
+#line 332 "./.y"
+{ yyval.elementAccess = new ElementAccess(MemberAccess::FromTypeName(yyvsp[-3].typeName, new Expression(Expression::t_SIMPLE_TYPE, yyvsp[-5].simpleType)), yyvsp[-1].argumentList); ;
+    break;}
+case 135:
+#line 333 "./.y"
+{ yyval.elementAccess = new ElementAccess(new Expression(Expression::t_THIS), yyvsp[-1].argumentList); ;
+    break;}
+case 136:
+#line 334 "./.y"
+{ yyval.elementAccess = new ElementAccess(MemberAccess::FromTypeName(yyvsp[-3].typeName, new Expression(Expression::t_THIS)), yyvsp[-1].argumentList); ;
+    break;}
+case 137:
+#line 335 "./.y"
+{ yyval.elementAccess = new ElementAccess(MemberAccess::FromTypeName(yyvsp[-3].typeName, new Expression(Expression::t_BASE)), yyvsp[-1].argumentList); ;
+    break;}
+case 138:
+#line 336 "./.y"
+{ yyval.elementAccess = new ElementAccess(MemberAccess::FromTypeName(yyvsp[-3].typeName, yyvsp[-5].invocationExpression), yyvsp[-1].argumentList); ;
+    break;}
+case 139:
+#line 337 "./.y"
+{ yyval.elementAccess = new ElementAccess(MemberAccess::FromTypeName(yyvsp[-3].typeName, new Expression(Expression::t_PARENTHESIZED, yyvsp[-6].expression)), yyvsp[-1].argumentList); ;
+    break;}
+case 140:
+#line 338 "./.y"
+{ yyval.elementAccess = new ElementAccess(MemberAccess::FromTypeName(yyvsp[-3].typeName, yyvsp[-5].objectCreation), yyvsp[-1].argumentList); ;
+    break;}
+case 141:
+#line 339 "./.y"
+{ yyval.elementAccess = new ElementAccess(MemberAccess::FromTypeName(yyvsp[-3].typeName, yyvsp[-5].arrayCreation), yyvsp[-1].argumentList); ;
+    break;}
+case 142:
+#line 340 "./.y"
+{ yyval.elementAccess = new ElementAccess(MemberAccess::FromTypeName(yyvsp[-3].typeName, yyvsp[-5].elementAccess), yyvsp[-1].argumentList); ;
+    break;}
+case 143:
+#line 341 "./.y"
+{ yyval.elementAccess = new ElementAccess(yyvsp[-3].objectCreation, yyvsp[-1].argumentList); ;
+    break;}
+case 144:
+#line 342 "./.y"
+{ yyval.elementAccess = new ElementAccess(yyvsp[-3].invocationExpression, yyvsp[-1].argumentList); ;
+    break;}
+case 145:
+#line 343 "./.y"
+{ yyval.elementAccess = new ElementAccess(yyvsp[-3].elementAccess, yyvsp[-1].argumentList); ;
+    break;}
+case 146:
+#line 344 "./.y"
+{ yyval.elementAccess = new ElementAccess(new Expression(Expression::t_PARENTHESIZED, yyvsp[-4].expression), yyvsp[-1].argumentList); ;
+    break;}
+case 147:
+#line 348 "./.y"
+{ yyval.arrayCreation = new ArrayCreation(yyvsp[0].arrayType); ;
+    break;}
+case 148:
+#line 349 "./.y"
+{ yyval.arrayCreation = new ArrayCreation(yyvsp[-1].arrayType,yyvsp[0].arrayInitializer); ;
+    break;}
+case 149:
+#line 350 "./.y"
+{ yyval.arrayCreation = new ArrayCreation(yyvsp[-3].simpleType,yyvsp[-1].expression); ;
+    break;}
+case 150:
+#line 351 "./.y"
+{ yyval.arrayCreation = new ArrayCreation(yyvsp[-4].simpleType,yyvsp[-2].expression,yyvsp[0].arrayInitializer); ;
+    break;}
+case 151:
+#line 352 "./.y"
+{ yyval.arrayCreation = new ArrayCreation(yyvsp[-3].typeName, yyvsp[-1].expression); ;
+    break;}
+case 152:
+#line 353 "./.y"
+{ yyval.arrayCreation = new ArrayCreation(yyvsp[-4].typeName,yyvsp[-2].expression,yyvsp[0].arrayInitializer); ;
+    break;}
+case 153:
+#line 357 "./.y"
+{ yyval.arrayInitializer = new ArrayInitializer(yyvsp[-1].expressionList); ;
+    break;}
+case 154:
+#line 358 "./.y"
+{ yyval.arrayInitializer = new ArrayInitializer(yyvsp[-2].expressionList); ;
+    break;}
+case 155:
+#line 362 "./.y"
+{ yyval.expressionList = new ExpressionList(yyvsp[0].expression); ;
+    break;}
+case 156:
+#line 363 "./.y"
+{ ExpressionList::Append(yyvsp[-2].expressionList, yyvsp[0].expression); ;
+    break;}
+case 157:
+#line 367 "./.y"
+{ yyval.expressionList = NULL; ;
+    break;}
+case 158:
+#line 368 "./.y"
+{ yyval.expressionList = yyvsp[0].expressionList; ;
+    break;}
+case 159:
+#line 372 "./.y"
+{ yyval.objectCreation = new ObjectCreation(yyvsp[-3].simpleType,yyvsp[-1].argumentList); ;
+    break;}
+case 160:
+#line 373 "./.y"
+{ yyval.objectCreation = new ObjectCreation(yyvsp[-4].simpleType,yyvsp[-2].argumentList,yyvsp[0].objectInitializer); ;
+    break;}
+case 161:
+#line 374 "./.y"
+{ yyval.objectCreation = new ObjectCreation(yyvsp[-1].simpleType,NULL,yyvsp[0].objectInitializer); ;
+    break;}
+case 162:
+#line 375 "./.y"
+{ yyval.objectCreation = new ObjectCreation(yyvsp[-3].typeName,yyvsp[-1].argumentList); ;
+    break;}
+case 163:
+#line 376 "./.y"
+{ yyval.objectCreation = new ObjectCreation(yyvsp[-4].typeName,yyvsp[-2].argumentList,yyvsp[0].objectInitializer); ;
+    break;}
+case 164:
+#line 377 "./.y"
+{ yyval.objectCreation = new ObjectCreation(yyvsp[-1].typeName,NULL,yyvsp[0].objectInitializer); ;
+    break;}
+case 165:
+#line 381 "./.y"
+{ yyval.objectInitializer = new ObjectInitializer(yyvsp[-1].memberInitializerList); ;
+    break;}
+case 166:
+#line 382 "./.y"
+{ yyval.objectInitializer = new ObjectInitializer(yyvsp[-2].memberInitializerList); ;
+    break;}
+case 167:
+#line 386 "./.y"
+{ yyval.memberInitializerList = NULL; ;
+    break;}
+case 168:
+#line 387 "./.y"
+{ yyval.memberInitializerList = yyvsp[0].memberInitializerList; ;
+    break;}
+case 169:
+#line 391 "./.y"
+{ yyval.memberInitializerList = new MemberInitializerList(yyvsp[0].memberInitializer); ;
+    break;}
+case 170:
+#line 392 "./.y"
+{ MemberInitializerList::Append(yyvsp[-2].memberInitializerList, yyvsp[0].memberInitializer); ;
+    break;}
+case 171:
+#line 396 "./.y"
+{ yyval.memberInitializer = new MemberInitializer(yyvsp[-2].identifier,yyvsp[0].expression); ;
+    break;}
+case 172:
+#line 397 "./.y"
+{ yyval.memberInitializer = new MemberInitializer(yyvsp[-3].argumentList,yyvsp[0].expression); ;
+    break;}
+case 173:
+#line 398 "./.y"
+{ yyval.memberInitializer = new MemberInitializer(yyvsp[-2].identifier,yyvsp[0].objectInitializer); ;
+    break;}
+case 174:
+#line 399 "./.y"
+{ yyval.memberInitializer = new MemberInitializer(yyvsp[-3].argumentList,yyvsp[0].objectInitializer); ;
+    break;}
+case 175:
+#line 403 "./.y"
+{ yyval.argumentList = NULL; ;
+    break;}
+case 176:
+#line 404 "./.y"
+{ yyval.argumentList = yyvsp[0].argumentList;;
+    break;}
+case 177:
+#line 408 "./.y"
+{ yyval.argumentList = new ArgumentList(yyvsp[0].argument);;
+    break;}
+case 178:
+#line 409 "./.y"
+{ ArgumentList::Append(yyvsp[-2].argumentList,yyvsp[0].argument);;
+    break;}
+case 179:
+#line 413 "./.y"
+{ yyval.argument = new Argument(yyvsp[0].expression); ;
+    break;}
+case 180:
+#line 414 "./.y"
+{ yyval.argument = new Argument(yyvsp[0].expression,yyvsp[-2].identifier); ;
+    break;}
+case 181:
+#line 418 "./.y"
+{ yyval.arrayType = new ArrayType(yyvsp[-2].simpleType); ;
+    break;}
+case 182:
+#line 419 "./.y"
+{ yyval.arrayType = new ArrayType(yyvsp[-2].typeName); ;
+    break;}
+case 183:
+#line 423 "./.y"
+{ yyval.simpleType = new SimpleType(SimpleType::t_INT);;
+    break;}
+case 184:
+#line 424 "./.y"
+{ yyval.simpleType = new SimpleType(SimpleType::t_CHAR);;
+    break;}
+case 185:
+#line 425 "./.y"
+{ yyval.simpleType = new SimpleType(SimpleType::t_STRING);;
+    break;}
+case 186:
+#line 426 "./.y"
+{ yyval.simpleType = new SimpleType(SimpleType::t_BOOL);;
+    break;}
+case 187:
+#line 430 "./.y"
+{ yyval.typeName = new TypeName(yyvsp[0].identifier); ;
+    break;}
+case 188:
+#line 431 "./.y"
+{ TypeName::Append(yyvsp[-2].typeName,yyvsp[0].identifier); ;
+    break;}
 }
    /* the action file gets copied in in place of this dollarsign */
 #line 487 "bison.simple"
@@ -1334,7 +1758,7 @@ yyerrhandle:
   yystate = yyn;
   goto yynewstate;
 }
-#line 404 "./.y"
+#line 436 "./.y"
 
 
 void yyerror(char const* s)
