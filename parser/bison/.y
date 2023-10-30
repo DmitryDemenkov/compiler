@@ -257,41 +257,41 @@ var_declarator: type ID
               ;
 
 
-expr: INT_LITERAL
-    | CHAR_LITERAL
-    | STRING_LITERAL
-    | BOOLEAN_LITERAL
-    | '(' expr ')' { $$ = $2; }
-    | member_access
-    | invocation_expression
-    | obj_creation_expr
-    | array_creation_expr
-    | element_access;
-    | '-' expr %prec UNMINUS
-    | '!' expr
-    | '(' type ')' expr
-    | '(' array_type ')' expr
-    | '(' expr ')' expr
-    | expr '*' expr 
-    | expr '/' expr 
-    | expr '%' expr	
-    | expr '+' expr 
-    | expr '-' expr 
-    | expr '<' expr 
-    | expr '>' expr	
-    | expr LESS_EQUAL expr 
-    | expr GREATER_EQUAL expr 
-    | expr IS type
-    | expr IS type_name
-    | expr IS array_type
-    | expr AS type
-    | expr AS type_name
-    | expr AS array_type
-    | expr EQUALITY expr
-    | expr INEQUALITY expr
-    | expr AND expr
-    | expr OR expr
-    | expr '=' expr 
+expr: INT_LITERAL { $$ = new Expression::Expression(t_INT_LITER); }
+    | CHAR_LITERAL { $$ = new Expression::Expression(t_CHAR_LITER); }
+    | STRING_LITERAL { $$ = new Expression::Expression(t_STRING_LITER); }
+    | BOOLEAN_LITERAL { $$ = new Expression::Expression(t_BOOL_LITER); }
+    | '(' expr ')' { $$ = Expression::Expression($2); }
+    | member_access { $$ = new Expression::Expression(t_MEMBER_ACCESS); }
+    | invocation_expression { $$ = new Expression::Expression(t_INVOCATION); }
+    | obj_creation_expr { $$ = new Expression::Expression(t_OBJ_CREATION); }
+    | array_creation_expr { $$ = new Expression::Expression(t_ARR_CREATION); }
+    | element_access; { $$ = new Expression::Expression(t_ELEMENT_ACCESS); }
+    | '-' expr %prec UNMINUS { $$ = Expression::Expression(t_UNMINUS, $2); }  
+    | '!' expr { $$ = Expression::Expression(t_NOT, $2); }
+    | '(' type ')' expr { $$ = Expression::Expression($2, $4); }
+    | '(' array_type ')' expr { $$ = Expression::Expression($2, $4); }
+    | '(' expr ')' expr { $$ = Expression::Expression($2, $4); }
+    | expr '*' expr { $$ = Expression::Expression($1,t_MUL, $3); }
+    | expr '/' expr { $$ = Expression::Expression($1,t_DIV, $3); }
+    | expr '%' expr	{ $$ = Expression::Expression($1,t_MOD, $3); }
+    | expr '+' expr { $$ = Expression::Expression($1,t_SUM, $3); }
+    | expr '-' expr { $$ = Expression::Expression($1,t_SUB, $3); }
+    | expr '<' expr { $$ = Expression::Expression($1,t_LESS, $3); }
+    | expr '>' expr	{ $$ = Expression::Expression($1,t_GREATER, $3); }
+    | expr LESS_EQUAL expr { $$ = Expression::Expression($1,t_LESS_EQUAL, $3); }
+    | expr GREATER_EQUAL expr { $$ = Expression::Expression($1,t_GREATER_EQUAL, $3); }
+    | expr IS type { $$ = Expression::Expression($1,t_IS,$3); }
+    | expr IS type_name { $$ = Expression::Expression($1,t_IS,$3); }
+    | expr IS array_type { $$ = Expression::Expression($1,t_IS,$3); }
+    | expr AS type { $$ = Expression::Expression($1,t_AS,$3); }
+    | expr AS type_name { $$ = Expression::Expression($1,t_AS,$3); }
+    | expr AS array_type { $$ = Expression::Expression($1,t_AS,$3); }
+    | expr EQUALITY expr { $$ = Expression::Expression($1,t_EQUALITY,$3); }
+    | expr INEQUALITY expr { $$ = Expression::Expression($1,t_INEQUALITY,$3); }
+    | expr AND expr { $$ = Expression::Expression($1,t_AND,$3); }
+    | expr OR expr { $$ = Expression::Expression($1,t_OR,$3); }
+    | expr '=' expr { $$ = Expression::Expression($1,t_IS,$3); }
     ;
 
 
