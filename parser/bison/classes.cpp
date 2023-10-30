@@ -300,3 +300,191 @@ InvocationExpression::InvocationExpression(Expression* expr,
 	this->left = expr;
 	this->argumentList = arguments;
 }
+
+VarDeclarator::VarDeclarator(SimpleType* simpletype, Expression* expression)
+{
+}
+
+VarDeclarator::VarDeclarator(TypeName* typeName, Expression* expression)
+{
+}
+
+VarDeclarator::VarDeclarator(ArrayType* arraytype, Expression* expression)
+{
+}
+
+void VarDeclarator::AddInitializer(VarDeclarator* declarator, Expression* expression)
+{
+}
+
+VarDeclaratorList::VarDeclaratorList(VarDeclarator* declarator, Expression* expression)
+{
+}
+
+void VarDeclaratorList::Append(string* identifier, Expression* expression)
+{
+}
+
+Statement::Statement(Type type, Expression* expression)
+{
+}
+
+Statement::Statement(Type type, VarDeclaratorList* declarators)
+{
+}
+
+Statement::Statement(Type type, StatementList* statements)
+{
+}
+
+StatementList::StatementList(Statement* statement)
+{
+}
+
+void StatementList::Append(StatementList statements, Statement* statement)
+{
+}
+
+IfStatement::IfStatement(Expression* expression, 
+	Statement* main, Statement* alternative) : Statement(Statement::t_IF)
+{
+}
+
+WhileStatement::WhileStatement(Expression* expression, 
+	Statement* statement) : Statement(Statement::t_WHILE)
+{
+}
+
+DoStatement::DoStatement(Statement* statement, 
+	Expression* expression) : Statement(Statement::t_DO)
+{
+}
+
+ForeachStatement::ForeachStatement(VarDeclarator* declarator, 
+	Expression* expression, Statement* statement) : Statement(Statement::t_FOREACH)
+{
+}
+
+ForStatement::ForStatement(Expression* init, 
+	Expression* cond, Expression* increment, Statement* statement) : Statement(Statement::t_FOR)
+{
+}
+
+ForStatement::ForStatement(VarDeclaratorList* declarations, 
+	Expression* cond, Expression* increment, Statement* statement) : Statement(Statement::t_FOR)
+{
+}
+
+ReturnStatement::ReturnStatement(Expression* expression) : Statement(Statement::t_RETURN, expression)
+{
+}
+
+ParamList::ParamList(VarDeclarator* param)
+{
+}
+
+void ParamList::Append(ParamList* params, VarDeclarator* param)
+{
+}
+
+Modifier::Modifier(Type type)
+{
+}
+
+ModifielrList::ModifielrList(Modifier* modifier)
+{
+}
+
+void ModifielrList::Append(ModifielrList* modifiers, Modifier* modifier)
+{
+}
+
+ClassMember::ClassMember(Type type, ReturnValueType returnValue, BaseConstructorType baseConstructor)
+{
+}
+
+ClassMemberList::ClassMemberList(ClassMember* member)
+{
+}
+
+void ClassMemberList::Append(ClassMemberList members, ClassMember* member)
+{
+}
+
+Method::Method(ModifielrList* modifiers, ReturnValueType returnValue, 
+	string* identifiers, ParamList* params, StatementList* statements)
+	: ClassMember(ClassMember::t_METHOD, returnValue, ClassMember::t_NULL)
+{
+}
+
+Method::Method(ModifielrList* modifiers, ReturnValueType returnValue, 
+	SimpleType* simpleType, string* identifiers, ParamList* params, StatementList* statements)
+	: ClassMember(ClassMember::t_METHOD, returnValue, ClassMember::t_NULL)
+{
+}
+
+Method::Method(ModifielrList* modifiers, ReturnValueType returnValue, 
+	TypeName* typeName, string* identifiers, ParamList* params, StatementList* statements)
+	: ClassMember(ClassMember::t_METHOD, returnValue, ClassMember::t_NULL)
+{
+}
+
+Method::Method(ModifielrList* modifiers, ReturnValueType returnValue, 
+	ArrayType* arrayType, string* identifiers, ParamList* params, StatementList* statements)
+	: ClassMember(ClassMember::t_METHOD, returnValue, ClassMember::t_NULL)
+{
+}
+
+Field::Field(ModifielrList* modifiers, ReturnValueType returnValue, 
+	SimpleType* simpleType, string* identifier, Expression* expression)
+	: ClassMember(ClassMember::t_FIELD, returnValue, ClassMember::t_NULL)
+{
+}
+
+Field::Field(ModifielrList* modifiers, ReturnValueType returnValue, 
+	TypeName* typeName, string* identifier, Expression* expression)
+	: ClassMember(ClassMember::t_FIELD, returnValue, ClassMember::t_NULL)
+{
+}
+
+Field::Field(ModifielrList* modifiers, ReturnValueType returnValue, 
+	ArrayType* arraType, string* identifier, Expression* expression)
+	: ClassMember(ClassMember::t_FIELD, returnValue, ClassMember::t_NULL)
+{
+}
+
+Constructor::Constructor(ModifielrList* modifiers, string* identifier, 
+	ParamList* params, BaseConstructorType baseConstructor, StatementList* statements, ArgumentList* args)
+	: ClassMember(ClassMember::t_CONSTRUCTOR, ClassMember::t_EMPTY, baseConstructor)
+{
+}
+
+ClassDeclaration::ClassDeclaration(ModifielrList* modifiers, 
+	string* identifier, ClassMemberList* members, TypeName* baseClass)
+	: ClassMember(ClassMember::t_CLASS, ClassMember::t_EMPTY, ClassMember::t_NULL)
+{
+}
+
+NamespaceMember::NamespaceMember(ClassDeclaration* decl)
+{
+}
+
+NamespaceMember::NamespaceMember(NamespaceDeclaration* decl)
+{
+}
+
+NamespaceMemberList::NamespaceMemberList(NamespaceMember* member)
+{
+}
+
+void NamespaceMemberList::Append(NamespaceMemberList* members, NamespaceMember* member)
+{
+}
+
+NamespaceDeclaration::NamespaceDeclaration(TypeName* typeName, NamespaceMemberList* members)
+{
+}
+
+Programm::Programm(NamespaceMemberList* members)
+{
+}

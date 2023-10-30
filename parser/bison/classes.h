@@ -8,6 +8,9 @@ using namespace std;
 class Expression;
 class MemberInitializerList;
 class ArrayInitializer;
+class StatementList;
+class ClassMemberList;
+class NamespaceDeclaration;
 
 class SimpleType
 {
@@ -258,3 +261,299 @@ public:
     InvocationExpression(Expression* expr, ArgumentList* arguments);
 };
 
+class VarDeclarator
+{
+public:
+    enum Type
+    {
+        t_SIMPLE_TYPE,
+        t_TYPE_NAME,
+        t_ARRAY_TYPE
+    };
+
+    int id;
+    SimpleType* simpleType = NULL;
+    TypeName* typeName = NULL;
+    ArrayType* arrayType = NULL;
+    string* identifier = NULL;
+    Expression* initializer = NULL;
+
+    VarDeclarator(SimpleType* simpletype, Expression* expression = NULL);
+    VarDeclarator(TypeName* typeName, Expression* expression = NULL);
+    VarDeclarator(ArrayType* arraytype, Expression* expression = NULL);
+
+    static void AddInitializer(VarDeclarator* declarator, Expression* expression);
+
+};
+
+class VarDeclaratorList
+{
+public:
+    int id;
+    VarDeclarator::Type type;
+    list<VarDeclarator*>* declarators = NULL;
+
+    VarDeclaratorList(VarDeclarator* declarator, Expression* expression = NULL);
+    
+    static void Append(string* identifier, Expression* expression = NULL);
+};
+
+class Statement
+{
+public:
+    enum Type
+    {
+        t_EMPTY,
+        t_EXPRESSION,
+        t_DECLARATOR,
+        t_IF,
+        t_WHILE,
+        t_DO,
+        t_FOR,
+        t_FOREACH,
+        t_RETURN,
+        t_BLOCK
+    };
+
+    int id;
+    Type type;
+    VarDeclaratorList* declarators = NULL;
+    ExpressionList* expressions = NULL;
+    StatementList* statements = NULL;
+
+    Statement(Type type, Expression* expression = NULL);
+    Statement(Type type, VarDeclaratorList* declarators);
+    Statement(Type type, StatementList* statements);
+};
+
+class StatementList
+{
+public:
+    int id;
+    list<Statement*>* statements = NULL;
+
+    StatementList(Statement* statement);
+    static void Append(StatementList statements, Statement* statement);
+};
+
+class IfStatement : public Statement
+{
+public:
+    IfStatement(Expression* expression, Statement* main, Statement* alternative = NULL);
+};
+
+class WhileStatement : public Statement
+{
+public:
+    WhileStatement(Expression* expression, Statement* statement);
+};
+
+class DoStatement : public Statement
+{
+public:
+    DoStatement(Statement* statement, Expression* expression);
+};
+
+class ForeachStatement : public Statement
+{
+public:
+    ForeachStatement(VarDeclarator* declarator, Expression* expression, Statement* statement);
+};
+
+class ForStatement : public Statement
+{
+public:
+    ForStatement(Expression* init, Expression* cond, Expression* increment, Statement* statement);
+    ForStatement(VarDeclaratorList* declarations, Expression* cond, Expression* increment, Statement* statement);
+};
+
+class ReturnStatement : public Statement
+{
+public:
+    ReturnStatement(Expression* expression = NULL);
+};
+
+class ParamList
+{
+    int id;
+    list<VarDeclarator*>* params = NULL;
+
+    ParamList(VarDeclarator* param);
+    static void Append(ParamList* params, VarDeclarator* param);
+};
+
+class Modifier
+{
+public:
+    enum Type
+    {
+        t_PRIVATE,
+        t_PROTECTED,
+        t_PUBLIC,
+        t_INTERNAL,
+        t_ABSTRACT,
+        t_STATIC,
+        t_OVERRIDE,
+        t_VIRTUAL
+    };
+
+    int id;
+    Type type;
+
+    Modifier(Type type);
+};
+
+class ModifielrList
+{
+public:
+    int id;
+    list<Modifier*>* modifiers = NULL;
+
+    ModifielrList(Modifier* modifier);
+    static void Append(ModifielrList* modifiers, Modifier* modifier);
+};
+
+class ClassMember
+{
+public:
+    enum Type
+    {
+        t_FIELD,
+        t_METHOD,
+        t_CONSTRUCTOR,
+        t_CLASS
+    };
+
+    enum ReturnValueType
+    {
+        t_EMPTY,
+        t_SIMPLE_TYPE,
+        t_TYPENAME,
+        t_ARRAY,
+        t_VOID
+    };
+
+    enum BaseConstructorType
+    {
+        t_NULL,
+        t_BASE,
+        t_THIS
+    };
+
+    int id;
+    Type type;
+    ReturnValueType returnValue;
+    BaseConstructorType baseConstructor;
+
+    ModifielrList* modifiers = NULL;
+    SimpleType* simpleType = NULL;;
+    TypeName* typeName = NULL;;
+    ArrayType* arrayType = NULL;;
+    string* identifier = NULL;;
+    Expression* expression = NULL;;
+    ParamList* paramList = NULL;;
+    StatementList* statementList = NULL;;
+    ArgumentList* argumentList = NULL;;
+    ClassMemberList* classMemberList = NULL;;
+
+    ClassMember(Type type, ReturnValueType returnValue, BaseConstructorType baseConstructor);
+};
+
+class ClassMemberList
+{
+public:
+    int id;
+    list<ClassMember*>* members = NULL;
+
+    ClassMemberList(ClassMember* member);
+    static void Append(ClassMemberList members, ClassMember* member);
+};
+
+class Method : public ClassMember
+{
+public:
+    Method(ModifielrList* modifiers, ReturnValueType returnValue,
+        string* identifiers, ParamList* params, StatementList* statements = NULL);
+
+    Method(ModifielrList* modifiers, ReturnValueType returnValue, 
+        SimpleType* simpleType, string* identifiers, ParamList* params, StatementList* statements = NULL);
+
+    Method(ModifielrList* modifiers, ReturnValueType returnValue,
+        TypeName* typeName, string* identifiers, ParamList* params, StatementList* statements = NULL);
+
+    Method(ModifielrList* modifiers, ReturnValueType returnValue,
+        ArrayType* arrayType, string* identifiers, ParamList* params, StatementList* statements = NULL);
+};
+
+class Field : public ClassMember
+{
+public:
+    Field(ModifielrList* modifiers, ReturnValueType returnValue, 
+        SimpleType* simpleType, string* identifier, Expression* expression = NULL);
+
+    Field(ModifielrList* modifiers, ReturnValueType returnValue,
+        TypeName* typeName, string* identifier, Expression* expression = NULL);
+
+    Field(ModifielrList* modifiers, ReturnValueType returnValue,
+        ArrayType* arraType, string* identifier, Expression* expression = NULL);
+};
+
+class Constructor : public ClassMember
+{
+public:
+    Constructor(ModifielrList* modifiers, string* identifier, 
+        ParamList* params, BaseConstructorType baseConstructor, StatementList* statements = NULL, ArgumentList* args = NULL);
+};
+
+class ClassDeclaration : public ClassMember
+{
+public:
+    ClassDeclaration(ModifielrList* modifiers, 
+        string* identifier, ClassMemberList* members, TypeName* baseClass = NULL);
+};
+
+class NamespaceMember
+{
+public:
+    enum Type
+    {
+        t_NAMESPACE,
+        t_CLASS
+    };
+
+    int id;
+    Type type;
+
+    ClassDeclaration* classDecl = NULL;
+    NamespaceDeclaration* namespaceDecl = NULL;
+
+    NamespaceMember(ClassDeclaration* decl);
+    NamespaceMember(NamespaceDeclaration* decl);
+};
+
+class NamespaceMemberList
+{
+public:
+    int id;
+    list<NamespaceMember*>* members = NULL;
+
+    NamespaceMemberList(NamespaceMember* member);
+    static void Append(NamespaceMemberList* members, NamespaceMember* member);
+};
+
+class NamespaceDeclaration
+{
+    int id;
+    TypeName* typeName = NULL;
+    NamespaceMemberList* members = NULL;
+
+    NamespaceDeclaration(TypeName* typeName, NamespaceMemberList* members);
+};
+
+class Programm
+{
+    int id;
+    NamespaceMemberList* members = NULL;
+
+    Programm(NamespaceMemberList* members);
+};
