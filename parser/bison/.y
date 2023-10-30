@@ -257,41 +257,41 @@ var_declarator: type ID
               ;
 
 
-expr: INT_LITERAL { $$ = new Expression::Expression(t_INT_LITER); }
-    | CHAR_LITERAL { $$ = new Expression::Expression(t_CHAR_LITER); }
-    | STRING_LITERAL { $$ = new Expression::Expression(t_STRING_LITER); }
-    | BOOLEAN_LITERAL { $$ = new Expression::Expression(t_BOOL_LITER); }
-    | '(' expr ')' { $$ = Expression::Expression($2); }
-    | member_access { $$ = new Expression::Expression(t_MEMBER_ACCESS); }
-    | invocation_expression { $$ = new Expression::Expression(t_INVOCATION); }
-    | obj_creation_expr { $$ = new Expression::Expression(t_OBJ_CREATION); }
-    | array_creation_expr { $$ = new Expression::Expression(t_ARR_CREATION); }
-    | element_access { $$ = new Expression::Expression(t_ELEMENT_ACCESS); }
-    | '-' expr %prec UNMINUS { $$ = Expression::Expression(t_UNMINUS, $2); }  
-    | '!' expr { $$ = Expression::Expression(t_NOT, $2); }
-    | '(' type ')' expr { $$ = Expression::Expression($2, $4); }
-    | '(' array_type ')' expr { $$ = Expression::Expression($2, $4); }
-    | '(' expr ')' expr { $$ = Expression::Expression($2, $4); }
-    | expr '*' expr { $$ = Expression::Expression($1,t_MUL, $3); }
-    | expr '/' expr { $$ = Expression::Expression($1,t_DIV, $3); }
-    | expr '%' expr	{ $$ = Expression::Expression($1,t_MOD, $3); }
-    | expr '+' expr { $$ = Expression::Expression($1,t_SUM, $3); }
-    | expr '-' expr { $$ = Expression::Expression($1,t_SUB, $3); }
-    | expr '<' expr { $$ = Expression::Expression($1,t_LESS, $3); }
-    | expr '>' expr	{ $$ = Expression::Expression($1,t_GREATER, $3); }
-    | expr LESS_EQUAL expr { $$ = Expression::Expression($1,t_LESS_EQUAL, $3); }
-    | expr GREATER_EQUAL expr { $$ = Expression::Expression($1,t_GREATER_EQUAL, $3); }
-    | expr IS type { $$ = Expression::Expression($1,t_IS,$3); }
-    | expr IS type_name { $$ = Expression::Expression($1,t_IS,$3); }
-    | expr IS array_type { $$ = Expression::Expression($1,t_IS,$3); }
-    | expr AS type { $$ = Expression::Expression($1,t_AS,$3); }
-    | expr AS type_name { $$ = Expression::Expression($1,t_AS,$3); }
-    | expr AS array_type { $$ = Expression::Expression($1,t_AS,$3); }
-    | expr EQUALITY expr { $$ = Expression::Expression($1,t_EQUALITY,$3); }
-    | expr INEQUALITY expr { $$ = Expression::Expression($1,t_INEQUALITY,$3); }
-    | expr AND expr { $$ = Expression::Expression($1,t_AND,$3); }
-    | expr OR expr { $$ = Expression::Expression($1,t_OR,$3); }
-    | expr '=' expr { $$ = Expression::Expression($1,t_IS,$3); }
+expr: INT_LITERAL { $$ = new Expression(t_INT_LITER); }
+    | CHAR_LITERAL { $$ = new Expression(t_CHAR_LITER); }
+    | STRING_LITERAL { $$ = new Expression(t_STRING_LITER); }
+    | BOOLEAN_LITERAL { $$ = new Expression(t_BOOL_LITER); }
+    | '(' expr ')' { $$ = Expression($2); }
+    | member_access { $$ = new Expression(t_MEMBER_ACCESS); }
+    | invocation_expression { $$ = Expression(t_INVOCATION); }
+    | obj_creation_expr { $$ = new Expression(t_OBJ_CREATION); }
+    | array_creation_expr { $$ = new Expression(t_ARR_CREATION); }
+    | element_access { $$ = new Expression(t_ELEMENT_ACCESS); }
+    | '-' expr %prec UNMINUS { $$ = Expression(t_UNMINUS, $2); }  
+    | '!' expr { $$ = Expression(t_NOT, $2); }
+    | '(' type ')' expr { $$ = Expression($2, $4); }
+    | '(' array_type ')' expr { $$ = Expression($2, $4); }
+    | '(' expr ')' expr { $$ = Expression($2, $4); }
+    | expr '*' expr { $$ = Expression($1,t_MUL, $3); }
+    | expr '/' expr { $$ = Expression($1,t_DIV, $3); }
+    | expr '%' expr	{ $$ = Expression($1,t_MOD, $3); }
+    | expr '+' expr { $$ = Expression($1,t_SUM, $3); }
+    | expr '-' expr { $$ = Expression($1,t_SUB, $3); }
+    | expr '<' expr { $$ = Expression($1,t_LESS, $3); }
+    | expr '>' expr	{ $$ = Expression($1,t_GREATER, $3); }
+    | expr LESS_EQUAL expr { $$ = Expression($1,t_LESS_EQUAL, $3); }
+    | expr GREATER_EQUAL expr { $$ = Expression($1,t_GREATER_EQUAL, $3); }
+    | expr IS type { $$ = Expression($1,t_IS,$3); }
+    | expr IS type_name { $$ = Expression($1,t_IS,$3); }
+    | expr IS array_type { $$ = Expression($1,t_IS,$3); }
+    | expr AS type { $$ = Expression($1,t_AS,$3); }
+    | expr AS type_name { $$ = Expression($1,t_AS,$3); }
+    | expr AS array_type { $$ = Expression($1,t_AS,$3); }
+    | expr EQUALITY expr { $$ = Expression($1,t_EQUALITY,$3); }
+    | expr INEQUALITY expr { $$ = Expression($1,t_INEQUALITY,$3); }
+    | expr AND expr { $$ = Expression($1,t_AND,$3); }
+    | expr OR expr { $$ = Expression($1,t_OR,$3); }
+    | expr '=' expr { $$ = Expression($1,t_IS,$3); }
     ;
 
 
@@ -329,89 +329,89 @@ element_access: type_name '[' argm_list ']'
               ;
 
 
-array_creation_expr: NEW array_type { $$ = new ArrayType::ArrayType($1); }
-                   | NEW array_type array_initializer { $$ = new ArrayCreation::ArrayCreation($2,$3); }
-                   | NEW type '[' expr ']' { $$ = new ArrayCreation::ArrayCreation($2,$4); }
-                   | NEW type '[' expr ']' array_initializer { $$ = new ArrayCreation::ArrayCreation($2,$4,$6); }
-                   | NEW type_name '[' expr ']' { $$ = new ArrayCreation::ArrayCreation($2, $4); }
-                   | NEW type_name '[' expr ']' array_initializer { $$ = new ArrayCreation::ArrayCreation($2,$4,$6); }
+array_creation_expr: NEW array_type { $$ = new ArrayType($1); }
+                   | NEW array_type array_initializer { $$ = new ArrayCreation($2,$3); }
+                   | NEW type '[' expr ']' { $$ = new ArrayCreation($2,$4); }
+                   | NEW type '[' expr ']' array_initializer { $$ = new ArrayCreation($2,$4,$6); }
+                   | NEW type_name '[' expr ']' { $$ = new ArrayCreation($2, $4); }
+                   | NEW type_name '[' expr ']' array_initializer { $$ = new ArrayCreation($2,$4,$6); }
                    ;
 
 
-array_initializer: '{' expr_list_em '}' { $$ = ExpressionList::ExpressionList($1); }
-                 | '{' expr_list ',' '}' { $$ = ArrayInitializer::ArrayInitializer($1); }
+array_initializer: '{' expr_list_em '}' { $$ = new ArrayInitializer($1); }
+                 | '{' expr_list ',' '}' { $$ = ArrayInitializer($1); }
                  ;
 
 
-expr_list: expr { $$ = ExpressionList::ExpressionList($1); }
+expr_list: expr { $$ = new ExpressionList($1); }
          | expr_list ',' expr { $$ = ExpressionList::Append($1, $3); }
          ;
 
 
 expr_list_em: /* empty*/ { $$ = null; }
-            | expr_list { $$ = ExpressionList::ExpressionList($1); }
+            | expr_list { $$ = new ExpressionList($1); }
             ;
 
 
-obj_creation_expr: NEW type '(' argm_list_em ')' { $$ = new ObjectCreation::ObjectCreation($2,$4); }
-                 | NEW type '(' argm_list_em ')' obj_initializer { $$ = new ObjectCreation::ObjectCreation($2,$4,$6); }
-                 | NEW type obj_initializer { $$ = new ObjectCreation::ObjectCreation($2,$3); }
-                 | NEW type_name '(' argm_list_em ')' { $$ = new ObjectCreation::ObjectCreation($2,$4); }
-                 | NEW type_name '(' argm_list_em ')' obj_initializer { $$ = new ObjectCreation::ObjectCreation($2,$4,$6); }
-                 | NEW type_name obj_initializer { $$ = new ObjectCreation::ObjectCreation($2,$3); }
+obj_creation_expr: NEW type '(' argm_list_em ')' { $$ = new ObjectCreation($2,$4); }
+                 | NEW type '(' argm_list_em ')' obj_initializer { $$ = new ObjectCreation($2,$4,$6); }
+                 | NEW type obj_initializer { $$ = new ObjectCreation($2,$3); }
+                 | NEW type_name '(' argm_list_em ')' { $$ = new ObjectCreation($2,$4); }
+                 | NEW type_name '(' argm_list_em ')' obj_initializer { $$ = new ObjectCreation($2,$4,$6); }
+                 | NEW type_name obj_initializer { $$ = new ObjectCreation($2,$3); }
                  ;
                  
 
-obj_initializer: '{' member_initializer_list_em '}' { $$ = new ObjectInitializer::ObjectInitializer($1); }
-               | '{' member_initializer_list ',' '}' { $$ = ObjectInitializer::ObjectInitializer($1); }
+obj_initializer: '{' member_initializer_list_em '}' { $$ = new ObjectInitializer($1); }
+               | '{' member_initializer_list ',' '}' { $$ = ObjectInitializer($1); }
                ;
 
 
 member_initializer_list_em: /* empty */ { $$ = null; }
-                          | member_initializer_list { $$ = new MemberInitializerList::MemberInitializerList($1); }
+                          | member_initializer_list { $$ = new MemberInitializerList($1); }
                           ;
 
 
-member_initializer_list: member_initializer { $$ = new MemberInitializerList::MemberInitializerList($1); }
+member_initializer_list: member_initializer { $$ = new MemberInitializerList($1); }
                        | member_initializer_list ',' member_initializer { $$ = MemberInitializerList::Append($1, $3); }
                        ;
 
 
-member_initializer: ID '=' expr { $$ = MemberInitializer::MemberInitializer($1,$3); }
-                  | '[' argm_list ']' '=' expr { $$ = MemberInitializer::MemberInitializer($2,$5); }
-                  | ID '=' obj_initializer { $$ = MemberInitializer::MemberInitializer($1,$3); }
-                  | '[' argm_list ']' '=' obj_initializer { $$ = MemberInitializer::MemberInitializer($2,$5); }
+member_initializer: ID '=' expr { $$ = MemberInitializer($1,$3); }
+                  | '[' argm_list ']' '=' expr { $$ = MemberInitializer($2,$5); }
+                  | ID '=' obj_initializer { $$ = MemberInitializer($1,$3); }
+                  | '[' argm_list ']' '=' obj_initializer { $$ = MemberInitializer($2,$5); }
                   ;
 
 
 argm_list_em: /* empty */ { $$ = null; }
-            | argm_list { $$ = new ArgumentList::ArgumentList($1);}
+            | argm_list { $$ = new ArgumentList($1);}
             ;
 
 
-argm_list: argm { $$ = new ArgumentList::ArgumentList($1);}
+argm_list: argm { $$ = new ArgumentList($1);}
          | argm_list ',' argm { $$ = ArgumentList::Append($1,$3);}
          ;
 
 
-argm: expr { $$ = new Argument::Argument($1); }
-    | ID ':' expr { $$ = Argument::Argument($1,$3); }
+argm: expr { $$ = new Argument($1); }
+    | ID ':' expr { $$ = Argument($1,$3); }
     ;
 
 
-array_type: type '[' ']' { $$ = new ArrayType::ArrayType($1); }
-          | type_name '[' ']' { $$ = ArrayType::ArrayType(t_TYPE_NAME); }
+array_type: type '[' ']' { $$ = new ArrayType($1); }
+          | type_name '[' ']' { $$ = new ArrayType(t_TYPE_NAME); }
           ;
 
 
-type: INT { $$ = new SimpleType::SimpleType(t_INT);}
-    | CHAR { $$ = new SimpleType::SimpleType(t_CHAR);}
-    | STRING { $$ = new SimpleType::SimpleType(t_STRING);}
-    | BOOL { $$ = new SimpleType::SimpleType(t_BOOL);}
+type: INT { $$ = new SimpleType(t_INT);}
+    | CHAR { $$ = new SimpleType(t_CHAR);}
+    | STRING { $$ = new SimpleType(t_STRING);}
+    | BOOL { $$ = new SimpleType(t_BOOL);}
     ;
 
 
-type_name: ID { $$ = new TypeName::TypeName($1); }
+type_name: ID { $$ = new TypeName($1); }
          | type_name '.' ID { $$ = TypeName::Append($1,$3); }
          ;
 
