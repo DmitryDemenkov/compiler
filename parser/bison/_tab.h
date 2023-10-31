@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include "classes.h"
 using namespace std;
 typedef union {
     int int_literal;
@@ -7,6 +8,21 @@ typedef union {
     bool boolean_literal;
     string *string_literal;
     string *identifier;
+	SimpleType* simpleType;
+	TypeName* typeName;
+	ArrayType* arrayType;
+	Argument* argument;
+	ArgumentList* argumentList;
+	ObjectInitializer* objectInitializer;
+	ObjectCreation* objectCreation;
+	MemberInitializer* memberInitializer;
+	MemberInitializerList* memberInitializerList;
+	Expression* expression;
+	ExpressionList* expressionList;
+	ArrayInitializer* arrayInitializer;
+	ArrayCreation* arrayCreation;
+	ElementAccess* elementAccess;
+	InvocationExpression* invocationExpression;
 } YYSTYPE;
 #define	ABSTRACT	258
 #define	VIRTUAL	259
