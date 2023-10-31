@@ -221,8 +221,6 @@ ObjectCreation::ObjectCreation(SimpleType* simpleType,
 	this->simpleType = simpleType;
 	this->argumentList = argumentList;
 	this->objInitializer = objInit;
-		
-
 }
 
 ObjectCreation::ObjectCreation(TypeName* typeName, 
@@ -251,6 +249,7 @@ string* ExpressionList::ToDOT()
 
 ArrayInitializer::ArrayInitializer(ExpressionList* expressions)
 {
+	this->id = ++maxId;
 	this->expressions = expressions;
 }
 
@@ -262,6 +261,7 @@ string* ArrayInitializer::ToDOT()
 ArrayCreation::ArrayCreation(ArrayType* arrType, 
 	ArrayInitializer* arrInit) : Expression(Expression::t_ARR_CREATION)
 {
+	this->id = ++maxId;
 	this->arrayType = arrType;
 	this->arrayInitializer = arrInit;
 
@@ -270,6 +270,7 @@ ArrayCreation::ArrayCreation(ArrayType* arrType,
 ArrayCreation::ArrayCreation(SimpleType* simpleType, 
 	Expression* expr, ArrayInitializer* arrInit) : Expression(Expression::t_ARR_CREATION)
 {
+	this->id = ++maxId;
 	this->simpleType = simpleType;
 	this->left = expr;
 }
@@ -277,6 +278,7 @@ ArrayCreation::ArrayCreation(SimpleType* simpleType,
 ArrayCreation::ArrayCreation(TypeName* typeName, 
 	Expression* expr, ArrayInitializer* arrInit) : Expression(Expression::t_ARR_CREATION)
 {
+	this->id = ++maxId;
 	this->typeName = typeName;
 	this->left = expr;
 	this->arrayInitializer = arrInit;
@@ -290,6 +292,7 @@ Expression* MemberAccess::FromTypeName(TypeName* typeName, Expression* left)
 ElementAccess::ElementAccess(Expression* expr, 
 	ArgumentList* arguments) : Expression(Expression::t_ELEMENT_ACCESS)
 {
+	this->id = ++maxId;
 	this->left = expr;
 	this->argumentList = arguments;
 }
@@ -297,62 +300,95 @@ ElementAccess::ElementAccess(Expression* expr,
 InvocationExpression::InvocationExpression(Expression* expr, 
 	ArgumentList* arguments) : Expression(Expression::t_INVOCATION)
 {
+	this->id = ++maxId;
 	this->left = expr;
 	this->argumentList = arguments;
 }
 
 VarDeclarator::VarDeclarator(SimpleType* simpletype, Expression* expression)
 {
+	this->id = ++maxId;
+	this->simpleType = simpletype;
+	this->initializer = expression;
 }
 
 VarDeclarator::VarDeclarator(TypeName* typeName, Expression* expression)
 {
+	this->id = ++maxId;
+	this->typeName = typeName;
+	this->initializer = expression;
 }
 
 VarDeclarator::VarDeclarator(ArrayType* arraytype, Expression* expression)
 {
+	this->id = ++maxId;
+	this->arrayType = arraytype;
+	this->initializer = expression;
 }
 
 void VarDeclarator::AddInitializer(VarDeclarator* declarator, Expression* expression)
 {
+	////////////////////////////////////////////////////////////
 }
 
 VarDeclaratorList::VarDeclaratorList(VarDeclarator* declarator, Expression* expression)
 {
+	////////////////////////////////////
 }
 
 void VarDeclaratorList::Append(string* identifier, Expression* expression)
 {
+	///////////////////////////////////////////////////////
 }
 
 Statement::Statement(Type type, Expression* expression)
 {
+	this->id = ++maxId;
+	this->type = type;
+	this->left = expression;
 }
 
 Statement::Statement(Type type, VarDeclaratorList* declarators)
 {
+	this->id = ++maxId;
+	this->type = type;
+	this->declarators = declarators;
 }
 
 Statement::Statement(Type type, StatementList* statements)
 {
+	this->id = ++maxId;
+	this->type = type;
+	this->statements = statements;
 }
 
 StatementList::StatementList(Statement* statement)
 {
+	this->id = ++maxId;
+	this->statements = new list <Statement*>{ statement };
 }
 
 void StatementList::Append(StatementList statements, Statement* statement)
 {
+	//////////////////////
 }
 
 IfStatement::IfStatement(Expression* expression, 
 	Statement* main, Statement* alternative) : Statement(Statement::t_IF)
 {
+	this->id = ++maxId;
+	this->left = expression;
+	this->statements = main;//////////////////////
+	this->alternative = alternative;//////////////////////
+
 }
 
 WhileStatement::WhileStatement(Expression* expression, 
 	Statement* statement) : Statement(Statement::t_WHILE)
 {
+	this->id = ++maxId;
+	this->left = expression;
+	this->statement = statement;///////////////////////
 }
 
 DoStatement::DoStatement(Statement* statement, 
@@ -381,10 +417,12 @@ ReturnStatement::ReturnStatement(Expression* expression) : Statement(Statement::
 
 ParamList::ParamList(VarDeclarator* param)
 {
+	///////////////////////////////////////
 }
 
 void ParamList::Append(ParamList* params, VarDeclarator* param)
 {
+	//////////////////////////////////////
 }
 
 Modifier::Modifier(Type type)
@@ -393,10 +431,12 @@ Modifier::Modifier(Type type)
 
 ModifielrList::ModifielrList(Modifier* modifier)
 {
+	///////////////////////////////////////
 }
 
 void ModifielrList::Append(ModifielrList* modifiers, Modifier* modifier)
 {
+	//////////////////////////////////////
 }
 
 ClassMember::ClassMember(Type type, ReturnValueType returnValue, BaseConstructorType baseConstructor)
@@ -405,10 +445,12 @@ ClassMember::ClassMember(Type type, ReturnValueType returnValue, BaseConstructor
 
 ClassMemberList::ClassMemberList(ClassMember* member)
 {
+	///////////////////////////////////////
 }
 
 void ClassMemberList::Append(ClassMemberList members, ClassMember* member)
 {
+	/////////////////////////////////////
 }
 
 Method::Method(ModifielrList* modifiers, ReturnValueType returnValue, 
@@ -467,24 +509,35 @@ ClassDeclaration::ClassDeclaration(ModifielrList* modifiers,
 
 NamespaceMember::NamespaceMember(ClassDeclaration* decl)
 {
+	this->id = ++maxId;
+	this->classDecl = decl;
 }
 
 NamespaceMember::NamespaceMember(NamespaceDeclaration* decl)
 {
+	this->id = ++maxId;
+	this->namespaceDecl = decl;
 }
 
 NamespaceMemberList::NamespaceMemberList(NamespaceMember* member)
 {
+	//////////////////////////////////
 }
 
 void NamespaceMemberList::Append(NamespaceMemberList* members, NamespaceMember* member)
 {
+	/////////////////////////////////
 }
 
 NamespaceDeclaration::NamespaceDeclaration(TypeName* typeName, NamespaceMemberList* members)
 {
+	this->id = ++maxId;
+	this->typeName = typeName;
+	this->members = members;
 }
 
 Programm::Programm(NamespaceMemberList* members)
 {
+	this->id = ++maxId;
+	this->members = members;
 }

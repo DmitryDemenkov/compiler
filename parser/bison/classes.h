@@ -224,6 +224,7 @@ public:
 class ArrayInitializer
 {
 public:
+    int id;
     ExpressionList* expressions = NULL;
 
     ArrayInitializer(ExpressionList* expressions);
@@ -318,6 +319,7 @@ public:
     int id;
     Type type;
     VarDeclaratorList* declarators = NULL;
+    Expression* left = NULL;/////????????
     ExpressionList* expressions = NULL;
     StatementList* statements = NULL;
 
