@@ -48,17 +48,18 @@ class ArrayType
 public:
     enum Type
     {
-        t_INT,
-        t_CHAR,
-        t_BOOL,
-        t_STRING,
+        t_SIMPLE_TYPE,
         t_TYPE_NAME
     };
 
     int id;
     Type type;
 
-    ArrayType(Type type);
+    SimpleType* simpleType = NULL;
+    TypeName* typeName = NULL;
+
+    ArrayType(SimpleType* simpleType);
+    ArrayType(TypeName* typeName);
 
     string* ToDOT();
 };

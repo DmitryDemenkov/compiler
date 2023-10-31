@@ -32,10 +32,18 @@ string* TypeName::ToDOT()
 	return nullptr;
 }
 
-ArrayType::ArrayType(Type type)
+ArrayType::ArrayType(SimpleType* simpleType)
 {
 	this->id = ++maxId;
-	this->type = type;
+	this->type = ArrayType::t_SIMPLE_TYPE;
+	this->simpleType = simpleType;
+}
+
+ArrayType::ArrayType(TypeName* typeName)
+{
+	this->id = ++maxId;
+	this->type = ArrayType::t_TYPE_NAME;
+	this->typeName = typeName;
 }
 
 string* ArrayType::ToDOT()
