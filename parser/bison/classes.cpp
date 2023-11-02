@@ -326,9 +326,16 @@ VarDeclarator::VarDeclarator(ArrayType* arraytype, Expression* expression)
 	this->initializer = expression;
 }
 
-void VarDeclarator::AddInitializer(VarDeclarator* declarator, Expression* expression)
-{
-	declarator->declarator->push_back(expression);/*ОШИБКА*/
+void VarDeclarator::AddInitializer(VarDeclarator* declarator, Expression* expression) 
+{ 
+	VarDeclarator* lastDeclarator = declarator;
+
+	while (lastDeclarator->declarator != NULL) {
+		lastDeclarator = lastDeclarator->declarator;
+	}
+
+	// Теперь lastDeclarator указывает на последний элемент в списке declarator.
+	lastDeclarator->initializer = new Expression(*expression);
 }
 
 VarDeclaratorList::VarDeclaratorList(VarDeclarator* declarator, Expression* expression)
