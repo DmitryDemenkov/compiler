@@ -328,17 +328,21 @@ VarDeclarator::VarDeclarator(ArrayType* arraytype, Expression* expression)
 
 void VarDeclarator::AddInitializer(VarDeclarator* declarator, Expression* expression)
 {
+	////declarator->declarator->push_back(expression);??????????????????????
 	////////////////////////////////////////////////////////////
 }
 
 VarDeclaratorList::VarDeclaratorList(VarDeclarator* declarator, Expression* expression)
 {
-	////////////////////////////////////
+	this->id = ++maxId;
+	this->declarators = new list<VarDeclarator*>{ declarator };
+	//this->declarators->push_back(declarator);
+	this->type = type;
 }
 
-void VarDeclaratorList::Append(string* identifier, Expression* expression)
+void VarDeclaratorList::Append(VarDeclaratorList* declarators, Expression* expression)
 {
-	///////////////////////////////////////////////////////
+	declarators->declarators->push_back(expression);/////////////////////////
 }
 
 Statement::Statement(Type type, Expression* expression)
@@ -368,9 +372,9 @@ StatementList::StatementList(Statement* statement)
 	this->statements = new list <Statement*>{ statement };
 }
 
-void StatementList::Append(StatementList statements, Statement* statement)
+void StatementList::Append(StatementList * statements, Statement* statement)
 {
-	//////////////////////
+	statements->statements->push_back(statement);
 }
 
 IfStatement::IfStatement(Expression* expression, 
@@ -378,7 +382,7 @@ IfStatement::IfStatement(Expression* expression,
 {
 	this->id = ++maxId;
 	this->left = expression;
-	this->statements = main;//////////////////////
+	this->main = main;//////////////////////
 	this->alternative = alternative;//////////////////////
 
 }
@@ -394,117 +398,189 @@ WhileStatement::WhileStatement(Expression* expression,
 DoStatement::DoStatement(Statement* statement, 
 	Expression* expression) : Statement(Statement::t_DO)
 {
+	this->id = ++maxId;
 }
 
 ForeachStatement::ForeachStatement(VarDeclarator* declarator, 
 	Expression* expression, Statement* statement) : Statement(Statement::t_FOREACH)
 {
+	this->id = ++maxId;
 }
 
 ForStatement::ForStatement(Expression* init, 
 	Expression* cond, Expression* increment, Statement* statement) : Statement(Statement::t_FOR)
 {
+	this->id = ++maxId;
 }
 
 ForStatement::ForStatement(VarDeclaratorList* declarations, 
 	Expression* cond, Expression* increment, Statement* statement) : Statement(Statement::t_FOR)
 {
+	this->id = ++maxId;
 }
 
 ReturnStatement::ReturnStatement(Expression* expression) : Statement(Statement::t_RETURN, expression)
 {
+	this->id = ++maxId;
+	this->expression->expression;////////
 }
 
 ParamList::ParamList(VarDeclarator* param)
 {
-	///////////////////////////////////////
+	this->id = ++maxId;
+	this->params = new list < VarDeclarator*>{ param };
 }
 
 void ParamList::Append(ParamList* params, VarDeclarator* param)
 {
-	//////////////////////////////////////
+	params->params->push_back(param);
 }
 
 Modifier::Modifier(Type type)
 {
+	this->id = ++maxId;
+	this->type = type;
 }
 
 ModifielrList::ModifielrList(Modifier* modifier)
 {
-	///////////////////////////////////////
+	this->id = ++maxId;
+	this->modifiers = new list < Modifier*>{ modifier };
 }
 
 void ModifielrList::Append(ModifielrList* modifiers, Modifier* modifier)
 {
-	//////////////////////////////////////
+	modifiers->modifiers->push_back(modifier);
 }
 
 ClassMember::ClassMember(Type type, ReturnValueType returnValue, BaseConstructorType baseConstructor)
 {
+	this->id = ++maxId;
+	this->type = type;
+	this->returnValue = returnValue;
+	this->baseConstructor = baseConstructor;
 }
 
 ClassMemberList::ClassMemberList(ClassMember* member)
 {
-	///////////////////////////////////////
+	this->id = ++maxId;
+	this->members = new list < ClassMember*>{ member };
 }
 
-void ClassMemberList::Append(ClassMemberList members, ClassMember* member)
+void ClassMemberList::Append(ClassMemberList *members, ClassMember* member)
 {
-	/////////////////////////////////////
+	members->members->push_back(member);
 }
 
 Method::Method(ModifielrList* modifiers, ReturnValueType returnValue, 
 	string* identifiers, ParamList* params, StatementList* statements)
 	: ClassMember(ClassMember::t_METHOD, returnValue, ClassMember::t_NULL)
 {
+	this->id = ++maxId;
+	this->modifiers = modifiers;
+	this->returnValue = returnValue;
+	this->identifiers = identifiers;///
+	this->params = params;///
+	this->statements = statements;///
+
 }
 
 Method::Method(ModifielrList* modifiers, ReturnValueType returnValue, 
 	SimpleType* simpleType, string* identifiers, ParamList* params, StatementList* statements)
 	: ClassMember(ClassMember::t_METHOD, returnValue, ClassMember::t_NULL)
 {
+	this->id = ++maxId;
+	this->modifiers = modifiers;
+	this->returnValue = returnValue;
+	this->identifiers = identifiers;///
+	this->simpleType = simpleType;
+	this->params = params;///
+	this->statements = statements;///
 }
 
 Method::Method(ModifielrList* modifiers, ReturnValueType returnValue, 
 	TypeName* typeName, string* identifiers, ParamList* params, StatementList* statements)
 	: ClassMember(ClassMember::t_METHOD, returnValue, ClassMember::t_NULL)
 {
+	this->id = ++maxId;
+	this->modifiers = modifiers;
+	this->returnValue = returnValue;
+	this->identifiers = identifiers;///
+	this->typeName = typeName;
+	this->params = params;///
+	this->statements = statements;///
 }
 
 Method::Method(ModifielrList* modifiers, ReturnValueType returnValue, 
 	ArrayType* arrayType, string* identifiers, ParamList* params, StatementList* statements)
 	: ClassMember(ClassMember::t_METHOD, returnValue, ClassMember::t_NULL)
 {
+	this->id = ++maxId;
+	this->modifiers = modifiers;
+	this->returnValue = returnValue;
+	this->identifiers = identifiers;///
+	this->arrayType = arrayType;
+	this->params = params;///
+	this->statements = statements;///
 }
 
 Field::Field(ModifielrList* modifiers, ReturnValueType returnValue, 
 	SimpleType* simpleType, string* identifier, Expression* expression)
 	: ClassMember(ClassMember::t_FIELD, returnValue, ClassMember::t_NULL)
 {
+	this->id = ++maxId;
+	this->modifiers = modifiers;
+	this->returnValue = returnValue;
+	this->identifiers = identifiers;///
+	this->simpleType = simpleType;
+	this->expression = expression;
 }
 
 Field::Field(ModifielrList* modifiers, ReturnValueType returnValue, 
 	TypeName* typeName, string* identifier, Expression* expression)
 	: ClassMember(ClassMember::t_FIELD, returnValue, ClassMember::t_NULL)
 {
+	this->id = ++maxId;
+	this->modifiers = modifiers;
+	this->returnValue = returnValue;
+	this->identifiers = identifiers;///
+	this->typeName = typeName;
+	this->expression = expression;
 }
 
 Field::Field(ModifielrList* modifiers, ReturnValueType returnValue, 
 	ArrayType* arraType, string* identifier, Expression* expression)
 	: ClassMember(ClassMember::t_FIELD, returnValue, ClassMember::t_NULL)
 {
+	this->id = ++maxId;
+	this->modifiers = modifiers;
+	this->returnValue = returnValue;
+	this->identifiers = identifiers;///
+	this->arraType = arraType;
+	this->expression = expression;
 }
 
 Constructor::Constructor(ModifielrList* modifiers, string* identifier, 
 	ParamList* params, BaseConstructorType baseConstructor, StatementList* statements, ArgumentList* args)
 	: ClassMember(ClassMember::t_CONSTRUCTOR, ClassMember::t_EMPTY, baseConstructor)
 {
+	this->id = ++maxId;
+	this->modifiers = modifiers;
+	this->retubaseConstructorrnValue = baseConstructor;
+	this->identifiers = identifiers;///////////
+	this->statements = statements;////////////
+	this->params = params;/////////////////
 }
 
 ClassDeclaration::ClassDeclaration(ModifielrList* modifiers, 
 	string* identifier, ClassMemberList* members, TypeName* baseClass)
 	: ClassMember(ClassMember::t_CLASS, ClassMember::t_EMPTY, ClassMember::t_NULL)
 {
+	this->id = ++maxId;
+	this->modifiers = modifiers;
+	this->members = members;
+	this->identifiers = identifiers;/////////////
+	this->baseClass = baseClass;///////////
 }
 
 NamespaceMember::NamespaceMember(ClassDeclaration* decl)
@@ -521,12 +597,13 @@ NamespaceMember::NamespaceMember(NamespaceDeclaration* decl)
 
 NamespaceMemberList::NamespaceMemberList(NamespaceMember* member)
 {
-	//////////////////////////////////
+	this->id = ++maxId;
+	this->members = new list < NamespaceMember*>{ member };
 }
 
 void NamespaceMemberList::Append(NamespaceMemberList* members, NamespaceMember* member)
 {
-	/////////////////////////////////
+	members->members->push_back(member);
 }
 
 NamespaceDeclaration::NamespaceDeclaration(TypeName* typeName, NamespaceMemberList* members)

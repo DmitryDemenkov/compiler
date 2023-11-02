@@ -296,7 +296,7 @@ public:
 
     VarDeclaratorList(VarDeclarator* declarator, Expression* expression = NULL);
     
-    static void Append(string* identifier, Expression* expression = NULL);
+    static void Append(VarDeclaratorList* declarators, Expression* expression = NULL);
 };
 
 class Statement
@@ -335,7 +335,7 @@ public:
     list<Statement*>* statements = NULL;
 
     StatementList(Statement* statement);
-    static void Append(StatementList statements, Statement* statement);
+    static void Append(StatementList *statements, Statement* statement);
 };
 
 class IfStatement : public Statement
@@ -456,7 +456,7 @@ public:
     ParamList* paramList = NULL;;
     StatementList* statementList = NULL;;
     ArgumentList* argumentList = NULL;;
-    ClassMemberList* classMemberList = NULL;;
+    ClassMemberList* classMemberList = NULL;
 
     ClassMember(Type type, ReturnValueType returnValue, BaseConstructorType baseConstructor);
 };
@@ -468,7 +468,7 @@ public:
     list<ClassMember*>* members = NULL;
 
     ClassMemberList(ClassMember* member);
-    static void Append(ClassMemberList members, ClassMember* member);
+    static void Append(ClassMemberList *members, ClassMember* member);
 };
 
 class Method : public ClassMember
