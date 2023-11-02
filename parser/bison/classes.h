@@ -448,14 +448,14 @@ public:
     BaseConstructorType baseConstructor;
 
     ModifielrList* modifiers = NULL;
-    SimpleType* simpleType = NULL;;
-    TypeName* typeName = NULL;;
-    ArrayType* arrayType = NULL;;
-    string* identifier = NULL;;
-    Expression* expression = NULL;;
-    ParamList* paramList = NULL;;
-    StatementList* statementList = NULL;;
-    ArgumentList* argumentList = NULL;;
+    SimpleType* simpleType = NULL;
+    TypeName* typeName = NULL;
+    ArrayType* arrayType = NULL;
+    string* identifier = NULL;
+    Expression* expression = NULL;
+    ParamList* paramList = NULL;
+    StatementList* statementList = NULL;
+    ArgumentList* argumentList = NULL;
     ClassMemberList* classMemberList = NULL;
 
     ClassMember(Type type, ReturnValueType returnValue, BaseConstructorType baseConstructor);

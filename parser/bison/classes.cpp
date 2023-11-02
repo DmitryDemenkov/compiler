@@ -405,24 +405,27 @@ ForeachStatement::ForeachStatement(VarDeclarator* declarator,
 	Expression* expression, Statement* statement) : Statement(Statement::t_FOREACH)
 {
 	this->id = ++maxId;
+	////////////
 }
 
 ForStatement::ForStatement(Expression* init, 
 	Expression* cond, Expression* increment, Statement* statement) : Statement(Statement::t_FOR)
 {
 	this->id = ++maxId;
+	/////////////
 }
 
 ForStatement::ForStatement(VarDeclaratorList* declarations, 
 	Expression* cond, Expression* increment, Statement* statement) : Statement(Statement::t_FOR)
 {
 	this->id = ++maxId;
+	/////////////
 }
 
 ReturnStatement::ReturnStatement(Expression* expression) : Statement(Statement::t_RETURN, expression)
 {
 	this->id = ++maxId;
-	this->expression->expression;////////
+	this->left = expression;
 }
 
 ParamList::ParamList(VarDeclarator* param)
@@ -479,9 +482,9 @@ Method::Method(ModifielrList* modifiers, ReturnValueType returnValue,
 	this->id = ++maxId;
 	this->modifiers = modifiers;
 	this->returnValue = returnValue;
-	this->identifiers = identifiers;///
-	this->params = params;///
-	this->statements = statements;///
+	this->identifier = identifiers;
+	this->paramList = paramList;
+	this->statementList = statements;
 
 }
 
@@ -492,10 +495,10 @@ Method::Method(ModifielrList* modifiers, ReturnValueType returnValue,
 	this->id = ++maxId;
 	this->modifiers = modifiers;
 	this->returnValue = returnValue;
-	this->identifiers = identifiers;///
+	this->identifier = identifiers;
 	this->simpleType = simpleType;
-	this->params = params;///
-	this->statements = statements;///
+	this->paramList = params;
+	this->statementList = statements;
 }
 
 Method::Method(ModifielrList* modifiers, ReturnValueType returnValue, 
@@ -505,10 +508,10 @@ Method::Method(ModifielrList* modifiers, ReturnValueType returnValue,
 	this->id = ++maxId;
 	this->modifiers = modifiers;
 	this->returnValue = returnValue;
-	this->identifiers = identifiers;///
+	this->identifier = identifiers;
 	this->typeName = typeName;
-	this->params = params;///
-	this->statements = statements;///
+	this->paramList = params;
+	this->statementList = statements;
 }
 
 Method::Method(ModifielrList* modifiers, ReturnValueType returnValue, 
@@ -518,10 +521,10 @@ Method::Method(ModifielrList* modifiers, ReturnValueType returnValue,
 	this->id = ++maxId;
 	this->modifiers = modifiers;
 	this->returnValue = returnValue;
-	this->identifiers = identifiers;///
+	this->identifier = identifiers;
 	this->arrayType = arrayType;
-	this->params = params;///
-	this->statements = statements;///
+	this->paramList = params;
+	this->statementList = statements;
 }
 
 Field::Field(ModifielrList* modifiers, ReturnValueType returnValue, 
@@ -531,7 +534,7 @@ Field::Field(ModifielrList* modifiers, ReturnValueType returnValue,
 	this->id = ++maxId;
 	this->modifiers = modifiers;
 	this->returnValue = returnValue;
-	this->identifiers = identifiers;///
+	this->identifier = identifier;
 	this->simpleType = simpleType;
 	this->expression = expression;
 }
@@ -543,7 +546,7 @@ Field::Field(ModifielrList* modifiers, ReturnValueType returnValue,
 	this->id = ++maxId;
 	this->modifiers = modifiers;
 	this->returnValue = returnValue;
-	this->identifiers = identifiers;///
+	this->identifier = identifier;
 	this->typeName = typeName;
 	this->expression = expression;
 }
@@ -555,8 +558,8 @@ Field::Field(ModifielrList* modifiers, ReturnValueType returnValue,
 	this->id = ++maxId;
 	this->modifiers = modifiers;
 	this->returnValue = returnValue;
-	this->identifiers = identifiers;///
-	this->arraType = arraType;
+	this->identifier = identifier;
+	this->arrayType = arraType;
 	this->expression = expression;
 }
 
@@ -566,10 +569,11 @@ Constructor::Constructor(ModifielrList* modifiers, string* identifier,
 {
 	this->id = ++maxId;
 	this->modifiers = modifiers;
-	this->retubaseConstructorrnValue = baseConstructor;
-	this->identifiers = identifiers;///////////
-	this->statements = statements;////////////
-	this->params = params;/////////////////
+	this->baseConstructor = baseConstructor;
+	this->identifier = identifier;
+	this->statementList = statements;
+	this->paramList = params;
+	this->argumentList = args;
 }
 
 ClassDeclaration::ClassDeclaration(ModifielrList* modifiers, 
@@ -578,9 +582,9 @@ ClassDeclaration::ClassDeclaration(ModifielrList* modifiers,
 {
 	this->id = ++maxId;
 	this->modifiers = modifiers;
-	this->members = members;
-	this->identifiers = identifiers;/////////////
-	this->baseClass = baseClass;///////////
+	this->classMemberList = members;
+	this->identifier = identifier;
+	this->typeName = baseClass;
 }
 
 NamespaceMember::NamespaceMember(ClassDeclaration* decl)
