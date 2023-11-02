@@ -328,21 +328,19 @@ VarDeclarator::VarDeclarator(ArrayType* arraytype, Expression* expression)
 
 void VarDeclarator::AddInitializer(VarDeclarator* declarator, Expression* expression)
 {
-	////declarator->declarator->push_back(expression);??????????????????????
-	////////////////////////////////////////////////////////////
+	declarator->declarator->push_back(expression);/*ÎØÈÁÊÀ*/
 }
 
 VarDeclaratorList::VarDeclaratorList(VarDeclarator* declarator, Expression* expression)
 {
 	this->id = ++maxId;
+	this->expr = expression;
 	this->declarators = new list<VarDeclarator*>{ declarator };
-	//this->declarators->push_back(declarator);
-	this->type = type;
 }
 
-void VarDeclaratorList::Append(VarDeclaratorList* declarators, Expression* expression)
+void VarDeclaratorList::Append(string* identifier, Expression* expression)
 {
-	declarators->declarators->push_back(expression);/////////////////////////
+	identifier->expression->push_back(new VarDeclarator(identifier, expression));/*ÎØÈÁÊÀ*/
 }
 
 Statement::Statement(Type type, Expression* expression)
@@ -382,9 +380,8 @@ IfStatement::IfStatement(Expression* expression,
 {
 	this->id = ++maxId;
 	this->left = expression;
-	this->main = main;//////////////////////
-	this->alternative = alternative;//////////////////////
-
+	this->statem = main;//////////////////////?????????????????????
+	this->statem = alternative;//////////////////////?????????????????????
 }
 
 WhileStatement::WhileStatement(Expression* expression, 
@@ -392,7 +389,7 @@ WhileStatement::WhileStatement(Expression* expression,
 {
 	this->id = ++maxId;
 	this->left = expression;
-	this->statement = statement;///////////////////////
+	this->statem = statement;
 }
 
 DoStatement::DoStatement(Statement* statement, 
@@ -405,21 +402,29 @@ ForeachStatement::ForeachStatement(VarDeclarator* declarator,
 	Expression* expression, Statement* statement) : Statement(Statement::t_FOREACH)
 {
 	this->id = ++maxId;
-	////////////
+	this->declarat = declarator;
+	this->left = expression;
+	this->statem = statement;
 }
 
 ForStatement::ForStatement(Expression* init, 
 	Expression* cond, Expression* increment, Statement* statement) : Statement(Statement::t_FOR)
 {
 	this->id = ++maxId;
-	/////////////
+	this->left = init;//////
+	this->left = cond;///////////////////
+	this->right = increment;
+	this->statem = statement;
 }
 
 ForStatement::ForStatement(VarDeclaratorList* declarations, 
 	Expression* cond, Expression* increment, Statement* statement) : Statement(Statement::t_FOR)
 {
 	this->id = ++maxId;
-	/////////////
+	this->declarators = declarations;
+	this->left = cond;
+	this->right = increment;
+	this->statem = statement;
 }
 
 ReturnStatement::ReturnStatement(Expression* expression) : Statement(Statement::t_RETURN, expression)
