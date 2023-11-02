@@ -347,7 +347,7 @@ VarDeclaratorList::VarDeclaratorList(VarDeclarator* declarator, Expression* expr
 
 void VarDeclaratorList::Append(string* identifier, Expression* expression)
 {
-	identifier->expression->push_back(new VarDeclarator(identifier, expression));/*ньхайю*/
+	declarators->push_back(new VarDeclarator(identifier, expression));/*ньхайю*/
 }
 
 Statement::Statement(Type type, Expression* expression)
