@@ -273,19 +273,16 @@ public:
     };
 
     int id;
+    Type type;
     SimpleType* simpleType = NULL;
     TypeName* typeName = NULL;
     ArrayType* arrayType = NULL;
     string* identifier = NULL;
     Expression* initializer = NULL;
-    VarDeclarator* declarator = NULL;////добавила
 
-    VarDeclarator(SimpleType* simpletype, Expression* expression = NULL);
-    VarDeclarator(TypeName* typeName, Expression* expression = NULL);
-    VarDeclarator(ArrayType* arraytype, Expression* expression = NULL);
-
-    static void AddInitializer(VarDeclarator* declarator, Expression* expression);
-
+    VarDeclarator(SimpleType* simpletype, string* identifier, Expression* expression = NULL);
+    VarDeclarator(TypeName* typeName, string* identifier, Expression* expression = NULL);
+    VarDeclarator(ArrayType* arraytype, string* identifier, Expression* expression = NULL);
 };
 
 class VarDeclaratorList
@@ -294,10 +291,9 @@ public:
     int id;
     VarDeclarator::Type type;
     list<VarDeclarator*>* declarators = NULL;
-    Expression* expr = NULL;////добавила
     VarDeclaratorList(VarDeclarator* declarator, Expression* expression = NULL);
     
-    static void Append(string* identifier, Expression* expression = NULL);
+    static void Append(VarDeclaratorList* declarators, string* identifier, Expression* expression = NULL);
 };
 
 class Statement
@@ -321,12 +317,8 @@ public:
     Type type;
   
     VarDeclaratorList* declarators = NULL;
-    VarDeclarator* declarat = NULL;//////?????
-    Expression* left = NULL;/////????????
-    Expression* right = NULL;/////????????
     ExpressionList* expressions = NULL;
     StatementList* statements = NULL;
-    Statement* statem = NULL;//добавила
 
     Statement(Type type, Expression* expression = NULL);
     Statement(Type type, VarDeclaratorList* declarators);
