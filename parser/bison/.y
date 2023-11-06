@@ -28,6 +28,32 @@ using namespace std;
 	ArrayCreation* arrayCreation;
 	ElementAccess* elementAccess;
 	InvocationExpression* invocationExpression;
+	VarDeclarator* varDeclarator;
+	VarDeclaratorList* varDeclaratorList;
+	Statement* statement;
+	StatementList* statementList;
+	IfStatement* ifStatement;
+	WhileStatement* whileStatement;
+	DoStatement* doStatement;
+	ForeachStatement* foreachStatement;
+	ForStatement* forStatement;
+	ReturnStatement* returnStatement;
+	ParamList* paramList;
+	Modifier* modifier;
+	ModifielrList* modifielrList;
+	ClassMember* classMember;
+	ClassMemberList* classMemberList;
+	Method* method;
+	Field* field;
+	Constructor* constructor;
+	ClassDeclaration* classDeclaration;
+	NamespaceMember* namespaceMember
+	NamespaceMemberList* namespaceMemberList;
+	NamespaceDeclaration* namespaceDeclaration;
+	Programm* programm;
+	
+	
+	
 }
 
 %token ABSTRACT 
@@ -100,130 +126,130 @@ using namespace std;
 
 %%
 
-program: namespace_member_declaration_list_em
+program: namespace_member_declaration_list_em { $$ = $1; }
        ;
 
 
-namespace_declaration: NAMESPACE type_name '{' namespace_member_declaration_list_em '}'
+namespace_declaration: NAMESPACE type_name '{' namespace_member_declaration_list_em '}' 
                      ;
 
 
-namespace_member_declaration_list_em: /* empty */
-                                    | namespace_member_declaration_list
+namespace_member_declaration_list_em: /* empty */ { $$ = NULL; }
+                                    | namespace_member_declaration_list { $$ = $1; }
                                     ;
 
 
-namespace_member_declaration_list: namespace_member_declaration
+namespace_member_declaration_list: namespace_member_declaration { $$ = $1; }
                                  | namespace_member_declaration_list namespace_member_declaration
                                  ;
 
 
-namespace_member_declaration: namespace_declaration
-                            | class_declaration
+namespace_member_declaration: namespace_declaration { $$ = $1; }
+                            | class_declaration { $$ = $1; }
                             ;
 
 
-class_declaration: modifier_list_em CLASS ID '{' class_member_declaration_list_em '}'
+class_declaration: modifier_list_em CLASS ID '{' class_member_declaration_list_em '}' { $$ = ClassDeclaration($1,ClassMember::t_CLASS, $3, $5); }
                  | modifier_list_em CLASS ID ':' type_name '{' class_member_declaration_list_em '}'
                  ;
 
 
-class_member_declaration_list_em: /* empty */
-                                | class_member_declaration_list
+class_member_declaration_list_em: /* empty */ { $$ = NULL; }
+                                | class_member_declaration_list { $$ = $1; }
                                 ;
 
 
-class_member_declaration_list: class_member_declaration
-                             | class_member_declaration_list class_member_declaration
+class_member_declaration_list: class_member_declaration { $$ = $1; }
+                             | class_member_declaration_list class_member_declaration { $$ = ClassMemberList::Append($1,$2); }
                              ;
 
 
-class_member_declaration: field_declaration
-                        | method_declaration
-                        | constructor_declaration
-                        | class_declaration
+class_member_declaration: field_declaration { $$ = $1; }
+                        | method_declaration { $$ = $1; }
+                        | constructor_declaration { $$ = $1; }
+                        | class_declaration { $$ = $1; }
                         ;
 
 
-constructor_declaration: modifier_list_em ID '(' param_list_em ')' ';'
-                       | modifier_list_em ID '(' param_list_em ')' '{' stmt_list_em '}'
-                       | modifier_list_em ID '(' param_list_em ')' ':' BASE '(' argm_list_em ')' ';'
-                       | modifier_list_em ID '(' param_list_em ')' ':' BASE '(' argm_list_em ')' '{' stmt_list_em '}'
-                       | modifier_list_em ID '(' param_list_em ')' ':' THIS '(' argm_list_em ')' ';'
-                       | modifier_list_em ID '(' param_list_em ')' ':' THIS '(' argm_list_em ')' '{' stmt_list_em '}'
+constructor_declaration: modifier_list_em ID '(' param_list_em ')' ';' { $$ = Constructor($1,$2,$4,ClassMember::t_NULL); }
+                       | modifier_list_em ID '(' param_list_em ')' '{' stmt_list_em '}' { $$ = Constructor($1,$2,$4,ClassMember::t_NULL, $7); }
+                       | modifier_list_em ID '(' param_list_em ')' ':' BASE '(' argm_list_em ')' ';' { $$ = Constructor($1,$2,$4,ClassMember::t_BASE,$9); }
+                       | modifier_list_em ID '(' param_list_em ')' ':' BASE '(' argm_list_em ')' '{' stmt_list_em '}' { $$ = Constructor($1,$2,$4,ClassMember::t_BASE,$9, $12); }
+                       | modifier_list_em ID '(' param_list_em ')' ':' THIS '(' argm_list_em ')' ';' { $$ = Constructor($1,$2,$4,ClassMember::t_THIS,$9); }
+                       | modifier_list_em ID '(' param_list_em ')' ':' THIS '(' argm_list_em ')' '{' stmt_list_em '}' { $$ = Constructor($1,$2,$4,ClassMember::t_THIS,$9, $12); }
                        ;
 
 
-field_declaration: modifier_list_em type ID ';'
-                 | modifier_list_em type ID '=' expr ';'
-                 | modifier_list_em type_name ID ';'
-                 | modifier_list_em type_name ID '=' expr ';'
-                 | modifier_list_em array_type ID ';'
-                 | modifier_list_em array_type ID '=' expr ';'
+field_declaration: modifier_list_em type ID ';' { $$ = Field($1,ClassMember::t_SIMPLE_TYPE,$3); }
+                 | modifier_list_em type ID '=' expr ';' { $$ = Field($1,ClassMember::t_SIMPLE_TYPE,$3,$5); }
+                 | modifier_list_em type_name ID ';' { $$ = Field($1,ClassMember::t_TYPENAME,$3); }
+                 | modifier_list_em type_name ID '=' expr ';' { $$ = Field($1,ClassMember::t_TYPENAME,$3,$5); }
+                 | modifier_list_em array_type ID ';' { $$ = Field($1,ClassMember::t_ARRAY,$3); }
+                 | modifier_list_em array_type ID '=' expr ';' { $$ = Field($1,ClassMember::t_ARRAY,$3,$5); }
                  ;
 
 
-method_declaration: modifier_list_em type ID '(' param_list_em ')' '{' stmt_list_em '}'
-                  | modifier_list_em type ID '(' param_list_em ')' ';'
-                  | modifier_list_em type_name ID '(' param_list_em ')' '{' stmt_list_em '}'
-                  | modifier_list_em type_name ID '(' param_list_em ')' ';'
-                  | modifier_list_em VOID ID '(' param_list_em ')' '{' stmt_list_em '}'
-                  | modifier_list_em VOID ID '(' param_list_em ')' ';'
-                  | modifier_list_em array_type ID '(' param_list_em ')' '{' stmt_list_em '}'
-                  | modifier_list_em array_type ID '(' param_list_em ')' ';'
+method_declaration: modifier_list_em type ID '(' param_list_em ')' '{' stmt_list_em '}' { $$ = Method($1,ClassMember::t_SIMPLE_TYPE,$3,$5,$8); }
+                  | modifier_list_em type ID '(' param_list_em ')' ';' { $$ = Method($1,ClassMember::t_SIMPLE_TYPE,$3,$5); }
+                  | modifier_list_em type_name ID '(' param_list_em ')' '{' stmt_list_em '}' { $$ = Method($1,ClassMember::t_TYPENAME,$3,$5,$8); }
+                  | modifier_list_em type_name ID '(' param_list_em ')' ';' { $$ = Method($1,ClassMember::t_TYPENAME,$3,$5); }
+                  | modifier_list_em VOID ID '(' param_list_em ')' '{' stmt_list_em '}' { $$ = Method($1,ClassMember::t_VOID,$3,$5,$8); }
+                  | modifier_list_em VOID ID '(' param_list_em ')' ';' { $$ = Method($1,ClassMember::t_VOID,$3,$5); }
+                  | modifier_list_em array_type ID '(' param_list_em ')' '{' stmt_list_em '}' { $$ = Method($1,ClassMember::t_ARRAY,$3,$5,$8); }
+                  | modifier_list_em array_type ID '(' param_list_em ')' ';' { $$ = Method($1,ClassMember::t_ARRAY,$3,$5); }
                   ;
 
 
-modifier_list_em: /* empty*/
-                | modifier_list
+modifier_list_em: /* empty*/ { $$ = NULL; }
+                | modifier_list { $$ = $1; }
                 ;
 
 
-modifier_list: modifier
-             | modifier_list modifier
+modifier_list: modifier { $$ = $1; }
+             | modifier_list modifier { $$ = ModifielrList::Append($1,$2); }
              ;
 
 
-modifier: PRIVATE
-        | PROTECTED
-        | PUBLIC
-        | INTERNAL
-        | ABSTRACT
-        | STATIC
-        | OVERRIDE
-        | VIRTUAL
+modifier: PRIVATE { $$ = new Modifier(Modifier::t_PRIVATE); }
+        | PROTECTED { $$ = new Modifier(Modifier::t_PROTECTED); }
+        | PUBLIC { $$ = new Modifier(Modifier::t_PUBLIC); }
+        | INTERNAL { $$ = new Modifier(Modifier::t_INTERNAL); }
+        | ABSTRACT { $$ = new Modifier(Modifier::t_ABSTRACT); }
+        | STATIC { $$ = new Modifier(Modifier::t_STATIC); }
+        | OVERRIDE { $$ = new Modifier(Modifier::t_OVERRIDE); }
+        | VIRTUAL { $$ = new Modifier(Modifier::t_VIRTUAL); }
         ;
 
 
-param_list_em: /* empty */
-             | param_list
+param_list_em: /* empty */ { $$ = NULL; }
+             | param_list { $$ = $1; }
              ;
 
 
-param_list: var_declarator
-          | param_list ',' var_declarator
+param_list: var_declarator { $$ = new ParamList($1); }
+          | param_list ',' var_declarator { $$ = ParamList::Append($1,$3); }
           ;
 
 
-stmt: ';'
-    | expr ';'
-    | var_declarator_list ';'
-    | if_stmt
-    | while_stmt
-    | do_stmt
-    | for_stmt
-    | foreach_stmt
-    | return_stmt
-    | '{' stmt_list_em '}'
+stmt: ';' { $$ = Statement(Statement::t_EMPTY); }
+    | expr ';' { $$ = Statement(Statement::t_EXPRESSION); }
+    | var_declarator_list ';' { $$ = Statement(Statement::t_DECLARATOR); }
+    | if_stmt { $$ = Statement(Statement::t_IF); }
+    | while_stmt { $$ = Statement(Statement::t_WHILE); }
+    | do_stmt { $$ = Statement(Statement::t_DO); }
+    | for_stmt { $$ = Statement(Statement::t_FOR); }
+    | foreach_stmt { $$ = Statement(Statement::t_FOREACH); }
+    | return_stmt { $$ = Statement(Statement::t_RETURN); }
+    | '{' stmt_list_em '}' { $$ = Statement(Statement::t_BLOCK); }
     ;
 
 
-stmt_list_em: /* empty*/
+stmt_list_em: /* empty*/ { $$ = NULL; }
             | stmt_list
             ;
 
 
-stmt_list: stmt
+stmt_list: stmt { $$ = $1; }
          | stmt_list stmt
          ;
 
@@ -238,8 +264,8 @@ for_stmt: FOR '(' for_expr ';' for_expr ';' for_expr ')' stmt
     	;
 
 
-for_expr: /*empty*/
-	    | expr
+for_expr: /*empty*/ { $$ = NULL; }
+	    | expr 
 	    ;
 
 
@@ -260,16 +286,16 @@ if_stmt: IF '(' expr ')' stmt %prec THEN
        ;
 
 
-var_declarator_list: var_declarator
-                   | var_declarator '=' expr
-                   | var_declarator_list ',' ID
-                   | var_declarator_list ',' ID '=' expr
+var_declarator_list: var_declarator { $$ = $1; }
+                   | var_declarator '=' expr { $$ = VarDeclaratorList(); }
+                   | var_declarator_list ',' ID { $$ = VarDeclaratorList($1,$3); }
+                   | var_declarator_list ',' ID '=' expr { $$ = VarDeclaratorList($1,$3,$5); }
                    ;
 
 
-var_declarator: type ID 
-              | type_name ID 
-              | array_type ID 
+var_declarator: type ID { $$ = new VarDeclarator($1, $2); }
+              | type_name ID { $$ = new VarDeclarator($1, $2); }
+              | array_type ID { $$ = new VarDeclarator($1, $2); }
               ;
 
 
