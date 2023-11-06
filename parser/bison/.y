@@ -130,7 +130,7 @@ program: namespace_member_declaration_list_em { $$ = $1; }
        ;
 
 
-namespace_declaration: NAMESPACE type_name '{' namespace_member_declaration_list_em '}' //////////////?????????
+namespace_declaration: NAMESPACE type_name '{' namespace_member_declaration_list_em '}' { $$ = NamespaceDeclaration($1, $3); }
                      ;
 
 
@@ -149,8 +149,8 @@ namespace_member_declaration: namespace_declaration { $$ = $1; }
                             ;
 
 
-class_declaration: modifier_list_em CLASS ID '{' class_member_declaration_list_em '}' { $$ = ClassDeclaration($1,ClassMember::t_CLASS, $3, $5); }/////////////???????????
-                 | modifier_list_em CLASS ID ':' type_name '{' class_member_declaration_list_em '}'////////////////??????????
+class_declaration: modifier_list_em CLASS ID '{' class_member_declaration_list_em '}' { $$ = ClassDeclaration($1, $3, $5); }
+                 | modifier_list_em CLASS ID ':' type_name '{' class_member_declaration_list_em '}' { $$ = ClassDeclaration($1, $3, $5,$7); }
                  ;
 
 
@@ -254,13 +254,13 @@ stmt_list: stmt { $$ = $1; }
          ;
 
 
-return_stmt: RETURN ';'
-           | RETURN expr ';'
+return_stmt: RETURN ';' { $$ = ReturnStatement(NULL); }
+           | RETURN expr ';' { $$ = ReturnStatement($2); }
            ; 
 
 
-for_stmt: FOR '(' for_expr ';' for_expr ';' for_expr ')' stmt
-        | FOR '(' var_declarator_list ';' for_expr ';' for_expr ')' stmt
+for_stmt: FOR '(' for_expr ';' for_expr ';' for_expr ')' stmt { $$ = ForStatement($3,$5,$7,$9); }
+        | FOR '(' var_declarator_list ';' for_expr ';' for_expr ')' stmt { $$ = ForStatement($3,$5,$7,$9); }
     	;
 
 
@@ -269,20 +269,20 @@ for_expr: /*empty*/ { $$ = NULL; }
 	    ;
 
 
-foreach_stmt: FOREACH '(' var_declarator IN expr ')' stmt
+foreach_stmt: FOREACH '(' var_declarator IN expr ')' stmt { $$ = ForeachStatement($3,$5,$7); }
 	        ;
 
 
-do_stmt: DO stmt WHILE '(' expr ')' ';'
+do_stmt: DO stmt WHILE '(' expr ')' ';' { $$ = DoStatement($2,$5); }
        ;
 
 
-while_stmt: WHILE '(' expr ')' stmt
+while_stmt: WHILE '(' expr ')' stmt { $$ = WhileStatement($3,$5); } 
           ;
 
 
-if_stmt: IF '(' expr ')' stmt %prec THEN
-       | IF '(' expr ')' stmt ELSE stmt
+if_stmt: IF '(' expr ')' stmt %prec THEN { $$ = IfStatement($3,$5); }
+       | IF '(' expr ')' stmt ELSE stmt { $$ = IfStatement($3,$5,$7); }
        ;
 
 
