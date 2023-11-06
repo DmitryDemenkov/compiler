@@ -130,7 +130,7 @@ program: namespace_member_declaration_list_em { $$ = $1; }
        ;
 
 
-namespace_declaration: NAMESPACE type_name '{' namespace_member_declaration_list_em '}' 
+namespace_declaration: NAMESPACE type_name '{' namespace_member_declaration_list_em '}' //////////////?????????
                      ;
 
 
@@ -140,7 +140,7 @@ namespace_member_declaration_list_em: /* empty */ { $$ = NULL; }
 
 
 namespace_member_declaration_list: namespace_member_declaration { $$ = $1; }
-                                 | namespace_member_declaration_list namespace_member_declaration
+                                 | namespace_member_declaration_list namespace_member_declaration { $$ = NamespaceMemberList::Append($1,$2); }
                                  ;
 
 
@@ -149,8 +149,8 @@ namespace_member_declaration: namespace_declaration { $$ = $1; }
                             ;
 
 
-class_declaration: modifier_list_em CLASS ID '{' class_member_declaration_list_em '}' { $$ = ClassDeclaration($1,ClassMember::t_CLASS, $3, $5); }
-                 | modifier_list_em CLASS ID ':' type_name '{' class_member_declaration_list_em '}'
+class_declaration: modifier_list_em CLASS ID '{' class_member_declaration_list_em '}' { $$ = ClassDeclaration($1,ClassMember::t_CLASS, $3, $5); }/////////////???????????
+                 | modifier_list_em CLASS ID ':' type_name '{' class_member_declaration_list_em '}'////////////////??????????
                  ;
 
 
@@ -245,12 +245,12 @@ stmt: ';' { $$ = Statement(Statement::t_EMPTY); }
 
 
 stmt_list_em: /* empty*/ { $$ = NULL; }
-            | stmt_list
+            | stmt_list { $$ = $1; }
             ;
 
 
 stmt_list: stmt { $$ = $1; }
-         | stmt_list stmt
+         | stmt_list stmt { $$ =  StatementList::Append($1,$2); }
          ;
 
 
@@ -265,7 +265,7 @@ for_stmt: FOR '(' for_expr ';' for_expr ';' for_expr ')' stmt
 
 
 for_expr: /*empty*/ { $$ = NULL; }
-	    | expr 
+	    | expr { $$ = $1; }
 	    ;
 
 
