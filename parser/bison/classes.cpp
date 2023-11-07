@@ -10,26 +10,49 @@ SimpleType::SimpleType(Type type)
 
 string* SimpleType::ToDOT()
 {
-	return nullptr;
+	string* dotStr = GetName();
+	*dotStr = to_string(id) + "[label=\"" + *dotStr + "\"];\n";
+	return dotStr;
+}
+
+string* SimpleType::GetName()
+{
+	switch (this->type)
+	{
+	case SimpleType::t_BOOL:   return new string("bool");
+	case SimpleType::t_INT:    return new string("int");
+	case SimpleType::t_CHAR:   return new string("char");
+	case SimpleType::t_STRING: return new string("string"); 
+	}
+	return NULL;
 }
 
 TypeName::TypeName(string* identifier)
 {
 	this->id = ++maxId;
 	this->identifiers = new list <string*>{ identifier };
-
 }
 
 void TypeName::Append(TypeName* typeName, string* identifier)
 {
-	
 	typeName->identifiers->push_back(identifier);
-
 }
 
 string* TypeName::ToDOT()
 {
-	return nullptr;
+	string* dotStr = new string();
+	int n = identifiers->size() - 1;
+	for (auto i = identifiers->rbegin(); i != identifiers->rend(); i++, n--)
+	{
+		string strId = to_string(id) + "." + to_string(n);
+		*dotStr += strId + "[label=\"" + **i + "\"];\n";
+		if (i != identifiers->rbegin())
+		{
+			string strPreviousId = to_string(id) + "." + to_string(n + 1);
+			*dotStr += strId + "->" + strPreviousId + "[label=\"next\"];\n";
+		}
+	}
+	return dotStr;
 }
 
 ArrayType::ArrayType(SimpleType* simpleType)
@@ -48,7 +71,22 @@ ArrayType::ArrayType(TypeName* typeName)
 
 string* ArrayType::ToDOT()
 {
-	return nullptr;
+	string* dotStr = NULL;
+	string childId;
+	switch (this->type)
+	{
+	case ArrayType::t_SIMPLE_TYPE:
+		childId = to_string(simpleType->id);
+		dotStr = simpleType->ToDOT();
+		break;
+	case ArrayType::t_TYPE_NAME:
+		childId = to_string(typeName->id);
+		dotStr = typeName->ToDOT();
+		break;
+	}
+	*dotStr += to_string(id) + "[label=\"array\"];\n";
+	*dotStr += to_string(id) + "->" + childId + "[label=\"type\"];\n";
+	return dotStr;
 }
 
 Argument::Argument(Expression* expression, string* identifier)
@@ -60,14 +98,22 @@ Argument::Argument(Expression* expression, string* identifier)
 
 string* Argument::ToDOT()
 {
-	return nullptr;
+	string* dotStr = expression->ToDOT();
+	*dotStr += to_string(id) + "[label=\"argm\"];\n";
+	*dotStr += to_string(id) + "->" + to_string(expression->id) + "[label=\"expr\"];\n";
+	if (identifier != NULL)
+	{
+		string identifierId = to_string(id) + ".1";
+		*dotStr += identifierId + "[lable=\"" + *identifier + "\"];\n";
+		*dotStr += to_string(id) + "->" + identifierId + "[label=\"id\"];\n";
+	}
+	return dotStr;
 }
 
 ArgumentList::ArgumentList(Argument* argument)
 {
-	this->id = ++maxId;
+	this->id = argument->id;
 	this->arguments = new list <Argument*>{ argument };
-
 }
 
 void ArgumentList::Append(ArgumentList* list, Argument* argument)
@@ -77,7 +123,18 @@ void ArgumentList::Append(ArgumentList* list, Argument* argument)
 
 string* ArgumentList::ToDOT()
 {
-	return nullptr;
+	string* dotStr = new string();
+	Argument* previous = NULL;
+	for (auto i = arguments->rbegin(); i != arguments->rend(); i++)
+	{
+		*dotStr += *((*i)->ToDOT());
+		if (previous != NULL)
+		{
+			*dotStr += to_string((*i)->id) + "->" + to_string(previous->id) + "[label=\"next\"];\n";
+		}
+		previous = *i;
+	}
+	return dotStr;
 }
 
 ObjectInitializer::ObjectInitializer(MemberInitializerList* initializers)
@@ -88,15 +145,17 @@ ObjectInitializer::ObjectInitializer(MemberInitializerList* initializers)
 
 string* ObjectInitializer::ToDOT()
 {
-	return nullptr;
+	string* dotStr = initializers->ToDOT();
+	*dotStr += to_string(id) + "[label=\"objInit\"];";
+	*dotStr += to_string(id) + "->" + to_string(initializers->id);
+	return dotStr;
 }
 
 MemberInitializer::MemberInitializer(string* identifier, Expression* expression)
 {
 	this->id = ++maxId;
 	this->identifier = identifier;
-	this->expression = expression;
-	
+	this->expression = expression;	
 }
 
 MemberInitializer::MemberInitializer(string* identifier, ObjectInitializer* objectInitializer)
@@ -104,7 +163,6 @@ MemberInitializer::MemberInitializer(string* identifier, ObjectInitializer* obje
 	this->id = ++maxId;
 	this->objectInitializer = objectInitializer;
 	this->identifier = identifier;
-	
 }
 
 MemberInitializer::MemberInitializer(ArgumentList* argumentList, Expression* expression)
@@ -112,7 +170,6 @@ MemberInitializer::MemberInitializer(ArgumentList* argumentList, Expression* exp
 	this->id = ++maxId;
 	this->argumentList = argumentList;
 	this->expression = expression;
-	
 }
 
 MemberInitializer::MemberInitializer(ArgumentList* argumentList, ObjectInitializer* objectInitializer)
@@ -124,12 +181,44 @@ MemberInitializer::MemberInitializer(ArgumentList* argumentList, ObjectInitializ
 
 string* MemberInitializer::ToDOT()
 {
-	return nullptr;
+	string memberId = "";
+	string* memberDot = new string();
+	if (identifier != NULL)
+	{
+		memberId = to_string(id) + ".1";
+		*memberDot += memberId + "[label=\"" + *identifier + "\"];\n";
+	}
+	else
+	{
+		memberId = to_string(argumentList->id);
+		memberDot = argumentList->ToDOT();
+	}
+
+	string initId = "";
+	string* initDot = NULL;
+	if (expression != NULL)
+	{
+		initId = to_string(expression->id);
+		initDot = expression->ToDOT();
+	}
+	else
+	{
+		initId = objectInitializer->id;
+		initDot = objectInitializer->ToDOT();
+	}
+
+	string* dotStr = new string();
+	*dotStr += *memberDot;
+	*dotStr += *initDot;
+	*dotStr += to_string(id) + "[label=\"memberInit\"];\n";
+	*dotStr += to_string(id) + "->" + memberId + "[label=\"member\"];\n";
+	*dotStr += to_string(id) + "->" + initId + "[label=\"initializer\"];\n";
+	return dotStr;
 }
 
 MemberInitializerList::MemberInitializerList(MemberInitializer* memberInitializer)
 {
-	this->id = ++maxId;
+	this->id = memberInitializer->id;
 	this->initializers = new list <MemberInitializer*>{ memberInitializer };
 }
 
@@ -140,7 +229,18 @@ void MemberInitializerList::Append(MemberInitializerList* list, MemberInitialize
 
 string* MemberInitializerList::ToDOT()
 {
-	return nullptr;
+	string* dotStr = new string();
+	MemberInitializer* previous = NULL;
+	for (auto i = initializers->rbegin(); i != initializers->rend(); i++)
+	{
+		*dotStr += *((*i)->ToDOT());
+		if (previous != NULL)
+		{
+			*dotStr += to_string((*i)->id) + "->" + to_string(previous->id) + "[label=\"next\"];\n";
+		}
+		previous = *i;
+	}
+	return dotStr;
 }
 
 Expression::Expression(Type type, string* name)
@@ -220,7 +320,75 @@ Expression::Expression(Type type, Expression* left, ArgumentList* arguments)
 
 string* Expression::ToDOT()
 {
-	return nullptr;
+	string* dotStr = GetName();
+	*dotStr = to_string(id) + "[label=\"" + *dotStr + "\"];\n";
+
+	if (left != NULL)
+	{
+		*dotStr += *left->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(left->id) + "[label=\"left\"];\n";
+	}
+	if (right != NULL)
+	{
+		*dotStr += *right->ToDOT();;
+		*dotStr += to_string(id) + "->" + to_string(right->id) + "[label=\"right\"];\n";
+	}
+	if (type != Expression::t_SIMPLE_TYPE && simpleType != NULL)
+	{
+		*dotStr += *simpleType->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(simpleType->id) + "[label=\"type\"];\n";
+	}
+	if (arrayType != NULL)
+	{
+		*dotStr += *arrayType->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(arrayType->id) + "[label=\"type\"];\n";
+	}
+	if (typeName != NULL)
+	{
+		*dotStr += *typeName->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(typeName->id) + "[label=\"type\"];\n";
+	}
+
+	return dotStr;
+}
+
+string* Expression::GetName()
+{
+	switch (type)
+	{
+	case Expression::t_INT_LITER: return new string(to_string(intLiteral));
+	case Expression::t_CHAR_LITER: return new string("\'" + to_string(charLiteral) + "\'");
+	case Expression::t_BOOL_LITER: return new string(to_string(boolLiteral));
+	case Expression::t_STRING_LITER: return new string("\"" + *name + "\"");
+	case Expression::t_ID: return name;
+	case Expression::t_SIMPLE_TYPE: simpleType->GetName();
+	case Expression::t_THIS: return new string("this");
+	case Expression::t_BASE: return new string("base");
+	case Expression::t_MEMBER_ACCESS: return new string(".");
+	case Expression::t_PARENTHESIZED: return new string("(expr)");
+	case Expression::t_UNMINUS: return new string("-");
+	case Expression::t_NOT: return new string("!");
+	case Expression::t_SIMPLE_TYPE_CAST: return new string("cast");
+	case Expression::t_ARRAY_CAST: return new string("cast");
+	case Expression::t_TYPENAME_CAST: return new string("cast");
+	case Expression::t_MUL: return new string("*");
+	case Expression::t_DIV: return new string("/");
+	case Expression::t_MOD: return new string("%");
+	case Expression::t_SUM: return new string("+");
+	case Expression::t_SUB: return new string("-");
+	case Expression::t_LESS: return new string("<");
+	case Expression::t_GREATER: return new string(">");
+	case Expression::t_LESS_EQUAL: return new string("<=");
+	case Expression::t_GREATER_EQUAL: return new string(">=");
+	case Expression::t_IS: return new string("is");
+	case Expression::t_AS: return new string("as");
+	case Expression::t_EQUALITY: return new string("==");
+	case Expression::t_INEQUALITY: return new string("!=");
+	case Expression::t_AND: return new string("&&");
+	case Expression::t_OR: return new string("||");
+	case Expression::t_ASSIGNMENT: return new string("=");
+	default: return NULL;
+	}
 }
 
 ObjectCreation::ObjectCreation(SimpleType* simpleType, 
@@ -239,9 +407,41 @@ ObjectCreation::ObjectCreation(TypeName* typeName,
 	this->objInitializer = objInit;
 }
 
+string* ObjectCreation::ToDOT()
+{
+	string typeId;
+	string* dotStr;
+	if (simpleType != NULL)
+	{
+		typeId = to_string(simpleType->id);
+		dotStr = simpleType->ToDOT();
+	}
+	else
+	{
+		typeId = to_string(typeName->id);
+		dotStr = typeName->ToDOT();
+	}
+	*dotStr += to_string(id) + "[label=\"objCreation\"];\n";
+	*dotStr += to_string(id) + "->" + typeId + "[label=\"type\"];\n";
+
+	if (argumentList != NULL)
+	{
+		*dotStr += *argumentList->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(argumentList->id) + "[label=\"args\"];\n";
+	}
+
+	if (objInitializer != NULL)
+	{
+		*dotStr += *objInitializer->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(objInitializer->id) + "[label=\"init\"];\n";
+	}
+
+	return dotStr;
+}
+
 ExpressionList::ExpressionList(Expression* expression)
 {
-	this->id = ++maxId;
+	this->id = expression->id;
 	this->expressions = new list <Expression*>{ expression };
 }
 
@@ -252,7 +452,18 @@ void ExpressionList::Append(ExpressionList* list, Expression* expression)
 
 string* ExpressionList::ToDOT()
 {
-	return nullptr;
+	string* dotStr = new string();
+	Expression* previous = NULL;
+	for (auto i = expressions->rbegin(); i != expressions->rend(); i++)
+	{
+		*dotStr += *((*i)->ToDOT());
+		if (previous != NULL)
+		{
+			*dotStr += to_string((*i)->id) + "->" + to_string(previous->id) + "[label=\"next\"];\n";
+		}
+		previous = *i;
+	}
+	return dotStr;
 }
 
 ArrayInitializer::ArrayInitializer(ExpressionList* expressions)
@@ -263,7 +474,10 @@ ArrayInitializer::ArrayInitializer(ExpressionList* expressions)
 
 string* ArrayInitializer::ToDOT()
 {
-	return nullptr;
+	string* dotStr = expressions->ToDOT();
+	*dotStr += to_string(id) + "[label=\"arrInit\"];\n";
+	*dotStr += to_string(id) + "->" + to_string(expressions->id) + "[label=\"expressions\"];\n";
+	return dotStr;
 }
 
 ArrayCreation::ArrayCreation(ArrayType* arrType, 
@@ -292,9 +506,57 @@ ArrayCreation::ArrayCreation(TypeName* typeName,
 	this->arrayInitializer = arrInit;
 }
 
+string* ArrayCreation::ToDOT()
+{
+	string typeId;
+	string* dotStr;
+	if (arrayType != NULL)
+	{
+		typeId = to_string(arrayType->id);
+		dotStr = arrayType->ToDOT();
+	}
+	else if (simpleType != NULL)
+	{
+		typeId = to_string(simpleType->id);
+		dotStr = simpleType->ToDOT();
+	}
+	else
+	{
+		typeId = to_string(typeName->id);
+		dotStr = typeName->ToDOT();
+	}
+	*dotStr += to_string(id) + "[label=\"arrCreation\"];\n";
+	*dotStr += to_string(id) + "->" + typeId + "[label=\"type\"];\n";
+
+	if (left != NULL)
+	{
+		*dotStr += *left->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(left->id) + "[label=\"expr\"];\n";
+	}
+
+	if (arrayInitializer != NULL)
+	{
+		*dotStr += *arrayInitializer->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(arrayInitializer->id) + "[label=\"arrInit\"];\n";
+	}
+
+	return dotStr;
+}
+
 Expression* MemberAccess::FromTypeName(TypeName* typeName, Expression* left)
 {
-	return nullptr;
+	for (string* s : *typeName->identifiers)
+	{
+		if (left == NULL)
+		{
+			left = new Expression(Expression::t_ID, s);
+		}
+		else
+		{
+			left = new Expression(Expression::t_MEMBER_ACCESS, left, new Expression(Expression::t_ID, s));
+		}
+	}
+	return left;
 }
 
 ElementAccess::ElementAccess(Expression* expr, 
@@ -305,12 +567,37 @@ ElementAccess::ElementAccess(Expression* expr,
 	this->argumentList = arguments;
 }
 
+string* ElementAccess::ToDOT()
+{
+	string* dotStr = left->ToDOT();
+	*dotStr += *argumentList->ToDOT();
+	*dotStr += to_string(id) + "[label\"elemAccess\"];\n";
+	*dotStr += to_string(id) + "->" + to_string(left->id) + "[label=\"expr\"];\n";
+	*dotStr += to_string(id) + "->" + to_string(argumentList->id) + "[label=\"args\"];\n";
+	return dotStr;
+}
+
 InvocationExpression::InvocationExpression(Expression* expr, 
 	ArgumentList* arguments) : Expression(Expression::t_INVOCATION)
 {
 	this->id = ++maxId;
 	this->left = expr;
 	this->argumentList = arguments;
+}
+
+string* InvocationExpression::ToDOT()
+{
+	string* dotStr = left->ToDOT();
+	*dotStr += to_string(id) + "[label\"invocation\"];\n";
+	*dotStr += to_string(id) + "->" + to_string(left->id) + "[label=\"expr\"];\n";
+
+	if (argumentList != NULL)
+	{
+		*dotStr += *argumentList->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(argumentList->id) + "[label=\"args\"];\n";
+	}
+
+	return dotStr;
 }
 
 VarDeclarator::VarDeclarator(SimpleType* simpletype, string* identifier, Expression* expression)
@@ -340,10 +627,43 @@ VarDeclarator::VarDeclarator(ArrayType* arraytype, string* identifier, Expressio
 	this->initializer = expression;
 }
 
+string* VarDeclarator::ToDOT()
+{
+	string typeId;
+	string* dotStr;
+	if (type == VarDeclarator::t_ARRAY_TYPE)
+	{
+		typeId = to_string(arrayType->id);
+		dotStr = arrayType->ToDOT();
+	}
+	else if (type == VarDeclarator::t_SIMPLE_TYPE)
+	{
+		typeId = to_string(simpleType->id);
+		dotStr = simpleType->ToDOT();
+	}
+	else
+	{
+		typeId = to_string(typeName->id);
+		dotStr = typeName->ToDOT();
+	}
+	*dotStr += to_string(id) + ".1[label=\"" + *identifier + "\"];\n";
+	*dotStr += to_string(id) + "[label=\"varDecl\"];\n";
+	*dotStr += to_string(id) + "->" + typeId + "[label=\"type\"];\n";
+	*dotStr += to_string(id) + "->" + to_string(id) + ".1[label=\"identifier\"];\n";
+
+	if (initializer != NULL)
+	{
+		*dotStr += *initializer->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(initializer->id) + "[label=\"init\"];\n";
+	}
+
+	return dotStr;
+}
+
 VarDeclaratorList::VarDeclaratorList(VarDeclarator* declarator, Expression* expression)
 {
 	declarator->initializer = expression;
-	this->id = ++maxId;
+	this->id = declarator->id;
 	this->type = declarator->type;
 	this->declarators = new list<VarDeclarator*>{ declarator };
 }
@@ -364,6 +684,22 @@ void VarDeclaratorList::Append(VarDeclaratorList* declarators, string* identifie
 		break;
 	}
 	declarators->declarators->push_back(varDecl);
+}
+
+string* VarDeclaratorList::ToDOT()
+{
+	string* dotStr = new string();
+	VarDeclarator* previous = NULL;
+	for (auto i = declarators->rbegin(); i != declarators->rend(); i++)
+	{
+		*dotStr += *((*i)->ToDOT());
+		if (previous != NULL)
+		{
+			*dotStr += to_string((*i)->id) + "->" + to_string(previous->id) + "[label=\"next\"];\n";
+		}
+		previous = *i;
+	}
+	return dotStr;
 }
 
 Statement::Statement(Type type, Expression* expression)

@@ -29,6 +29,7 @@ public:
     SimpleType(Type type);
 
     string* ToDOT();
+    string* GetName();
 };
 
 class TypeName
@@ -197,7 +198,10 @@ public:
     Expression(Type type, Expression* left, Expression* right = NULL);
     Expression(Type type, Expression* left, ArgumentList* arguments);
 
-    string* ToDOT();
+    virtual string* ToDOT();
+
+private:
+    string* GetName();
 };
 
 class ObjectCreation : public Expression
@@ -208,6 +212,8 @@ public:
 
     ObjectCreation(TypeName* typeName,
         ArgumentList* argumentList = NULL, ObjectInitializer* objInit = NULL);
+
+    string* ToDOT();
 };
 
 class ExpressionList
@@ -243,6 +249,8 @@ public:
     
     ArrayCreation(TypeName* typeName,
         Expression* expr = NULL, ArrayInitializer* arrInit = NULL);
+
+    string* ToDOT();
 };
 
 class MemberAccess : public Expression
@@ -255,12 +263,16 @@ class ElementAccess : public Expression
 {
 public:
     ElementAccess(Expression* expr, ArgumentList* arguments);
+
+    string* ToDOT();
 };
 
 class InvocationExpression : public Expression
 {
 public:
     InvocationExpression(Expression* expr, ArgumentList* arguments);
+
+    string* ToDOT();
 };
 
 class VarDeclarator
@@ -284,6 +296,8 @@ public:
     VarDeclarator(SimpleType* simpletype, string* identifier, Expression* expression = NULL);
     VarDeclarator(TypeName* typeName, string* identifier, Expression* expression = NULL);
     VarDeclarator(ArrayType* arraytype, string* identifier, Expression* expression = NULL);
+
+    string* ToDOT();
 };
 
 class VarDeclaratorList
@@ -295,6 +309,8 @@ public:
     VarDeclaratorList(VarDeclarator* declarator, Expression* expression = NULL);
     
     static void Append(VarDeclaratorList* declarators, string* identifier, Expression* expression = NULL);
+
+    string* ToDOT();
 };
 
 class Statement
