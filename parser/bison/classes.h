@@ -375,6 +375,7 @@ public:
 
 class ParamList
 {
+public:
     int id;
     list<VarDeclarator*>* params = NULL;
 
@@ -543,6 +544,7 @@ public:
 
 class NamespaceDeclaration
 {
+public:
     int id;
     TypeName* typeName = NULL;
     NamespaceMemberList* members = NULL;
@@ -552,6 +554,7 @@ class NamespaceDeclaration
 
 class Programm
 {
+public:
     int id;
     NamespaceMemberList* members = NULL;
 

@@ -60,37 +60,60 @@ typedef union {
     int int_literal;
     char char_literal;
     bool boolean_literal;
-    string *string_literal;
-    string *identifier;
-	SimpleType* simpleType;
-	TypeName* typeName;
-	ArrayType* arrayType;
-	Argument* argument;
-	ArgumentList* argumentList;
-	ObjectInitializer* objectInitializer;
-	ObjectCreation* objectCreation;
-	MemberInitializer* memberInitializer;
-	MemberInitializerList* memberInitializerList;
-	Expression* expression;
-	ExpressionList* expressionList;
-	ArrayInitializer* arrayInitializer;
-	ArrayCreation* arrayCreation;
-	ElementAccess* elementAccess;
-	InvocationExpression* invocationExpression;
+    string* string_literal;
+    string* identifier;
+    SimpleType* simpleType;
+    TypeName* typeName;
+    ArrayType* arrayType;
+    Argument* argument;
+    ArgumentList* argumentList;
+    ObjectInitializer* objectInitializer;
+    ObjectCreation* objectCreation;
+    MemberInitializer* memberInitializer;
+    MemberInitializerList* memberInitializerList;
+    Expression* expression;
+    ExpressionList* expressionList;
+    ArrayInitializer* arrayInitializer;
+    ArrayCreation* arrayCreation;
+    ElementAccess* elementAccess;
+    InvocationExpression* invocationExpression;
+    VarDeclarator* varDeclarator;
+    VarDeclaratorList* varDeclaratorList;
+    Statement* statement;
+    StatementList* statementList;
+    IfStatement* ifStatement;
+    WhileStatement* whileStatement;
+    DoStatement* doStatement;
+    ForeachStatement* foreachStatement;
+    ForStatement* forStatement;
+    ReturnStatement* returnStatement;
+    ParamList* paramList;
+    Modifier* modifier;
+    ModifielrList* modifielrList;
+    ClassMember* classMember;
+    ClassMemberList* classMemberList;
+    Method* method;
+    Field* field;
+    Constructor* construct;
+    ClassDeclaration* classDeclaration;
+    NamespaceMember* namespaceMember;
+    NamespaceMemberList* namespaceMemberList;
+    NamespaceDeclaration* namespaceDeclaration;
+    Programm* programm;
 } YYSTYPE;
 
 #ifndef YYLTYPE
 typedef
-  struct yyltype
-    {
-      int timestamp;
-      int first_line;
-      int first_column;
-      int last_line;
-      int last_column;
-      char *text;
-   }
-  yyltype;
+struct yyltype
+{
+    int timestamp;
+    int first_line;
+    int first_column;
+    int last_line;
+    int last_column;
+    char* text;
+}
+yyltype;
 
 #define YYLTYPE yyltype
 #endif
@@ -111,7 +134,7 @@ typedef
 
 #define YYTRANSLATE(x) ((unsigned)(x) <= 298 ? yytranslate[x] : 111)
 
-static const char yytranslate[] = {     0,
+static const char yytranslate[] = { 0,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -145,7 +168,7 @@ static const char yytranslate[] = {     0,
 };
 
 #if YYDEBUG != 0
-static const short yyprhs[] = {     0,
+static const short yyprhs[] = { 0,
      0,     2,     8,     9,    11,    13,    16,    18,    20,    27,
     36,    37,    39,    41,    44,    46,    48,    50,    52,    59,
     68,    80,    94,   106,   120,   125,   132,   137,   144,   149,
@@ -167,7 +190,7 @@ static const short yyprhs[] = {     0,
    778,   782,   786,   788,   790,   792,   794,   796
 };
 
-static const short yyrhs[] = {    65,
+static const short yyrhs[] = { 65,
      0,     9,   110,    58,    65,    59,     0,     0,    66,     0,
     67,     0,    66,    67,     0,    64,     0,    68,     0,    75,
      8,    31,    58,    69,    59,     0,    75,     8,    31,    60,
@@ -254,28 +277,28 @@ static const short yyrhs[] = {    65,
 
 #if YYDEBUG != 0
 static const short yyrline[] = { 0,
-   103,   107,   111,   112,   116,   117,   121,   122,   126,   127,
-   131,   132,   136,   137,   141,   142,   143,   144,   148,   149,
-   150,   151,   152,   153,   157,   158,   159,   160,   161,   162,
-   166,   167,   168,   169,   170,   171,   172,   173,   177,   178,
-   182,   183,   187,   188,   189,   190,   191,   192,   193,   194,
-   198,   199,   203,   204,   208,   209,   210,   211,   212,   213,
-   214,   215,   216,   217,   221,   222,   226,   227,   231,   232,
-   236,   237,   241,   242,   246,   250,   254,   258,   259,   263,
-   264,   265,   266,   270,   271,   272,   276,   277,   278,   279,
-   280,   281,   282,   283,   284,   285,   286,   287,   288,   289,
-   290,   291,   292,   293,   294,   295,   296,   297,   298,   299,
-   300,   301,   302,   303,   304,   305,   306,   307,   308,   309,
-   310,   314,   315,   316,   317,   318,   319,   320,   321,   322,
-   323,   327,   331,   332,   333,   334,   335,   336,   337,   338,
-   339,   340,   341,   342,   343,   344,   348,   349,   350,   351,
-   352,   353,   357,   358,   362,   363,   367,   368,   372,   373,
-   374,   375,   376,   377,   381,   382,   386,   387,   391,   392,
-   396,   397,   398,   399,   403,   404,   408,   409,   413,   414,
-   418,   419,   423,   424,   425,   426,   430,   431
+   149,   153,   157,   158,   162,   163,   167,   168,   172,   173,
+   177,   178,   182,   183,   187,   188,   189,   190,   194,   195,
+   196,   197,   198,   199,   203,   204,   205,   206,   207,   208,
+   212,   213,   214,   215,   216,   217,   218,   219,   223,   224,
+   228,   229,   233,   234,   235,   236,   237,   238,   239,   240,
+   244,   245,   249,   250,   254,   255,   256,   257,   258,   259,
+   260,   261,   262,   263,   267,   268,   272,   273,   277,   278,
+   282,   283,   287,   288,   292,   296,   300,   304,   305,   309,
+   310,   311,   312,   316,   317,   318,   322,   323,   324,   325,
+   326,   327,   328,   329,   330,   331,   332,   333,   334,   335,
+   336,   337,   338,   339,   340,   341,   342,   343,   344,   345,
+   346,   347,   348,   349,   350,   351,   352,   353,   354,   355,
+   356,   360,   361,   362,   363,   364,   365,   366,   367,   368,
+   369,   373,   377,   378,   379,   380,   381,   382,   383,   384,
+   385,   386,   387,   388,   389,   390,   394,   395,   396,   397,
+   398,   399,   403,   404,   408,   409,   413,   414,   418,   419,
+   420,   421,   422,   423,   427,   428,   432,   433,   437,   438,
+   442,   443,   444,   445,   449,   450,   454,   455,   459,   460,
+   464,   465,   469,   470,   471,   472,   476,   477
 };
 
-static const char * const yytname[] = {   "$","error","$undefined.","ABSTRACT",
+static const char* const yytname[] = { "$","error","$undefined.","ABSTRACT",
 "VIRTUAL","OVERRIDE","BASE","THIS","CLASS","NAMESPACE","STATIC","RETURN","PUBLIC",
 "INTERNAL","PROTECTED","PRIVATE","DO","IF","FOR","FOREACH","IN","WHILE","VOID",
 "INT","CHAR","STRING","BOOL","INT_LITERAL","CHAR_LITERAL","STRING_LITERAL","BOOLEAN_LITERAL",
@@ -295,7 +318,7 @@ static const char * const yytname[] = {   "$","error","$undefined.","ABSTRACT",
 };
 #endif
 
-static const short yyr1[] = {     0,
+static const short yyr1[] = { 0,
     63,    64,    65,    65,    66,    66,    67,    67,    68,    68,
     69,    69,    70,    70,    71,    71,    71,    71,    72,    72,
     72,    72,    72,    72,    73,    73,    73,    73,    73,    73,
@@ -317,7 +340,7 @@ static const short yyr1[] = {     0,
    108,   108,   109,   109,   109,   109,   110,   110
 };
 
-static const short yyr2[] = {     0,
+static const short yyr2[] = { 0,
      1,     5,     0,     1,     1,     2,     1,     1,     6,     8,
      0,     1,     1,     2,     1,     1,     1,     1,     6,     8,
     11,    13,    11,    13,     4,     6,     4,     6,     4,     6,
@@ -339,7 +362,7 @@ static const short yyr2[] = {     0,
      3,     3,     1,     1,     1,     1,     1,     3
 };
 
-static const short yydefact[] = {     3,
+static const short yydefact[] = { 3,
     47,    50,    49,     0,    48,    45,    46,    44,    43,     7,
      1,     4,     5,     8,     0,    40,    41,   187,     0,     6,
      0,    42,     0,     3,     0,   188,     0,    39,     0,     2,
@@ -382,7 +405,7 @@ static const short yydefact[] = {     3,
     72,     0,     0,     0
 };
 
-static const short yydefgoto[] = {   392,
+static const short yydefgoto[] = { 392,
     10,    11,    12,    13,    14,    32,    33,    34,    35,    36,
     37,    15,    16,    17,    61,    62,   167,   168,   169,   170,
    171,   295,   172,   173,   174,   175,   176,   177,   186,    96,
@@ -390,7 +413,7 @@ static const short yydefgoto[] = {   392,
    270,   222,   223,   188,    64,   101,   102
 };
 
-static const short yypact[] = {   292,
+static const short yypact[] = { 292,
 -32768,-32768,-32768,   -17,-32768,-32768,-32768,-32768,-32768,-32768,
 -32768,   292,-32768,-32768,    11,   330,-32768,-32768,    54,-32768,
     -1,-32768,    30,   292,   217,-32768,   -32,   103,   -17,-32768,
@@ -433,7 +456,7 @@ static const short yypact[] = {   292,
 -32768,   513,   514,-32768
 };
 
-static const short yypgoto[] = {-32768,
+static const short yypgoto[] = { -32768,
 -32768,   500,-32768,   515,     0,   474,-32768,   493,-32768,-32768,
 -32768,    14,-32768,   512,    92,-32768,  -151,  -149,-32768,-32768,
 -32768,  -320,-32768,-32768,-32768,-32768,   285,   -31,   121,-32768,
@@ -445,7 +468,7 @@ static const short yypgoto[] = {-32768,
 #define	YYLAST		1042
 
 
-static const short yytable[] = {    19,
+static const short yytable[] = { 19,
     57,    49,   266,    48,   259,   265,   187,   239,   242,   272,
    360,   361,   197,    18,   260,   247,    65,   249,    21,    23,
     58,    63,   267,    65,    39,    67,    30,    31,    63,    25,
@@ -553,7 +576,7 @@ static const short yytable[] = {    19,
    139,   140
 };
 
-static const short yycheck[] = {     4,
+static const short yycheck[] = { 4,
     31,    38,    31,    38,    52,   192,   115,   157,   160,   196,
    331,   332,   120,    31,    62,   165,    53,   169,     8,    50,
     51,    53,    51,    60,    29,    32,    59,    28,    60,    31,
@@ -680,10 +703,10 @@ static const short yycheck[] = {     4,
    along with this program; if not, write to the Free Software
    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
-/* As a special exception, when this file is copied by Bison into a
-   Bison output file, you may use that output file without restriction.
-   This special exception was added by the Free Software Foundation
-   in version 1.24 of Bison.  */
+   /* As a special exception, when this file is copied by Bison into a
+      Bison output file, you may use that output file without restriction.
+      This special exception was added by the Free Software Foundation
+      in version 1.24 of Bison.  */
 
 #ifndef alloca
 #ifdef __GNUC__
@@ -697,15 +720,15 @@ static const short yycheck[] = {     4,
 #else /* not MSDOS, or __TURBOC__ */
 #if defined(_AIX)
 #include <malloc.h>
- #pragma alloca
+#pragma alloca
 #else /* not MSDOS, __TURBOC__, or _AIX */
 #ifdef __hpux
 #ifdef __cplusplus
 extern "C" {
-void *alloca (unsigned int);
+    void* alloca(unsigned int);
 };
 #else /* not __cplusplus */
-void *alloca ();
+void* alloca();
 #endif /* not __cplusplus */
 #endif /* __hpux */
 #endif /* not _AIX */
@@ -719,9 +742,9 @@ void *alloca ();
   It was written by Richard Stallman by simplifying the hairy parser
   used when %semantic_parser is specified.  */
 
-/* Note: there must be only one dollar sign in this file.
-   It is replaced by the list of actions, each action
-   as one case of the switch.  */
+  /* Note: there must be only one dollar sign in this file.
+     It is replaced by the list of actions, each action
+     as one case of the switch.  */
 
 #define yyerrok		(yyerrstatus = 0)
 #define yyclearin	(yychar = YYEMPTY)
@@ -730,10 +753,10 @@ void *alloca ();
 #define YYACCEPT	return(0)
 #define YYABORT 	return(1)
 #define YYERROR		goto yyerrlab1
-/* Like YYERROR except do call yyerror.
-   This remains here temporarily to ease the
-   transition to the new meaning of YYERROR, for GCC.
-   Once GCC version 2 has supplanted version 1, this can go.  */
+     /* Like YYERROR except do call yyerror.
+        This remains here temporarily to ease the
+        transition to the new meaning of YYERROR, for GCC.
+        Once GCC version 2 has supplanted version 1, this can go.  */
 #define YYFAIL		goto yyerrlab
 #define YYRECOVERING()  (!!yyerrstatus)
 #define YYBACKUP(token, value) \
@@ -771,17 +794,17 @@ while (0)
 #endif /* not YYLSP_NEEDED */
 #endif
 
-/* If nonreentrant, generate the variables here */
+        /* If nonreentrant, generate the variables here */
 
 #ifndef YYPURE
 
 int	yychar;			/*  the lookahead symbol		*/
 YYSTYPE	yylval;			/*  the semantic value of the		*/
-				/*  lookahead symbol			*/
+/*  lookahead symbol			*/
 
 #ifdef YYLSP_NEEDED
 YYLTYPE yylloc;			/*  location data for the lookahead	*/
-				/*  symbol				*/
+/*  symbol				*/
 #endif
 
 int yynerrs;			/*  number of parse errors so far       */
@@ -793,7 +816,7 @@ int yydebug;			/*  nonzero means print parse trace	*/
    from coexisting.  */
 #endif
 
-/*  YYINITDEPTH indicates the initial size of the parser's stacks	*/
+   /*  YYINITDEPTH indicates the initial size of the parser's stacks	*/
 
 #ifndef	YYINITDEPTH
 #define YYINITDEPTH 200
@@ -810,11 +833,11 @@ int yydebug;			/*  nonzero means print parse trace	*/
 #define YYMAXDEPTH 10000
 #endif
 
-/* Prevent warning if -Wstrict-prototypes.  */
+    /* Prevent warning if -Wstrict-prototypes.  */
 #ifdef __GNUC__
-int yyparse (void);
+int yyparse(void);
 #endif
-
+
 #if __GNUC__ > 1		/* GNU C and GNU C++ define this.  */
 #define __yy_memcpy(FROM,TO,COUNT)	__builtin_memcpy(TO,FROM,COUNT)
 #else				/* not GNU C or C++ */
@@ -823,17 +846,17 @@ int yyparse (void);
 /* This is the most reliable way to avoid incompatibilities
    in available built-in functions on various systems.  */
 static void
-__yy_memcpy (from, to, count)
-     char *from;
-     char *to;
-     int count;
+__yy_memcpy(from, to, count)
+char* from;
+char* to;
+int count;
 {
-  register char *f = from;
-  register char *t = to;
-  register int i = count;
+    register char* f = from;
+    register char* t = to;
+    register int i = count;
 
-  while (i-- > 0)
-    *t++ = *f++;
+    while (i-- > 0)
+        *t++ = *f++;
 }
 
 #else /* __cplusplus */
@@ -841,19 +864,19 @@ __yy_memcpy (from, to, count)
 /* This is the most reliable way to avoid incompatibilities
    in available built-in functions on various systems.  */
 static void
-__yy_memcpy (char *from, char *to, int count)
+__yy_memcpy(char* from, char* to, int count)
 {
-  register char *f = from;
-  register char *t = to;
-  register int i = count;
+    register char* f = from;
+    register char* t = to;
+    register int i = count;
 
-  while (i-- > 0)
-    *t++ = *f++;
+    while (i-- > 0)
+        *t++ = *f++;
 }
 
 #endif
 #endif
-
+
 #line 192 "bison.simple"
 
 /* The user can define YYPARSE_PARAM as the name of an argument to be passed
@@ -871,894 +894,1238 @@ __yy_memcpy (char *from, char *to, int count)
 
 int
 yyparse(YYPARSE_PARAM)
-     YYPARSE_PARAM_DECL
+YYPARSE_PARAM_DECL
 {
-  register int yystate;
-  register int yyn;
-  register short *yyssp;
-  register YYSTYPE *yyvsp;
-  int yyerrstatus;	/*  number of tokens to shift before error messages enabled */
-  int yychar1 = 0;		/*  lookahead token as an internal (translated) token number */
+    register int yystate;
+    register int yyn;
+    register short* yyssp;
+    register YYSTYPE* yyvsp;
+    int yyerrstatus;	/*  number of tokens to shift before error messages enabled */
+    int yychar1 = 0;		/*  lookahead token as an internal (translated) token number */
 
-  short	yyssa[YYINITDEPTH];	/*  the state stack			*/
-  YYSTYPE yyvsa[YYINITDEPTH];	/*  the semantic value stack		*/
+    short	yyssa[YYINITDEPTH];	/*  the state stack			*/
+    YYSTYPE yyvsa[YYINITDEPTH];	/*  the semantic value stack		*/
 
-  short *yyss = yyssa;		/*  refer to the stacks thru separate pointers */
-  YYSTYPE *yyvs = yyvsa;	/*  to allow yyoverflow to reallocate them elsewhere */
+    short* yyss = yyssa;		/*  refer to the stacks thru separate pointers */
+    YYSTYPE* yyvs = yyvsa;	/*  to allow yyoverflow to reallocate them elsewhere */
 
 #ifdef YYLSP_NEEDED
-  YYLTYPE yylsa[YYINITDEPTH];	/*  the location stack			*/
-  YYLTYPE *yyls = yylsa;
-  YYLTYPE *yylsp;
+    YYLTYPE yylsa[YYINITDEPTH];	/*  the location stack			*/
+    YYLTYPE* yyls = yylsa;
+    YYLTYPE* yylsp;
 
 #define YYPOPSTACK   (yyvsp--, yyssp--, yylsp--)
 #else
 #define YYPOPSTACK   (yyvsp--, yyssp--)
 #endif
 
-  int yystacksize = YYINITDEPTH;
+    int yystacksize = YYINITDEPTH;
 
 #ifdef YYPURE
-  int yychar;
-  YYSTYPE yylval;
-  int yynerrs;
+    int yychar;
+    YYSTYPE yylval;
+    int yynerrs;
 #ifdef YYLSP_NEEDED
-  YYLTYPE yylloc;
+    YYLTYPE yylloc;
 #endif
 #endif
 
-  YYSTYPE yyval;		/*  the variable used to return		*/
-				/*  semantic values from the action	*/
-				/*  routines				*/
+    YYSTYPE yyval;		/*  the variable used to return		*/
+    /*  semantic values from the action	*/
+    /*  routines				*/
 
-  int yylen;
+    int yylen;
 
 #if YYDEBUG != 0
-  if (yydebug)
-    fprintf(stderr, "Starting parse\n");
+    if (yydebug)
+        fprintf(stderr, "Starting parse\n");
 #endif
 
-  yystate = 0;
-  yyerrstatus = 0;
-  yynerrs = 0;
-  yychar = YYEMPTY;		/* Cause a token to be read.  */
+    yystate = 0;
+    yyerrstatus = 0;
+    yynerrs = 0;
+    yychar = YYEMPTY;		/* Cause a token to be read.  */
 
-  /* Initialize stack pointers.
-     Waste one element of value and location stack
-     so that they stay on the same level as the state stack.
-     The wasted elements are never initialized.  */
+    /* Initialize stack pointers.
+       Waste one element of value and location stack
+       so that they stay on the same level as the state stack.
+       The wasted elements are never initialized.  */
 
-  yyssp = yyss - 1;
-  yyvsp = yyvs;
+    yyssp = yyss - 1;
+    yyvsp = yyvs;
 #ifdef YYLSP_NEEDED
-  yylsp = yyls;
+    yylsp = yyls;
 #endif
 
-/* Push a new state, which is found in  yystate  .  */
-/* In all cases, when you get here, the value and location stacks
-   have just been pushed. so pushing a state here evens the stacks.  */
+    /* Push a new state, which is found in  yystate  .  */
+    /* In all cases, when you get here, the value and location stacks
+       have just been pushed. so pushing a state here evens the stacks.  */
 yynewstate:
 
-  *++yyssp = yystate;
+    *++yyssp = yystate;
 
-  if (yyssp >= yyss + yystacksize - 1)
+    if (yyssp >= yyss + yystacksize - 1)
     {
-      /* Give user a chance to reallocate the stack */
-      /* Use copies of these so that the &'s don't force the real ones into memory. */
-      YYSTYPE *yyvs1 = yyvs;
-      short *yyss1 = yyss;
+        /* Give user a chance to reallocate the stack */
+        /* Use copies of these so that the &'s don't force the real ones into memory. */
+        YYSTYPE* yyvs1 = yyvs;
+        short* yyss1 = yyss;
 #ifdef YYLSP_NEEDED
-      YYLTYPE *yyls1 = yyls;
+        YYLTYPE* yyls1 = yyls;
 #endif
 
-      /* Get the current used size of the three stacks, in elements.  */
-      int size = yyssp - yyss + 1;
+        /* Get the current used size of the three stacks, in elements.  */
+        int size = yyssp - yyss + 1;
 
 #ifdef yyoverflow
-      /* Each stack pointer address is followed by the size of
-	 the data in use in that stack, in bytes.  */
+        /* Each stack pointer address is followed by the size of
+       the data in use in that stack, in bytes.  */
 #ifdef YYLSP_NEEDED
-      /* This used to be a conditional around just the two extra args,
-	 but that might be undefined if yyoverflow is a macro.  */
-      yyoverflow("parser stack overflow",
-		 &yyss1, size * sizeof (*yyssp),
-		 &yyvs1, size * sizeof (*yyvsp),
-		 &yyls1, size * sizeof (*yylsp),
-		 &yystacksize);
+       /* This used to be a conditional around just the two extra args,
+      but that might be undefined if yyoverflow is a macro.  */
+        yyoverflow("parser stack overflow",
+            &yyss1, size * sizeof(*yyssp),
+            &yyvs1, size * sizeof(*yyvsp),
+            &yyls1, size * sizeof(*yylsp),
+            &yystacksize);
 #else
-      yyoverflow("parser stack overflow",
-		 &yyss1, size * sizeof (*yyssp),
-		 &yyvs1, size * sizeof (*yyvsp),
-		 &yystacksize);
+        yyoverflow("parser stack overflow",
+            &yyss1, size * sizeof(*yyssp),
+            &yyvs1, size * sizeof(*yyvsp),
+            &yystacksize);
 #endif
 
-      yyss = yyss1; yyvs = yyvs1;
+        yyss = yyss1; yyvs = yyvs1;
 #ifdef YYLSP_NEEDED
-      yyls = yyls1;
+        yyls = yyls1;
 #endif
 #else /* no yyoverflow */
-      /* Extend the stack our own way.  */
-      if (yystacksize >= YYMAXDEPTH)
-	{
-	  yyerror("parser stack overflow");
-	  return 2;
-	}
-      yystacksize *= 2;
-      if (yystacksize > YYMAXDEPTH)
-	yystacksize = YYMAXDEPTH;
-      yyss = (short *) alloca (yystacksize * sizeof (*yyssp));
-      __yy_memcpy ((char *)yyss1, (char *)yyss, size * sizeof (*yyssp));
-      yyvs = (YYSTYPE *) alloca (yystacksize * sizeof (*yyvsp));
-      __yy_memcpy ((char *)yyvs1, (char *)yyvs, size * sizeof (*yyvsp));
+        /* Extend the stack our own way.  */
+        if (yystacksize >= YYMAXDEPTH)
+        {
+            yyerror("parser stack overflow");
+            return 2;
+        }
+        yystacksize *= 2;
+        if (yystacksize > YYMAXDEPTH)
+            yystacksize = YYMAXDEPTH;
+        yyss = (short*)alloca(yystacksize * sizeof(*yyssp));
+        __yy_memcpy((char*)yyss1, (char*)yyss, size * sizeof(*yyssp));
+        yyvs = (YYSTYPE*)alloca(yystacksize * sizeof(*yyvsp));
+        __yy_memcpy((char*)yyvs1, (char*)yyvs, size * sizeof(*yyvsp));
 #ifdef YYLSP_NEEDED
-      yyls = (YYLTYPE *) alloca (yystacksize * sizeof (*yylsp));
-      __yy_memcpy ((char *)yyls1, (char *)yyls, size * sizeof (*yylsp));
+        yyls = (YYLTYPE*)alloca(yystacksize * sizeof(*yylsp));
+        __yy_memcpy((char*)yyls1, (char*)yyls, size * sizeof(*yylsp));
 #endif
 #endif /* no yyoverflow */
 
-      yyssp = yyss + size - 1;
-      yyvsp = yyvs + size - 1;
+        yyssp = yyss + size - 1;
+        yyvsp = yyvs + size - 1;
 #ifdef YYLSP_NEEDED
-      yylsp = yyls + size - 1;
+        yylsp = yyls + size - 1;
 #endif
 
 #if YYDEBUG != 0
-      if (yydebug)
-	fprintf(stderr, "Stack size increased to %d\n", yystacksize);
+        if (yydebug)
+            fprintf(stderr, "Stack size increased to %d\n", yystacksize);
 #endif
 
-      if (yyssp >= yyss + yystacksize - 1)
-	YYABORT;
+        if (yyssp >= yyss + yystacksize - 1)
+            YYABORT;
     }
 
 #if YYDEBUG != 0
-  if (yydebug)
-    fprintf(stderr, "Entering state %d\n", yystate);
+    if (yydebug)
+        fprintf(stderr, "Entering state %d\n", yystate);
 #endif
 
-  goto yybackup;
- yybackup:
+    goto yybackup;
+yybackup:
 
-/* Do appropriate processing given the current state.  */
-/* Read a lookahead token if we need one and don't already have one.  */
-/* yyresume: */
+    /* Do appropriate processing given the current state.  */
+    /* Read a lookahead token if we need one and don't already have one.  */
+    /* yyresume: */
 
-  /* First try to decide what to do without reference to lookahead token.  */
+      /* First try to decide what to do without reference to lookahead token.  */
 
-  yyn = yypact[yystate];
-  if (yyn == YYFLAG)
-    goto yydefault;
+    yyn = yypact[yystate];
+    if (yyn == YYFLAG)
+        goto yydefault;
 
-  /* Not known => get a lookahead token if don't already have one.  */
+    /* Not known => get a lookahead token if don't already have one.  */
 
-  /* yychar is either YYEMPTY or YYEOF
-     or a valid token in external form.  */
+    /* yychar is either YYEMPTY or YYEOF
+       or a valid token in external form.  */
 
-  if (yychar == YYEMPTY)
+    if (yychar == YYEMPTY)
     {
 #if YYDEBUG != 0
-      if (yydebug)
-	fprintf(stderr, "Reading a token: ");
+        if (yydebug)
+            fprintf(stderr, "Reading a token: ");
 #endif
-      yychar = YYLEX;
+        yychar = YYLEX;
     }
 
-  /* Convert token to internal form (in yychar1) for indexing tables with */
+    /* Convert token to internal form (in yychar1) for indexing tables with */
 
-  if (yychar <= 0)		/* This means end of input. */
+    if (yychar <= 0)		/* This means end of input. */
     {
-      yychar1 = 0;
-      yychar = YYEOF;		/* Don't call YYLEX any more */
+        yychar1 = 0;
+        yychar = YYEOF;		/* Don't call YYLEX any more */
 
 #if YYDEBUG != 0
-      if (yydebug)
-	fprintf(stderr, "Now at end of input.\n");
+        if (yydebug)
+            fprintf(stderr, "Now at end of input.\n");
 #endif
     }
-  else
+    else
     {
-      yychar1 = YYTRANSLATE(yychar);
+        yychar1 = YYTRANSLATE(yychar);
 
 #if YYDEBUG != 0
-      if (yydebug)
-	{
-	  fprintf (stderr, "Next token is %d (%s", yychar, yytname[yychar1]);
-	  /* Give the individual parser a way to print the precise meaning
-	     of a token, for further debugging info.  */
+        if (yydebug)
+        {
+            fprintf(stderr, "Next token is %d (%s", yychar, yytname[yychar1]);
+            /* Give the individual parser a way to print the precise meaning
+               of a token, for further debugging info.  */
 #ifdef YYPRINT
-	  YYPRINT (stderr, yychar, yylval);
+            YYPRINT(stderr, yychar, yylval);
 #endif
-	  fprintf (stderr, ")\n");
-	}
+            fprintf(stderr, ")\n");
+        }
 #endif
     }
 
-  yyn += yychar1;
-  if (yyn < 0 || yyn > YYLAST || yycheck[yyn] != yychar1)
-    goto yydefault;
+    yyn += yychar1;
+    if (yyn < 0 || yyn > YYLAST || yycheck[yyn] != yychar1)
+        goto yydefault;
 
-  yyn = yytable[yyn];
+    yyn = yytable[yyn];
 
-  /* yyn is what to do for this token type in this state.
-     Negative => reduce, -yyn is rule number.
-     Positive => shift, yyn is new state.
-       New state is final state => don't bother to shift,
-       just return success.
-     0, or most negative number => error.  */
+    /* yyn is what to do for this token type in this state.
+       Negative => reduce, -yyn is rule number.
+       Positive => shift, yyn is new state.
+         New state is final state => don't bother to shift,
+         just return success.
+       0, or most negative number => error.  */
 
-  if (yyn < 0)
+    if (yyn < 0)
     {
-      if (yyn == YYFLAG)
-	goto yyerrlab;
-      yyn = -yyn;
-      goto yyreduce;
+        if (yyn == YYFLAG)
+            goto yyerrlab;
+        yyn = -yyn;
+        goto yyreduce;
     }
-  else if (yyn == 0)
-    goto yyerrlab;
+    else if (yyn == 0)
+        goto yyerrlab;
 
-  if (yyn == YYFINAL)
-    YYACCEPT;
+    if (yyn == YYFINAL)
+        YYACCEPT;
 
-  /* Shift the lookahead token.  */
+    /* Shift the lookahead token.  */
 
 #if YYDEBUG != 0
-  if (yydebug)
-    fprintf(stderr, "Shifting token %d (%s), ", yychar, yytname[yychar1]);
+    if (yydebug)
+        fprintf(stderr, "Shifting token %d (%s), ", yychar, yytname[yychar1]);
 #endif
 
-  /* Discard the token being shifted unless it is eof.  */
-  if (yychar != YYEOF)
-    yychar = YYEMPTY;
+    /* Discard the token being shifted unless it is eof.  */
+    if (yychar != YYEOF)
+        yychar = YYEMPTY;
 
-  *++yyvsp = yylval;
+    *++yyvsp = yylval;
 #ifdef YYLSP_NEEDED
-  *++yylsp = yylloc;
+    * ++yylsp = yylloc;
 #endif
 
-  /* count tokens shifted since error; after three, turn off error status.  */
-  if (yyerrstatus) yyerrstatus--;
+    /* count tokens shifted since error; after three, turn off error status.  */
+    if (yyerrstatus) yyerrstatus--;
 
-  yystate = yyn;
-  goto yynewstate;
+    yystate = yyn;
+    goto yynewstate;
 
-/* Do the default action for the current state.  */
+    /* Do the default action for the current state.  */
 yydefault:
 
-  yyn = yydefact[yystate];
-  if (yyn == 0)
-    goto yyerrlab;
+    yyn = yydefact[yystate];
+    if (yyn == 0)
+        goto yyerrlab;
 
-/* Do a reduction.  yyn is the number of a rule to reduce with.  */
+    /* Do a reduction.  yyn is the number of a rule to reduce with.  */
 yyreduce:
-  yylen = yyr2[yyn];
-  if (yylen > 0)
-    yyval = yyvsp[1-yylen]; /* implement default value of the action */
+    yylen = yyr2[yyn];
+    if (yylen > 0)
+        yyval = yyvsp[1 - yylen]; /* implement default value of the action */
 
 #if YYDEBUG != 0
-  if (yydebug)
+    if (yydebug)
     {
-      int i;
+        int i;
 
-      fprintf (stderr, "Reducing via rule %d (line %d), ",
-	       yyn, yyrline[yyn]);
+        fprintf(stderr, "Reducing via rule %d (line %d), ",
+            yyn, yyrline[yyn]);
 
-      /* Print the symbols being reduced, and their result.  */
-      for (i = yyprhs[yyn]; yyrhs[i] > 0; i++)
-	fprintf (stderr, "%s ", yytname[yyrhs[i]]);
-      fprintf (stderr, " -> %s\n", yytname[yyr1[yyn]]);
+        /* Print the symbols being reduced, and their result.  */
+        for (i = yyprhs[yyn]; yyrhs[i] > 0; i++)
+            fprintf(stderr, "%s ", yytname[yyrhs[i]]);
+        fprintf(stderr, " -> %s\n", yytname[yyr1[yyn]]);
     }
 #endif
 
 
-  switch (yyn) {
+    switch (yyn) {
 
-case 87:
-#line 276 "./.y"
-{ yyval.expression = new Expression(Expression::t_INT_LITER); ;
-    break;}
-case 88:
+    case 1:
+#line 149 "./.y"
+    { yyval.programm = new Programm(yyvsp[0].namespaceMemberList); ;
+    break; }
+    case 2:
+#line 153 "./.y"
+    { yyval.namespaceDeclaration = new NamespaceDeclaration(yyvsp[-3].typeName, yyvsp[-1].namespaceMemberList); ;
+    break; }
+    case 3:
+#line 157 "./.y"
+    { yyval.namespaceMemberList = NULL; ;
+    break; }
+    case 4:
+#line 158 "./.y"
+    { yyval.namespaceMemberList = yyvsp[0].namespaceMemberList; ;
+    break; }
+    case 5:
+#line 162 "./.y"
+    { yyval.namespaceMemberList = new NamespaceMemberList(yyvsp[0].namespaceMember); ;
+    break; }
+    case 6:
+#line 163 "./.y"
+    { NamespaceMemberList::Append(yyvsp[-1].namespaceMemberList, yyvsp[0].namespaceMember); ;
+    break; }
+    case 7:
+#line 167 "./.y"
+    { yyval.namespaceMember = new NamespaceMember(yyvsp[0].namespaceDeclaration); ;
+    break; }
+    case 8:
+#line 168 "./.y"
+    { yyval.namespaceMember = new NamespaceMember(yyvsp[0].classDeclaration); ;
+    break; }
+    case 9:
+#line 172 "./.y"
+    { yyval.classDeclaration = new ClassDeclaration(yyvsp[-5].modifielrList, yyvsp[-3].identifier, yyvsp[-1].classMemberList); ;
+    break; }
+    case 10:
+#line 173 "./.y"
+    { yyval.classDeclaration = new ClassDeclaration(yyvsp[-7].modifielrList, yyvsp[-5].identifier, yyvsp[-1].classMemberList, yyvsp[-3].typeName); ;
+    break; }
+    case 11:
+#line 177 "./.y"
+    { yyval.classMemberList = NULL; ;
+    break; }
+    case 12:
+#line 178 "./.y"
+    { yyval.classMemberList = yyvsp[0].classMemberList; ;
+    break; }
+    case 13:
+#line 182 "./.y"
+    { yyval.classMemberList = new ClassMemberList(yyvsp[0].classMember); ;
+    break; }
+    case 14:
+#line 183 "./.y"
+    { ClassMemberList::Append(yyvsp[-1].classMemberList, yyvsp[0].classMember); ;
+    break; }
+    case 15:
+#line 187 "./.y"
+    { yyval.classMember = yyvsp[0].field; ;
+    break; }
+    case 16:
+#line 188 "./.y"
+    { yyval.classMember = yyvsp[0].method; ;
+    break; }
+    case 17:
+#line 189 "./.y"
+    { yyval.classMember = yyvsp[0].construct; ;
+    break; }
+    case 18:
+#line 190 "./.y"
+    { yyval.classMember = yyvsp[0].classDeclaration; ;
+    break; }
+    case 19:
+#line 194 "./.y"
+    { yyval.construct = new Constructor(yyvsp[-5].modifielrList, yyvsp[-4].identifier, yyvsp[-2].paramList, ClassMember::t_NULL); ;
+    break; }
+    case 20:
+#line 195 "./.y"
+    { yyval.construct = new Constructor(yyvsp[-7].modifielrList, yyvsp[-6].identifier, yyvsp[-4].paramList, ClassMember::t_NULL, yyvsp[-1].statementList); ;
+    break; }
+    case 21:
+#line 196 "./.y"
+    { yyval.construct = new Constructor(yyvsp[-10].modifielrList, yyvsp[-9].identifier, yyvsp[-7].paramList, ClassMember::t_BASE, NULL, yyvsp[-2].argumentList); ;
+    break; }
+    case 22:
+#line 197 "./.y"
+    { yyval.construct = new Constructor(yyvsp[-12].modifielrList, yyvsp[-11].identifier, yyvsp[-9].paramList, ClassMember::t_BASE, yyvsp[-1].statementList, yyvsp[-4].argumentList); ;
+    break; }
+    case 23:
+#line 198 "./.y"
+    { yyval.construct = new Constructor(yyvsp[-10].modifielrList, yyvsp[-9].identifier, yyvsp[-7].paramList, ClassMember::t_THIS, NULL, yyvsp[-2].argumentList); ;
+    break; }
+    case 24:
+#line 199 "./.y"
+    { yyval.construct = new Constructor(yyvsp[-12].modifielrList, yyvsp[-11].identifier, yyvsp[-9].paramList, ClassMember::t_THIS, yyvsp[-1].statementList, yyvsp[-4].argumentList); ;
+    break; }
+    case 25:
+#line 203 "./.y"
+    { yyval.field = new Field(yyvsp[-3].modifielrList, ClassMember::t_SIMPLE_TYPE, yyvsp[-2].simpleType, yyvsp[-1].identifier); ;
+    break; }
+    case 26:
+#line 204 "./.y"
+    { yyval.field = new Field(yyvsp[-5].modifielrList, ClassMember::t_SIMPLE_TYPE, yyvsp[-4].simpleType, yyvsp[-3].identifier, yyvsp[-1].expression); ;
+    break; }
+    case 27:
+#line 205 "./.y"
+    { yyval.field = new Field(yyvsp[-3].modifielrList, ClassMember::t_TYPENAME, yyvsp[-2].typeName, yyvsp[-1].identifier); ;
+    break; }
+    case 28:
+#line 206 "./.y"
+    { yyval.field = new Field(yyvsp[-5].modifielrList, ClassMember::t_TYPENAME, yyvsp[-4].typeName, yyvsp[-3].identifier, yyvsp[-1].expression); ;
+    break; }
+    case 29:
+#line 207 "./.y"
+    { yyval.field = new Field(yyvsp[-3].modifielrList, ClassMember::t_ARRAY, yyvsp[-2].arrayType, yyvsp[-1].identifier); ;
+    break; }
+    case 30:
+#line 208 "./.y"
+    { yyval.field = new Field(yyvsp[-5].modifielrList, ClassMember::t_ARRAY, yyvsp[-4].arrayType, yyvsp[-3].identifier, yyvsp[-1].expression); ;
+    break; }
+    case 31:
+#line 212 "./.y"
+    { yyval.method = new Method(yyvsp[-8].modifielrList, ClassMember::t_SIMPLE_TYPE, yyvsp[-6].identifier, yyvsp[-4].paramList, yyvsp[-1].statementList); ;
+    break; }
+    case 32:
+#line 213 "./.y"
+    { yyval.method = new Method(yyvsp[-6].modifielrList, ClassMember::t_SIMPLE_TYPE, yyvsp[-4].identifier, yyvsp[-2].paramList); ;
+    break; }
+    case 33:
+#line 214 "./.y"
+    { yyval.method = new Method(yyvsp[-8].modifielrList, ClassMember::t_TYPENAME, yyvsp[-6].identifier, yyvsp[-4].paramList, yyvsp[-1].statementList); ;
+    break; }
+    case 34:
+#line 215 "./.y"
+    { yyval.method = new Method(yyvsp[-6].modifielrList, ClassMember::t_TYPENAME, yyvsp[-4].identifier, yyvsp[-2].paramList); ;
+    break; }
+    case 35:
+#line 216 "./.y"
+    { yyval.method = new Method(yyvsp[-8].modifielrList, ClassMember::t_VOID, yyvsp[-6].identifier, yyvsp[-4].paramList, yyvsp[-1].statementList); ;
+    break; }
+    case 36:
+#line 217 "./.y"
+    { yyval.method = new Method(yyvsp[-6].modifielrList, ClassMember::t_VOID, yyvsp[-4].identifier, yyvsp[-2].paramList); ;
+    break; }
+    case 37:
+#line 218 "./.y"
+    { yyval.method = new Method(yyvsp[-8].modifielrList, ClassMember::t_ARRAY, yyvsp[-6].identifier, yyvsp[-4].paramList, yyvsp[-1].statementList); ;
+    break; }
+    case 38:
+#line 219 "./.y"
+    { yyval.method = new Method(yyvsp[-6].modifielrList, ClassMember::t_ARRAY, yyvsp[-4].identifier, yyvsp[-2].paramList); ;
+    break; }
+    case 39:
+#line 223 "./.y"
+    { yyval.modifielrList = NULL; ;
+    break; }
+    case 40:
+#line 224 "./.y"
+    { yyval.modifielrList = yyvsp[0].modifielrList; ;
+    break; }
+    case 41:
+#line 228 "./.y"
+    { yyval.modifielrList = new ModifielrList(yyvsp[0].modifier); ;
+    break; }
+    case 42:
+#line 229 "./.y"
+    { ModifielrList::Append(yyvsp[-1].modifielrList, yyvsp[0].modifier); ;
+    break; }
+    case 43:
+#line 233 "./.y"
+    { yyval.modifier = new Modifier(Modifier::t_PRIVATE); ;
+    break; }
+    case 44:
+#line 234 "./.y"
+    { yyval.modifier = new Modifier(Modifier::t_PROTECTED); ;
+    break; }
+    case 45:
+#line 235 "./.y"
+    { yyval.modifier = new Modifier(Modifier::t_PUBLIC); ;
+    break; }
+    case 46:
+#line 236 "./.y"
+    { yyval.modifier = new Modifier(Modifier::t_INTERNAL); ;
+    break; }
+    case 47:
+#line 237 "./.y"
+    { yyval.modifier = new Modifier(Modifier::t_ABSTRACT); ;
+    break; }
+    case 48:
+#line 238 "./.y"
+    { yyval.modifier = new Modifier(Modifier::t_STATIC); ;
+    break; }
+    case 49:
+#line 239 "./.y"
+    { yyval.modifier = new Modifier(Modifier::t_OVERRIDE); ;
+    break; }
+    case 50:
+#line 240 "./.y"
+    { yyval.modifier = new Modifier(Modifier::t_VIRTUAL); ;
+    break; }
+    case 51:
+#line 244 "./.y"
+    { yyval.paramList = NULL; ;
+    break; }
+    case 52:
+#line 245 "./.y"
+    { yyval.paramList = yyvsp[0].paramList; ;
+    break; }
+    case 53:
+#line 249 "./.y"
+    { yyval.paramList = new ParamList(yyvsp[0].varDeclarator); ;
+    break; }
+    case 54:
+#line 250 "./.y"
+    { ParamList::Append(yyvsp[-2].paramList, yyvsp[0].varDeclarator); ;
+    break; }
+    case 55:
+#line 254 "./.y"
+    { yyval.statement = new Statement(Statement::t_EMPTY); ;
+    break; }
+    case 56:
+#line 255 "./.y"
+    { yyval.statement = new Statement(Statement::t_EXPRESSION); ;
+    break; }
+    case 57:
+#line 256 "./.y"
+    { yyval.statement = new Statement(Statement::t_DECLARATOR); ;
+    break; }
+    case 58:
+#line 257 "./.y"
+    { yyval.statement = new Statement(Statement::t_IF); ;
+    break; }
+    case 59:
+#line 258 "./.y"
+    { yyval.statement = new Statement(Statement::t_WHILE); ;
+    break; }
+    case 60:
+#line 259 "./.y"
+    { yyval.statement = new Statement(Statement::t_DO); ;
+    break; }
+    case 61:
+#line 260 "./.y"
+    { yyval.statement = new Statement(Statement::t_FOR); ;
+    break; }
+    case 62:
+#line 261 "./.y"
+    { yyval.statement = new Statement(Statement::t_FOREACH); ;
+    break; }
+    case 63:
+#line 262 "./.y"
+    { yyval.statement = new Statement(Statement::t_RETURN); ;
+    break; }
+    case 64:
+#line 263 "./.y"
+    { yyval.statement = new Statement(Statement::t_BLOCK); ;
+    break; }
+    case 65:
+#line 267 "./.y"
+    { yyval.statementList = NULL; ;
+    break; }
+    case 66:
+#line 268 "./.y"
+    { yyval.statementList = yyvsp[0].statementList; ;
+    break; }
+    case 67:
+#line 272 "./.y"
+    { yyval.statementList = new StatementList(yyvsp[0].statement); ;
+    break; }
+    case 68:
+#line 273 "./.y"
+    { StatementList::Append(yyvsp[-1].statementList, yyvsp[0].statement); ;
+    break; }
+    case 69:
 #line 277 "./.y"
-{ yyval.expression = new Expression(Expression::t_CHAR_LITER); ;
-    break;}
-case 89:
+    { yyval.returnStatement = new ReturnStatement(NULL); ;
+    break; }
+    case 70:
 #line 278 "./.y"
-{ yyval.expression = new Expression(Expression::t_STRING_LITER); ;
-    break;}
-case 90:
-#line 279 "./.y"
-{ yyval.expression = new Expression(Expression::t_BOOL_LITER); ;
-    break;}
-case 91:
-#line 280 "./.y"
-{ yyval.expression = new Expression(Expression::t_PARENTHESIZED, yyvsp[-1].expression); ;
-    break;}
-case 92:
-#line 281 "./.y"
-{ yyval.expression = yyvsp[0].expression; ;
-    break;}
-case 93:
+    { yyval.returnStatement = new ReturnStatement(yyvsp[-1].expression); ;
+    break; }
+    case 71:
 #line 282 "./.y"
-{ yyval.expression = yyvsp[0].invocationExpression; ;
-    break;}
-case 94:
+    { yyval.forStatement = new ForStatement(yyvsp[-6].expression, yyvsp[-4].expression, yyvsp[-2].expression, yyvsp[0].statement); ;
+    break; }
+    case 72:
 #line 283 "./.y"
-{ yyval.expression = yyvsp[0].objectCreation; ;
-    break;}
-case 95:
-#line 284 "./.y"
-{ yyval.expression = yyvsp[0].arrayCreation; ;
-    break;}
-case 96:
-#line 285 "./.y"
-{ yyval.expression = yyvsp[0].elementAccess; ;
-    break;}
-case 97:
-#line 286 "./.y"
-{ yyval.expression = new Expression(Expression::t_UNMINUS, yyvsp[0].expression); ;
-    break;}
-case 98:
+    { yyval.forStatement = new ForStatement(yyvsp[-6].varDeclaratorList, yyvsp[-4].expression, yyvsp[-2].expression, yyvsp[0].statement); ;
+    break; }
+    case 73:
 #line 287 "./.y"
-{ yyval.expression = new Expression(Expression::t_NOT, yyvsp[0].expression); ;
-    break;}
-case 99:
+    { yyval.expression = NULL; ;
+    break; }
+    case 74:
 #line 288 "./.y"
-{ yyval.expression = new Expression(Expression::t_SIMPLE_TYPE_CAST, yyvsp[-2].simpleType, yyvsp[0].expression); ;
-    break;}
-case 100:
-#line 289 "./.y"
-{ yyval.expression = new Expression(Expression::t_ARRAY_CAST, yyvsp[-2].arrayType, yyvsp[0].expression); ;
-    break;}
-case 101:
-#line 290 "./.y"
-{ yyval.expression = new Expression(Expression::t_TYPENAME_CAST, yyvsp[-2].expression, yyvsp[0].expression); ;
-    break;}
-case 102:
-#line 291 "./.y"
-{ yyval.expression = new Expression(Expression::t_MUL, yyvsp[-2].expression, yyvsp[0].expression); ;
-    break;}
-case 103:
+    { yyval.expression = yyvsp[0].expression; ;
+    break; }
+    case 75:
 #line 292 "./.y"
-{ yyval.expression = new Expression(Expression::t_DIV, yyvsp[-2].expression, yyvsp[0].expression); ;
-    break;}
-case 104:
-#line 293 "./.y"
-{ yyval.expression = new Expression(Expression::t_MOD, yyvsp[-2].expression, yyvsp[0].expression); ;
-    break;}
-case 105:
-#line 294 "./.y"
-{ yyval.expression = new Expression(Expression::t_SUM, yyvsp[-2].expression, yyvsp[0].expression); ;
-    break;}
-case 106:
-#line 295 "./.y"
-{ yyval.expression = new Expression(Expression::t_SUB, yyvsp[-2].expression, yyvsp[0].expression); ;
-    break;}
-case 107:
+    { yyval.foreachStatement = new ForeachStatement(yyvsp[-4].varDeclarator, yyvsp[-2].expression, yyvsp[0].statement); ;
+    break; }
+    case 76:
 #line 296 "./.y"
-{ yyval.expression = new Expression(Expression::t_LESS, yyvsp[-2].expression, yyvsp[0].expression); ;
-    break;}
-case 108:
-#line 297 "./.y"
-{ yyval.expression = new Expression(Expression::t_GREATER, yyvsp[-2].expression, yyvsp[0].expression); ;
-    break;}
-case 109:
-#line 298 "./.y"
-{ yyval.expression = new Expression(Expression::t_LESS_EQUAL, yyvsp[-2].expression, yyvsp[0].expression); ;
-    break;}
-case 110:
-#line 299 "./.y"
-{ yyval.expression = new Expression(Expression::t_GREATER_EQUAL, yyvsp[-2].expression, yyvsp[0].expression); ;
-    break;}
-case 111:
+    { yyval.doStatement = new DoStatement(yyvsp[-5].statement, yyvsp[-2].expression); ;
+    break; }
+    case 77:
 #line 300 "./.y"
-{ yyval.expression = new Expression(Expression::t_IS, yyvsp[0].simpleType, yyvsp[-2].expression); ;
-    break;}
-case 112:
-#line 301 "./.y"
-{ yyval.expression = new Expression(Expression::t_IS, yyvsp[0].typeName, yyvsp[-2].expression); ;
-    break;}
-case 113:
-#line 302 "./.y"
-{ yyval.expression = new Expression(Expression::t_IS, yyvsp[0].arrayType, yyvsp[-2].expression); ;
-    break;}
-case 114:
-#line 303 "./.y"
-{ yyval.expression = new Expression(Expression::t_AS, yyvsp[0].simpleType, yyvsp[-2].expression); ;
-    break;}
-case 115:
+    { yyval.whileStatement = new WhileStatement(yyvsp[-2].expression, yyvsp[0].statement); ;
+    break; }
+    case 78:
 #line 304 "./.y"
-{ yyval.expression = new Expression(Expression::t_AS, yyvsp[0].typeName, yyvsp[-2].expression); ;
-    break;}
-case 116:
+    { yyval.ifStatement = new IfStatement(yyvsp[-2].expression, yyvsp[0].statement); ;
+    break; }
+    case 79:
 #line 305 "./.y"
-{ yyval.expression = new Expression(Expression::t_AS, yyvsp[0].arrayType, yyvsp[-2].expression); ;
-    break;}
-case 117:
-#line 306 "./.y"
-{ yyval.expression = new Expression(Expression::t_EQUALITY, yyvsp[-2].expression ,yyvsp[0].expression); ;
-    break;}
-case 118:
-#line 307 "./.y"
-{ yyval.expression = new Expression(Expression::t_INEQUALITY, yyvsp[-2].expression ,yyvsp[0].expression); ;
-    break;}
-case 119:
-#line 308 "./.y"
-{ yyval.expression = new Expression(Expression::t_AND, yyvsp[-2].expression, yyvsp[0].expression); ;
-    break;}
-case 120:
+    { yyval.ifStatement = new IfStatement(yyvsp[-4].expression, yyvsp[-2].statement, yyvsp[0].statement); ;
+    break; }
+    case 80:
 #line 309 "./.y"
-{ yyval.expression = new Expression(Expression::t_OR, yyvsp[-2].expression, yyvsp[0].expression); ;
-    break;}
-case 121:
+    { yyval.varDeclaratorList = new VarDeclaratorList(yyvsp[0].varDeclarator); ;
+    break; }
+    case 81:
 #line 310 "./.y"
-{ yyval.expression = new Expression(Expression::t_IS, yyvsp[-2].expression, yyvsp[0].expression); ;
-    break;}
-case 122:
-#line 314 "./.y"
-{ yyval.expression = MemberAccess::FromTypeName(yyvsp[0].typeName); ;
-    break;}
-case 123:
-#line 315 "./.y"
-{ yyval.expression = MemberAccess::FromTypeName(yyvsp[0].typeName, new Expression(Expression::t_SIMPLE_TYPE, yyvsp[-2].simpleType)); ;
-    break;}
-case 124:
+    { yyval.varDeclaratorList = new VarDeclaratorList(yyvsp[-2].varDeclarator, yyvsp[0].expression); ;
+    break; }
+    case 82:
+#line 311 "./.y"
+    { VarDeclaratorList::Append(yyvsp[-2].varDeclaratorList, yyvsp[0].identifier); ;
+    break; }
+    case 83:
+#line 312 "./.y"
+    { VarDeclaratorList::Append(yyvsp[-4].varDeclaratorList, yyvsp[-2].identifier, yyvsp[0].expression); ;
+    break; }
+    case 84:
 #line 316 "./.y"
-{ yyval.expression = new Expression(Expression::t_THIS); ;
-    break;}
-case 125:
+    { yyval.varDeclarator = new VarDeclarator(yyvsp[-1].simpleType, yyvsp[0].identifier); ;
+    break; }
+    case 85:
 #line 317 "./.y"
-{ yyval.expression = MemberAccess::FromTypeName(yyvsp[0].typeName, new Expression(Expression::t_THIS)); ;
-    break;}
-case 126:
+    { yyval.varDeclarator = new VarDeclarator(yyvsp[-1].typeName, yyvsp[0].identifier); ;
+    break; }
+    case 86:
 #line 318 "./.y"
-{ yyval.expression = MemberAccess::FromTypeName(yyvsp[0].typeName, new Expression(Expression::t_BASE)); ;
-    break;}
-case 127:
-#line 319 "./.y"
-{ yyval.expression = MemberAccess::FromTypeName(yyvsp[0].typeName, yyvsp[-2].invocationExpression); ;
-    break;}
-case 128:
-#line 320 "./.y"
-{ yyval.expression = MemberAccess::FromTypeName(yyvsp[0].typeName, new Expression(Expression::t_PARENTHESIZED, yyvsp[-3].expression)); ;
-    break;}
-case 129:
-#line 321 "./.y"
-{ yyval.expression = MemberAccess::FromTypeName(yyvsp[0].typeName, yyvsp[-2].objectCreation); ;
-    break;}
-case 130:
+    { yyval.varDeclarator = new VarDeclarator(yyvsp[-1].arrayType, yyvsp[0].identifier); ;
+    break; }
+    case 87:
 #line 322 "./.y"
-{ yyval.expression = MemberAccess::FromTypeName(yyvsp[0].typeName, yyvsp[-2].arrayCreation); ;
-    break;}
-case 131:
+    { yyval.expression = new Expression(Expression::t_INT_LITER); ;
+    break; }
+    case 88:
 #line 323 "./.y"
-{ yyval.expression = MemberAccess::FromTypeName(yyvsp[0].typeName, yyvsp[-2].elementAccess); ;
-    break;}
-case 132:
+    { yyval.expression = new Expression(Expression::t_CHAR_LITER); ;
+    break; }
+    case 89:
+#line 324 "./.y"
+    { yyval.expression = new Expression(Expression::t_STRING_LITER); ;
+    break; }
+    case 90:
+#line 325 "./.y"
+    { yyval.expression = new Expression(Expression::t_BOOL_LITER); ;
+    break; }
+    case 91:
+#line 326 "./.y"
+    { yyval.expression = new Expression(Expression::t_PARENTHESIZED, yyvsp[-1].expression); ;
+    break; }
+    case 92:
 #line 327 "./.y"
-{ yyval.invocationExpression = new InvocationExpression(yyvsp[-3].expression, yyvsp[-1].argumentList); ;
-    break;}
-case 133:
+    { yyval.expression = yyvsp[0].expression; ;
+    break; }
+    case 93:
+#line 328 "./.y"
+    { yyval.expression = yyvsp[0].invocationExpression; ;
+    break; }
+    case 94:
+#line 329 "./.y"
+    { yyval.expression = yyvsp[0].objectCreation; ;
+    break; }
+    case 95:
+#line 330 "./.y"
+    { yyval.expression = yyvsp[0].arrayCreation; ;
+    break; }
+    case 96:
 #line 331 "./.y"
-{ yyval.elementAccess = new ElementAccess(MemberAccess::FromTypeName(yyvsp[-3].typeName), yyvsp[-1].argumentList); ;
-    break;}
-case 134:
+    { yyval.expression = yyvsp[0].elementAccess; ;
+    break; }
+    case 97:
 #line 332 "./.y"
-{ yyval.elementAccess = new ElementAccess(MemberAccess::FromTypeName(yyvsp[-3].typeName, new Expression(Expression::t_SIMPLE_TYPE, yyvsp[-5].simpleType)), yyvsp[-1].argumentList); ;
-    break;}
-case 135:
+    { yyval.expression = new Expression(Expression::t_UNMINUS, yyvsp[0].expression); ;
+    break; }
+    case 98:
 #line 333 "./.y"
-{ yyval.elementAccess = new ElementAccess(new Expression(Expression::t_THIS), yyvsp[-1].argumentList); ;
-    break;}
-case 136:
+    { yyval.expression = new Expression(Expression::t_NOT, yyvsp[0].expression); ;
+    break; }
+    case 99:
 #line 334 "./.y"
-{ yyval.elementAccess = new ElementAccess(MemberAccess::FromTypeName(yyvsp[-3].typeName, new Expression(Expression::t_THIS)), yyvsp[-1].argumentList); ;
-    break;}
-case 137:
+    { yyval.expression = new Expression(Expression::t_SIMPLE_TYPE_CAST, yyvsp[-2].simpleType, yyvsp[0].expression); ;
+    break; }
+    case 100:
 #line 335 "./.y"
-{ yyval.elementAccess = new ElementAccess(MemberAccess::FromTypeName(yyvsp[-3].typeName, new Expression(Expression::t_BASE)), yyvsp[-1].argumentList); ;
-    break;}
-case 138:
+    { yyval.expression = new Expression(Expression::t_ARRAY_CAST, yyvsp[-2].arrayType, yyvsp[0].expression); ;
+    break; }
+    case 101:
 #line 336 "./.y"
-{ yyval.elementAccess = new ElementAccess(MemberAccess::FromTypeName(yyvsp[-3].typeName, yyvsp[-5].invocationExpression), yyvsp[-1].argumentList); ;
-    break;}
-case 139:
+    { yyval.expression = new Expression(Expression::t_TYPENAME_CAST, yyvsp[-2].expression, yyvsp[0].expression); ;
+    break; }
+    case 102:
 #line 337 "./.y"
-{ yyval.elementAccess = new ElementAccess(MemberAccess::FromTypeName(yyvsp[-3].typeName, new Expression(Expression::t_PARENTHESIZED, yyvsp[-6].expression)), yyvsp[-1].argumentList); ;
-    break;}
-case 140:
+    { yyval.expression = new Expression(Expression::t_MUL, yyvsp[-2].expression, yyvsp[0].expression); ;
+    break; }
+    case 103:
 #line 338 "./.y"
-{ yyval.elementAccess = new ElementAccess(MemberAccess::FromTypeName(yyvsp[-3].typeName, yyvsp[-5].objectCreation), yyvsp[-1].argumentList); ;
-    break;}
-case 141:
+    { yyval.expression = new Expression(Expression::t_DIV, yyvsp[-2].expression, yyvsp[0].expression); ;
+    break; }
+    case 104:
 #line 339 "./.y"
-{ yyval.elementAccess = new ElementAccess(MemberAccess::FromTypeName(yyvsp[-3].typeName, yyvsp[-5].arrayCreation), yyvsp[-1].argumentList); ;
-    break;}
-case 142:
+    { yyval.expression = new Expression(Expression::t_MOD, yyvsp[-2].expression, yyvsp[0].expression); ;
+    break; }
+    case 105:
 #line 340 "./.y"
-{ yyval.elementAccess = new ElementAccess(MemberAccess::FromTypeName(yyvsp[-3].typeName, yyvsp[-5].elementAccess), yyvsp[-1].argumentList); ;
-    break;}
-case 143:
+    { yyval.expression = new Expression(Expression::t_SUM, yyvsp[-2].expression, yyvsp[0].expression); ;
+    break; }
+    case 106:
 #line 341 "./.y"
-{ yyval.elementAccess = new ElementAccess(yyvsp[-3].objectCreation, yyvsp[-1].argumentList); ;
-    break;}
-case 144:
+    { yyval.expression = new Expression(Expression::t_SUB, yyvsp[-2].expression, yyvsp[0].expression); ;
+    break; }
+    case 107:
 #line 342 "./.y"
-{ yyval.elementAccess = new ElementAccess(yyvsp[-3].invocationExpression, yyvsp[-1].argumentList); ;
-    break;}
-case 145:
+    { yyval.expression = new Expression(Expression::t_LESS, yyvsp[-2].expression, yyvsp[0].expression); ;
+    break; }
+    case 108:
 #line 343 "./.y"
-{ yyval.elementAccess = new ElementAccess(yyvsp[-3].elementAccess, yyvsp[-1].argumentList); ;
-    break;}
-case 146:
+    { yyval.expression = new Expression(Expression::t_GREATER, yyvsp[-2].expression, yyvsp[0].expression); ;
+    break; }
+    case 109:
 #line 344 "./.y"
-{ yyval.elementAccess = new ElementAccess(new Expression(Expression::t_PARENTHESIZED, yyvsp[-4].expression), yyvsp[-1].argumentList); ;
-    break;}
-case 147:
+    { yyval.expression = new Expression(Expression::t_LESS_EQUAL, yyvsp[-2].expression, yyvsp[0].expression); ;
+    break; }
+    case 110:
+#line 345 "./.y"
+    { yyval.expression = new Expression(Expression::t_GREATER_EQUAL, yyvsp[-2].expression, yyvsp[0].expression); ;
+    break; }
+    case 111:
+#line 346 "./.y"
+    { yyval.expression = new Expression(Expression::t_IS, yyvsp[0].simpleType, yyvsp[-2].expression); ;
+    break; }
+    case 112:
+#line 347 "./.y"
+    { yyval.expression = new Expression(Expression::t_IS, yyvsp[0].typeName, yyvsp[-2].expression); ;
+    break; }
+    case 113:
 #line 348 "./.y"
-{ yyval.arrayCreation = new ArrayCreation(yyvsp[0].arrayType); ;
-    break;}
-case 148:
+    { yyval.expression = new Expression(Expression::t_IS, yyvsp[0].arrayType, yyvsp[-2].expression); ;
+    break; }
+    case 114:
 #line 349 "./.y"
-{ yyval.arrayCreation = new ArrayCreation(yyvsp[-1].arrayType,yyvsp[0].arrayInitializer); ;
-    break;}
-case 149:
+    { yyval.expression = new Expression(Expression::t_AS, yyvsp[0].simpleType, yyvsp[-2].expression); ;
+    break; }
+    case 115:
 #line 350 "./.y"
-{ yyval.arrayCreation = new ArrayCreation(yyvsp[-3].simpleType,yyvsp[-1].expression); ;
-    break;}
-case 150:
+    { yyval.expression = new Expression(Expression::t_AS, yyvsp[0].typeName, yyvsp[-2].expression); ;
+    break; }
+    case 116:
 #line 351 "./.y"
-{ yyval.arrayCreation = new ArrayCreation(yyvsp[-4].simpleType,yyvsp[-2].expression,yyvsp[0].arrayInitializer); ;
-    break;}
-case 151:
+    { yyval.expression = new Expression(Expression::t_AS, yyvsp[0].arrayType, yyvsp[-2].expression); ;
+    break; }
+    case 117:
 #line 352 "./.y"
-{ yyval.arrayCreation = new ArrayCreation(yyvsp[-3].typeName, yyvsp[-1].expression); ;
-    break;}
-case 152:
+    { yyval.expression = new Expression(Expression::t_EQUALITY, yyvsp[-2].expression, yyvsp[0].expression); ;
+    break; }
+    case 118:
 #line 353 "./.y"
-{ yyval.arrayCreation = new ArrayCreation(yyvsp[-4].typeName,yyvsp[-2].expression,yyvsp[0].arrayInitializer); ;
-    break;}
-case 153:
-#line 357 "./.y"
-{ yyval.arrayInitializer = new ArrayInitializer(yyvsp[-1].expressionList); ;
-    break;}
-case 154:
-#line 358 "./.y"
-{ yyval.arrayInitializer = new ArrayInitializer(yyvsp[-2].expressionList); ;
-    break;}
-case 155:
+    { yyval.expression = new Expression(Expression::t_INEQUALITY, yyvsp[-2].expression, yyvsp[0].expression); ;
+    break; }
+    case 119:
+#line 354 "./.y"
+    { yyval.expression = new Expression(Expression::t_AND, yyvsp[-2].expression, yyvsp[0].expression); ;
+    break; }
+    case 120:
+#line 355 "./.y"
+    { yyval.expression = new Expression(Expression::t_OR, yyvsp[-2].expression, yyvsp[0].expression); ;
+    break; }
+    case 121:
+#line 356 "./.y"
+    { yyval.expression = new Expression(Expression::t_IS, yyvsp[-2].expression, yyvsp[0].expression); ;
+    break; }
+    case 122:
+#line 360 "./.y"
+    { yyval.expression = MemberAccess::FromTypeName(yyvsp[0].typeName); ;
+    break; }
+    case 123:
+#line 361 "./.y"
+    { yyval.expression = MemberAccess::FromTypeName(yyvsp[0].typeName, new Expression(Expression::t_SIMPLE_TYPE, yyvsp[-2].simpleType)); ;
+    break; }
+    case 124:
 #line 362 "./.y"
-{ yyval.expressionList = new ExpressionList(yyvsp[0].expression); ;
-    break;}
-case 156:
+    { yyval.expression = new Expression(Expression::t_THIS); ;
+    break; }
+    case 125:
 #line 363 "./.y"
-{ ExpressionList::Append(yyvsp[-2].expressionList, yyvsp[0].expression); ;
-    break;}
-case 157:
+    { yyval.expression = MemberAccess::FromTypeName(yyvsp[0].typeName, new Expression(Expression::t_THIS)); ;
+    break; }
+    case 126:
+#line 364 "./.y"
+    { yyval.expression = MemberAccess::FromTypeName(yyvsp[0].typeName, new Expression(Expression::t_BASE)); ;
+    break; }
+    case 127:
+#line 365 "./.y"
+    { yyval.expression = MemberAccess::FromTypeName(yyvsp[0].typeName, yyvsp[-2].invocationExpression); ;
+    break; }
+    case 128:
+#line 366 "./.y"
+    { yyval.expression = MemberAccess::FromTypeName(yyvsp[0].typeName, new Expression(Expression::t_PARENTHESIZED, yyvsp[-3].expression)); ;
+    break; }
+    case 129:
 #line 367 "./.y"
-{ yyval.expressionList = NULL; ;
-    break;}
-case 158:
+    { yyval.expression = MemberAccess::FromTypeName(yyvsp[0].typeName, yyvsp[-2].objectCreation); ;
+    break; }
+    case 130:
 #line 368 "./.y"
-{ yyval.expressionList = yyvsp[0].expressionList; ;
-    break;}
-case 159:
-#line 372 "./.y"
-{ yyval.objectCreation = new ObjectCreation(yyvsp[-3].simpleType,yyvsp[-1].argumentList); ;
-    break;}
-case 160:
+    { yyval.expression = MemberAccess::FromTypeName(yyvsp[0].typeName, yyvsp[-2].arrayCreation); ;
+    break; }
+    case 131:
+#line 369 "./.y"
+    { yyval.expression = MemberAccess::FromTypeName(yyvsp[0].typeName, yyvsp[-2].elementAccess); ;
+    break; }
+    case 132:
 #line 373 "./.y"
-{ yyval.objectCreation = new ObjectCreation(yyvsp[-4].simpleType,yyvsp[-2].argumentList,yyvsp[0].objectInitializer); ;
-    break;}
-case 161:
-#line 374 "./.y"
-{ yyval.objectCreation = new ObjectCreation(yyvsp[-1].simpleType,NULL,yyvsp[0].objectInitializer); ;
-    break;}
-case 162:
-#line 375 "./.y"
-{ yyval.objectCreation = new ObjectCreation(yyvsp[-3].typeName,yyvsp[-1].argumentList); ;
-    break;}
-case 163:
-#line 376 "./.y"
-{ yyval.objectCreation = new ObjectCreation(yyvsp[-4].typeName,yyvsp[-2].argumentList,yyvsp[0].objectInitializer); ;
-    break;}
-case 164:
+    { yyval.invocationExpression = new InvocationExpression(yyvsp[-3].expression, yyvsp[-1].argumentList); ;
+    break; }
+    case 133:
 #line 377 "./.y"
-{ yyval.objectCreation = new ObjectCreation(yyvsp[-1].typeName,NULL,yyvsp[0].objectInitializer); ;
-    break;}
-case 165:
+    { yyval.elementAccess = new ElementAccess(MemberAccess::FromTypeName(yyvsp[-3].typeName), yyvsp[-1].argumentList); ;
+    break; }
+    case 134:
+#line 378 "./.y"
+    { yyval.elementAccess = new ElementAccess(MemberAccess::FromTypeName(yyvsp[-3].typeName, new Expression(Expression::t_SIMPLE_TYPE, yyvsp[-5].simpleType)), yyvsp[-1].argumentList); ;
+    break; }
+    case 135:
+#line 379 "./.y"
+    { yyval.elementAccess = new ElementAccess(new Expression(Expression::t_THIS), yyvsp[-1].argumentList); ;
+    break; }
+    case 136:
+#line 380 "./.y"
+    { yyval.elementAccess = new ElementAccess(MemberAccess::FromTypeName(yyvsp[-3].typeName, new Expression(Expression::t_THIS)), yyvsp[-1].argumentList); ;
+    break; }
+    case 137:
 #line 381 "./.y"
-{ yyval.objectInitializer = new ObjectInitializer(yyvsp[-1].memberInitializerList); ;
-    break;}
-case 166:
+    { yyval.elementAccess = new ElementAccess(MemberAccess::FromTypeName(yyvsp[-3].typeName, new Expression(Expression::t_BASE)), yyvsp[-1].argumentList); ;
+    break; }
+    case 138:
 #line 382 "./.y"
-{ yyval.objectInitializer = new ObjectInitializer(yyvsp[-2].memberInitializerList); ;
-    break;}
-case 167:
+    { yyval.elementAccess = new ElementAccess(MemberAccess::FromTypeName(yyvsp[-3].typeName, yyvsp[-5].invocationExpression), yyvsp[-1].argumentList); ;
+    break; }
+    case 139:
+#line 383 "./.y"
+    { yyval.elementAccess = new ElementAccess(MemberAccess::FromTypeName(yyvsp[-3].typeName, new Expression(Expression::t_PARENTHESIZED, yyvsp[-6].expression)), yyvsp[-1].argumentList); ;
+    break; }
+    case 140:
+#line 384 "./.y"
+    { yyval.elementAccess = new ElementAccess(MemberAccess::FromTypeName(yyvsp[-3].typeName, yyvsp[-5].objectCreation), yyvsp[-1].argumentList); ;
+    break; }
+    case 141:
+#line 385 "./.y"
+    { yyval.elementAccess = new ElementAccess(MemberAccess::FromTypeName(yyvsp[-3].typeName, yyvsp[-5].arrayCreation), yyvsp[-1].argumentList); ;
+    break; }
+    case 142:
 #line 386 "./.y"
-{ yyval.memberInitializerList = NULL; ;
-    break;}
-case 168:
+    { yyval.elementAccess = new ElementAccess(MemberAccess::FromTypeName(yyvsp[-3].typeName, yyvsp[-5].elementAccess), yyvsp[-1].argumentList); ;
+    break; }
+    case 143:
 #line 387 "./.y"
-{ yyval.memberInitializerList = yyvsp[0].memberInitializerList; ;
-    break;}
-case 169:
-#line 391 "./.y"
-{ yyval.memberInitializerList = new MemberInitializerList(yyvsp[0].memberInitializer); ;
-    break;}
-case 170:
-#line 392 "./.y"
-{ MemberInitializerList::Append(yyvsp[-2].memberInitializerList, yyvsp[0].memberInitializer); ;
-    break;}
-case 171:
+    { yyval.elementAccess = new ElementAccess(yyvsp[-3].objectCreation, yyvsp[-1].argumentList); ;
+    break; }
+    case 144:
+#line 388 "./.y"
+    { yyval.elementAccess = new ElementAccess(yyvsp[-3].invocationExpression, yyvsp[-1].argumentList); ;
+    break; }
+    case 145:
+#line 389 "./.y"
+    { yyval.elementAccess = new ElementAccess(yyvsp[-3].elementAccess, yyvsp[-1].argumentList); ;
+    break; }
+    case 146:
+#line 390 "./.y"
+    { yyval.elementAccess = new ElementAccess(new Expression(Expression::t_PARENTHESIZED, yyvsp[-4].expression), yyvsp[-1].argumentList); ;
+    break; }
+    case 147:
+#line 394 "./.y"
+    { yyval.arrayCreation = new ArrayCreation(yyvsp[0].arrayType); ;
+    break; }
+    case 148:
+#line 395 "./.y"
+    { yyval.arrayCreation = new ArrayCreation(yyvsp[-1].arrayType, yyvsp[0].arrayInitializer); ;
+    break; }
+    case 149:
 #line 396 "./.y"
-{ yyval.memberInitializer = new MemberInitializer(yyvsp[-2].identifier,yyvsp[0].expression); ;
-    break;}
-case 172:
+    { yyval.arrayCreation = new ArrayCreation(yyvsp[-3].simpleType, yyvsp[-1].expression); ;
+    break; }
+    case 150:
 #line 397 "./.y"
-{ yyval.memberInitializer = new MemberInitializer(yyvsp[-3].argumentList,yyvsp[0].expression); ;
-    break;}
-case 173:
+    { yyval.arrayCreation = new ArrayCreation(yyvsp[-4].simpleType, yyvsp[-2].expression, yyvsp[0].arrayInitializer); ;
+    break; }
+    case 151:
 #line 398 "./.y"
-{ yyval.memberInitializer = new MemberInitializer(yyvsp[-2].identifier,yyvsp[0].objectInitializer); ;
-    break;}
-case 174:
+    { yyval.arrayCreation = new ArrayCreation(yyvsp[-3].typeName, yyvsp[-1].expression); ;
+    break; }
+    case 152:
 #line 399 "./.y"
-{ yyval.memberInitializer = new MemberInitializer(yyvsp[-3].argumentList,yyvsp[0].objectInitializer); ;
-    break;}
-case 175:
+    { yyval.arrayCreation = new ArrayCreation(yyvsp[-4].typeName, yyvsp[-2].expression, yyvsp[0].arrayInitializer); ;
+    break; }
+    case 153:
 #line 403 "./.y"
-{ yyval.argumentList = NULL; ;
-    break;}
-case 176:
+    { yyval.arrayInitializer = new ArrayInitializer(yyvsp[-1].expressionList); ;
+    break; }
+    case 154:
 #line 404 "./.y"
-{ yyval.argumentList = yyvsp[0].argumentList;;
-    break;}
-case 177:
+    { yyval.arrayInitializer = new ArrayInitializer(yyvsp[-2].expressionList); ;
+    break; }
+    case 155:
 #line 408 "./.y"
-{ yyval.argumentList = new ArgumentList(yyvsp[0].argument);;
-    break;}
-case 178:
+    { yyval.expressionList = new ExpressionList(yyvsp[0].expression); ;
+    break; }
+    case 156:
 #line 409 "./.y"
-{ ArgumentList::Append(yyvsp[-2].argumentList,yyvsp[0].argument);;
-    break;}
-case 179:
+    { ExpressionList::Append(yyvsp[-2].expressionList, yyvsp[0].expression); ;
+    break; }
+    case 157:
 #line 413 "./.y"
-{ yyval.argument = new Argument(yyvsp[0].expression); ;
-    break;}
-case 180:
+    { yyval.expressionList = NULL; ;
+    break; }
+    case 158:
 #line 414 "./.y"
-{ yyval.argument = new Argument(yyvsp[0].expression,yyvsp[-2].identifier); ;
-    break;}
-case 181:
+    { yyval.expressionList = yyvsp[0].expressionList; ;
+    break; }
+    case 159:
 #line 418 "./.y"
-{ yyval.arrayType = new ArrayType(yyvsp[-2].simpleType); ;
-    break;}
-case 182:
+    { yyval.objectCreation = new ObjectCreation(yyvsp[-3].simpleType, yyvsp[-1].argumentList); ;
+    break; }
+    case 160:
 #line 419 "./.y"
-{ yyval.arrayType = new ArrayType(yyvsp[-2].typeName); ;
-    break;}
-case 183:
+    { yyval.objectCreation = new ObjectCreation(yyvsp[-4].simpleType, yyvsp[-2].argumentList, yyvsp[0].objectInitializer); ;
+    break; }
+    case 161:
+#line 420 "./.y"
+    { yyval.objectCreation = new ObjectCreation(yyvsp[-1].simpleType, NULL, yyvsp[0].objectInitializer); ;
+    break; }
+    case 162:
+#line 421 "./.y"
+    { yyval.objectCreation = new ObjectCreation(yyvsp[-3].typeName, yyvsp[-1].argumentList); ;
+    break; }
+    case 163:
+#line 422 "./.y"
+    { yyval.objectCreation = new ObjectCreation(yyvsp[-4].typeName, yyvsp[-2].argumentList, yyvsp[0].objectInitializer); ;
+    break; }
+    case 164:
 #line 423 "./.y"
-{ yyval.simpleType = new SimpleType(SimpleType::t_INT);;
-    break;}
-case 184:
-#line 424 "./.y"
-{ yyval.simpleType = new SimpleType(SimpleType::t_CHAR);;
-    break;}
-case 185:
-#line 425 "./.y"
-{ yyval.simpleType = new SimpleType(SimpleType::t_STRING);;
-    break;}
-case 186:
-#line 426 "./.y"
-{ yyval.simpleType = new SimpleType(SimpleType::t_BOOL);;
-    break;}
-case 187:
-#line 430 "./.y"
-{ yyval.typeName = new TypeName(yyvsp[0].identifier); ;
-    break;}
-case 188:
-#line 431 "./.y"
-{ TypeName::Append(yyvsp[-2].typeName,yyvsp[0].identifier); ;
-    break;}
-}
-   /* the action file gets copied in in place of this dollarsign */
+    { yyval.objectCreation = new ObjectCreation(yyvsp[-1].typeName, NULL, yyvsp[0].objectInitializer); ;
+    break; }
+    case 165:
+#line 427 "./.y"
+    { yyval.objectInitializer = new ObjectInitializer(yyvsp[-1].memberInitializerList); ;
+    break; }
+    case 166:
+#line 428 "./.y"
+    { yyval.objectInitializer = new ObjectInitializer(yyvsp[-2].memberInitializerList); ;
+    break; }
+    case 167:
+#line 432 "./.y"
+    { yyval.memberInitializerList = NULL; ;
+    break; }
+    case 168:
+#line 433 "./.y"
+    { yyval.memberInitializerList = yyvsp[0].memberInitializerList; ;
+    break; }
+    case 169:
+#line 437 "./.y"
+    { yyval.memberInitializerList = new MemberInitializerList(yyvsp[0].memberInitializer); ;
+    break; }
+    case 170:
+#line 438 "./.y"
+    { MemberInitializerList::Append(yyvsp[-2].memberInitializerList, yyvsp[0].memberInitializer); ;
+    break; }
+    case 171:
+#line 442 "./.y"
+    { yyval.memberInitializer = new MemberInitializer(yyvsp[-2].identifier, yyvsp[0].expression); ;
+    break; }
+    case 172:
+#line 443 "./.y"
+    { yyval.memberInitializer = new MemberInitializer(yyvsp[-3].argumentList, yyvsp[0].expression); ;
+    break; }
+    case 173:
+#line 444 "./.y"
+    { yyval.memberInitializer = new MemberInitializer(yyvsp[-2].identifier, yyvsp[0].objectInitializer); ;
+    break; }
+    case 174:
+#line 445 "./.y"
+    { yyval.memberInitializer = new MemberInitializer(yyvsp[-3].argumentList, yyvsp[0].objectInitializer); ;
+    break; }
+    case 175:
+#line 449 "./.y"
+    { yyval.argumentList = NULL; ;
+    break; }
+    case 176:
+#line 450 "./.y"
+    { yyval.argumentList = yyvsp[0].argumentList;;
+    break; }
+    case 177:
+#line 454 "./.y"
+    { yyval.argumentList = new ArgumentList(yyvsp[0].argument);;
+    break; }
+    case 178:
+#line 455 "./.y"
+    { ArgumentList::Append(yyvsp[-2].argumentList, yyvsp[0].argument);;
+    break; }
+    case 179:
+#line 459 "./.y"
+    { yyval.argument = new Argument(yyvsp[0].expression); ;
+    break; }
+    case 180:
+#line 460 "./.y"
+    { yyval.argument = new Argument(yyvsp[0].expression, yyvsp[-2].identifier); ;
+    break; }
+    case 181:
+#line 464 "./.y"
+    { yyval.arrayType = new ArrayType(yyvsp[-2].simpleType); ;
+    break; }
+    case 182:
+#line 465 "./.y"
+    { yyval.arrayType = new ArrayType(yyvsp[-2].typeName); ;
+    break; }
+    case 183:
+#line 469 "./.y"
+    { yyval.simpleType = new SimpleType(SimpleType::t_INT);;
+    break; }
+    case 184:
+#line 470 "./.y"
+    { yyval.simpleType = new SimpleType(SimpleType::t_CHAR);;
+    break; }
+    case 185:
+#line 471 "./.y"
+    { yyval.simpleType = new SimpleType(SimpleType::t_STRING);;
+    break; }
+    case 186:
+#line 472 "./.y"
+    { yyval.simpleType = new SimpleType(SimpleType::t_BOOL);;
+    break; }
+    case 187:
+#line 476 "./.y"
+    { yyval.typeName = new TypeName(yyvsp[0].identifier); ;
+    break; }
+    case 188:
+#line 477 "./.y"
+    { TypeName::Append(yyvsp[-2].typeName, yyvsp[0].identifier); ;
+    break; }
+    }
+    /* the action file gets copied in in place of this dollarsign */
 #line 487 "bison.simple"
-
-  yyvsp -= yylen;
-  yyssp -= yylen;
+
+    yyvsp -= yylen;
+    yyssp -= yylen;
 #ifdef YYLSP_NEEDED
-  yylsp -= yylen;
+    yylsp -= yylen;
 #endif
 
 #if YYDEBUG != 0
-  if (yydebug)
+    if (yydebug)
     {
-      short *ssp1 = yyss - 1;
-      fprintf (stderr, "state stack now");
-      while (ssp1 != yyssp)
-	fprintf (stderr, " %d", *++ssp1);
-      fprintf (stderr, "\n");
+        short* ssp1 = yyss - 1;
+        fprintf(stderr, "state stack now");
+        while (ssp1 != yyssp)
+            fprintf(stderr, " %d", *++ssp1);
+        fprintf(stderr, "\n");
     }
 #endif
 
-  *++yyvsp = yyval;
+    * ++yyvsp = yyval;
 
 #ifdef YYLSP_NEEDED
-  yylsp++;
-  if (yylen == 0)
+    yylsp++;
+    if (yylen == 0)
     {
-      yylsp->first_line = yylloc.first_line;
-      yylsp->first_column = yylloc.first_column;
-      yylsp->last_line = (yylsp-1)->last_line;
-      yylsp->last_column = (yylsp-1)->last_column;
-      yylsp->text = 0;
+        yylsp->first_line = yylloc.first_line;
+        yylsp->first_column = yylloc.first_column;
+        yylsp->last_line = (yylsp - 1)->last_line;
+        yylsp->last_column = (yylsp - 1)->last_column;
+        yylsp->text = 0;
     }
-  else
+    else
     {
-      yylsp->last_line = (yylsp+yylen-1)->last_line;
-      yylsp->last_column = (yylsp+yylen-1)->last_column;
+        yylsp->last_line = (yylsp + yylen - 1)->last_line;
+        yylsp->last_column = (yylsp + yylen - 1)->last_column;
     }
 #endif
 
-  /* Now "shift" the result of the reduction.
-     Determine what state that goes to,
-     based on the state we popped back to
-     and the rule number reduced by.  */
+    /* Now "shift" the result of the reduction.
+       Determine what state that goes to,
+       based on the state we popped back to
+       and the rule number reduced by.  */
 
-  yyn = yyr1[yyn];
+    yyn = yyr1[yyn];
 
-  yystate = yypgoto[yyn - YYNTBASE] + *yyssp;
-  if (yystate >= 0 && yystate <= YYLAST && yycheck[yystate] == *yyssp)
-    yystate = yytable[yystate];
-  else
-    yystate = yydefgoto[yyn - YYNTBASE];
+    yystate = yypgoto[yyn - YYNTBASE] + *yyssp;
+    if (yystate >= 0 && yystate <= YYLAST && yycheck[yystate] == *yyssp)
+        yystate = yytable[yystate];
+    else
+        yystate = yydefgoto[yyn - YYNTBASE];
 
-  goto yynewstate;
+    goto yynewstate;
 
 yyerrlab:   /* here on detecting error */
 
-  if (! yyerrstatus)
-    /* If not already recovering from an error, report this error.  */
+    if (!yyerrstatus)
+        /* If not already recovering from an error, report this error.  */
     {
-      ++yynerrs;
+        ++yynerrs;
 
 #ifdef YYERROR_VERBOSE
-      yyn = yypact[yystate];
+        yyn = yypact[yystate];
 
-      if (yyn > YYFLAG && yyn < YYLAST)
-	{
-	  int size = 0;
-	  char *msg;
-	  int x, count;
+        if (yyn > YYFLAG && yyn < YYLAST)
+        {
+            int size = 0;
+            char* msg;
+            int x, count;
 
-	  count = 0;
-	  /* Start X at -yyn if nec to avoid negative indexes in yycheck.  */
-	  for (x = (yyn < 0 ? -yyn : 0);
-	       x < (sizeof(yytname) / sizeof(char *)); x++)
-	    if (yycheck[x + yyn] == x)
-	      size += strlen(yytname[x]) + 15, count++;
-	  msg = (char *) malloc(size + 15);
-	  if (msg != 0)
-	    {
-	      strcpy(msg, "parse error");
+            count = 0;
+            /* Start X at -yyn if nec to avoid negative indexes in yycheck.  */
+            for (x = (yyn < 0 ? -yyn : 0);
+                x < (sizeof(yytname) / sizeof(char*)); x++)
+                if (yycheck[x + yyn] == x)
+                    size += strlen(yytname[x]) + 15, count++;
+            msg = (char*)malloc(size + 15);
+            if (msg != 0)
+            {
+                strcpy(msg, "parse error");
 
-	      if (count < 5)
-		{
-		  count = 0;
-		  for (x = (yyn < 0 ? -yyn : 0);
-		       x < (sizeof(yytname) / sizeof(char *)); x++)
-		    if (yycheck[x + yyn] == x)
-		      {
-			strcat(msg, count == 0 ? ", expecting `" : " or `");
-			strcat(msg, yytname[x]);
-			strcat(msg, "'");
-			count++;
-		      }
-		}
-	      yyerror(msg);
-	      free(msg);
-	    }
-	  else
-	    yyerror ("parse error; also virtual memory exceeded");
-	}
-      else
+                if (count < 5)
+                {
+                    count = 0;
+                    for (x = (yyn < 0 ? -yyn : 0);
+                        x < (sizeof(yytname) / sizeof(char*)); x++)
+                        if (yycheck[x + yyn] == x)
+                        {
+                            strcat(msg, count == 0 ? ", expecting `" : " or `");
+                            strcat(msg, yytname[x]);
+                            strcat(msg, "'");
+                            count++;
+                        }
+                }
+                yyerror(msg);
+                free(msg);
+            }
+            else
+                yyerror("parse error; also virtual memory exceeded");
+        }
+        else
 #endif /* YYERROR_VERBOSE */
-	yyerror("parse error");
+            yyerror("parse error");
     }
 
-  goto yyerrlab1;
+    goto yyerrlab1;
 yyerrlab1:   /* here on error raised explicitly by an action */
 
-  if (yyerrstatus == 3)
+    if (yyerrstatus == 3)
     {
-      /* if just tried and failed to reuse lookahead token after an error, discard it.  */
+        /* if just tried and failed to reuse lookahead token after an error, discard it.  */
 
-      /* return failure if at end of input */
-      if (yychar == YYEOF)
-	YYABORT;
+        /* return failure if at end of input */
+        if (yychar == YYEOF)
+            YYABORT;
 
 #if YYDEBUG != 0
-      if (yydebug)
-	fprintf(stderr, "Discarding token %d (%s).\n", yychar, yytname[yychar1]);
+        if (yydebug)
+            fprintf(stderr, "Discarding token %d (%s).\n", yychar, yytname[yychar1]);
 #endif
 
-      yychar = YYEMPTY;
+        yychar = YYEMPTY;
     }
 
-  /* Else will try to reuse lookahead token
-     after shifting the error token.  */
+    /* Else will try to reuse lookahead token
+       after shifting the error token.  */
 
-  yyerrstatus = 3;		/* Each real token shifted decrements this */
+    yyerrstatus = 3;		/* Each real token shifted decrements this */
 
-  goto yyerrhandle;
+    goto yyerrhandle;
 
 yyerrdefault:  /* current state does not do anything special for the error token. */
 
 #if 0
-  /* This is wrong; only states that explicitly want error tokens
-     should shift them.  */
-  yyn = yydefact[yystate];  /* If its default is to accept any token, ok.  Otherwise pop it.*/
-  if (yyn) goto yydefault;
+    /* This is wrong; only states that explicitly want error tokens
+       should shift them.  */
+    yyn = yydefact[yystate];  /* If its default is to accept any token, ok.  Otherwise pop it.*/
+    if (yyn) goto yydefault;
 #endif
 
 yyerrpop:   /* pop the current state because it cannot handle the error token */
 
-  if (yyssp == yyss) YYABORT;
-  yyvsp--;
-  yystate = *--yyssp;
+    if (yyssp == yyss) YYABORT;
+    yyvsp--;
+    yystate = *--yyssp;
 #ifdef YYLSP_NEEDED
-  yylsp--;
+    yylsp--;
 #endif
 
 #if YYDEBUG != 0
-  if (yydebug)
+    if (yydebug)
     {
-      short *ssp1 = yyss - 1;
-      fprintf (stderr, "Error: state stack now");
-      while (ssp1 != yyssp)
-	fprintf (stderr, " %d", *++ssp1);
-      fprintf (stderr, "\n");
+        short* ssp1 = yyss - 1;
+        fprintf(stderr, "Error: state stack now");
+        while (ssp1 != yyssp)
+            fprintf(stderr, " %d", *++ssp1);
+        fprintf(stderr, "\n");
     }
 #endif
 
 yyerrhandle:
 
-  yyn = yypact[yystate];
-  if (yyn == YYFLAG)
-    goto yyerrdefault;
+    yyn = yypact[yystate];
+    if (yyn == YYFLAG)
+        goto yyerrdefault;
 
-  yyn += YYTERROR;
-  if (yyn < 0 || yyn > YYLAST || yycheck[yyn] != YYTERROR)
-    goto yyerrdefault;
+    yyn += YYTERROR;
+    if (yyn < 0 || yyn > YYLAST || yycheck[yyn] != YYTERROR)
+        goto yyerrdefault;
 
-  yyn = yytable[yyn];
-  if (yyn < 0)
+    yyn = yytable[yyn];
+    if (yyn < 0)
     {
-      if (yyn == YYFLAG)
-	goto yyerrpop;
-      yyn = -yyn;
-      goto yyreduce;
+        if (yyn == YYFLAG)
+            goto yyerrpop;
+        yyn = -yyn;
+        goto yyreduce;
     }
-  else if (yyn == 0)
-    goto yyerrpop;
+    else if (yyn == 0)
+        goto yyerrpop;
 
-  if (yyn == YYFINAL)
-    YYACCEPT;
+    if (yyn == YYFINAL)
+        YYACCEPT;
 
 #if YYDEBUG != 0
-  if (yydebug)
-    fprintf(stderr, "Shifting error token, ");
+    if (yydebug)
+        fprintf(stderr, "Shifting error token, ");
 #endif
 
-  *++yyvsp = yylval;
+    * ++yyvsp = yylval;
 #ifdef YYLSP_NEEDED
-  *++yylsp = yylloc;
+    * ++yylsp = yylloc;
 #endif
 
-  yystate = yyn;
-  goto yynewstate;
+    yystate = yyn;
+    goto yynewstate;
 }
-#line 436 "./.y"
+#line 482 "./.y"
 
 
 void yyerror(char const* s)

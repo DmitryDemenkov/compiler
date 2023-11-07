@@ -23,6 +23,29 @@ typedef union {
 	ArrayCreation* arrayCreation;
 	ElementAccess* elementAccess;
 	InvocationExpression* invocationExpression;
+	VarDeclarator* varDeclarator;
+	VarDeclaratorList* varDeclaratorList;
+	Statement* statement;
+	StatementList* statementList;
+	IfStatement* ifStatement;
+	WhileStatement* whileStatement;
+	DoStatement* doStatement;
+	ForeachStatement* foreachStatement;
+	ForStatement* forStatement;
+	ReturnStatement* returnStatement;
+	ParamList* paramList;
+	Modifier* modifier;
+	ModifielrList* modifielrList;
+	ClassMember* classMember;
+	ClassMemberList* classMemberList;
+	Method* method;
+	Field* field;
+	Constructor* construct;
+	ClassDeclaration* classDeclaration;
+	NamespaceMember* namespaceMember;
+	NamespaceMemberList* namespaceMemberList;
+	NamespaceDeclaration* namespaceDeclaration;
+	Programm* programm;	
 } YYSTYPE;
 #define	ABSTRACT	258
 #define	VIRTUAL	259
