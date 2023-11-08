@@ -160,7 +160,7 @@ namespace_member_declaration_list_em: /* empty */ { $$ = NULL; }
 
 
 namespace_member_declaration_list: namespace_member_declaration { $$ = new NamespaceMemberList($1); }
-                                 | namespace_member_declaration_list namespace_member_declaration { NamespaceMemberList::Append($1,$2); }
+                                 | namespace_member_declaration_list namespace_member_declaration { $$ = NamespaceMemberList::Append($1,$2); }
                                  ;
 
 
@@ -180,7 +180,7 @@ class_member_declaration_list_em: /* empty */ { $$ = NULL; }
 
 
 class_member_declaration_list: class_member_declaration { $$ = new ClassMemberList($1); }
-                             | class_member_declaration_list class_member_declaration { ClassMemberList::Append($1,$2); }
+                             | class_member_declaration_list class_member_declaration { $$ = ClassMemberList::Append($1,$2); }
                              ;
 
 
@@ -226,7 +226,7 @@ modifier_list_em: /* empty*/ { $$ = NULL; }
 
 
 modifier_list: modifier { $$ = new ModifielrList($1); }
-             | modifier_list modifier { ModifielrList::Append($1,$2); }
+             | modifier_list modifier { $$ = ModifielrList::Append($1,$2); }
              ;
 
 
@@ -247,7 +247,7 @@ param_list_em: /* empty */ { $$ = NULL; }
 
 
 param_list: var_declarator { $$ = new ParamList($1); }
-          | param_list ',' var_declarator { ParamList::Append($1,$3); }
+          | param_list ',' var_declarator { $$ = ParamList::Append($1,$3); }
           ;
 
 
@@ -270,7 +270,7 @@ stmt_list_em: /* empty*/ { $$ = NULL; }
 
 
 stmt_list: stmt { $$ = new StatementList($1); }
-         | stmt_list stmt { StatementList::Append($1,$2); }
+         | stmt_list stmt { $$ = StatementList::Append($1,$2); }
          ;
 
 
@@ -308,8 +308,8 @@ if_stmt: IF '(' expr ')' stmt %prec THEN { $$ = new IfStatement($3,$5); }
 
 var_declarator_list: var_declarator { $$ = new VarDeclaratorList($1); }
                    | var_declarator '=' expr { $$ = new VarDeclaratorList($1,$3); }
-                   | var_declarator_list ',' ID { VarDeclaratorList::Append($1,$3); }
-                   | var_declarator_list ',' ID '=' expr { VarDeclaratorList::Append($1,$3,$5); }
+                   | var_declarator_list ',' ID { $$ = VarDeclaratorList::Append($1,$3); }
+                   | var_declarator_list ',' ID '=' expr { $$ = VarDeclaratorList::Append($1,$3,$5); }
                    ;
 
 
@@ -406,7 +406,7 @@ array_initializer: '{' expr_list_em '}' { $$ = new ArrayInitializer($2); }
 
 
 expr_list: expr { $$ = new ExpressionList($1); }
-         | expr_list ',' expr { ExpressionList::Append($1, $3); }
+         | expr_list ',' expr { $$ = ExpressionList::Append($1, $3); }
          ;
 
 
@@ -435,7 +435,7 @@ member_initializer_list_em: /* empty */ { $$ = NULL; }
 
 
 member_initializer_list: member_initializer { $$ = new MemberInitializerList($1); }
-                       | member_initializer_list ',' member_initializer { MemberInitializerList::Append($1, $3); }
+                       | member_initializer_list ',' member_initializer { $$ = MemberInitializerList::Append($1, $3); }
                        ;
 
 
@@ -452,7 +452,7 @@ argm_list_em: /* empty */ { $$ = NULL; }
 
 
 argm_list: argm { $$ = new ArgumentList($1);}
-         | argm_list ',' argm { ArgumentList::Append($1,$3);}
+         | argm_list ',' argm { $$ = ArgumentList::Append($1,$3);}
          ;
 
 
@@ -474,7 +474,7 @@ type: INT { $$ = new SimpleType(SimpleType::t_INT);}
 
 
 type_name: ID { $$ = new TypeName($1); }
-         | type_name '.' ID { TypeName::Append($1,$3); }
+         | type_name '.' ID { $$ = TypeName::Append($1,$3); }
          ;
 
 

@@ -39,7 +39,7 @@ public:
     list<string*>* identifiers;
 
     TypeName(string* identifier);
-    static void Append(TypeName* typeName, string* identifier);
+    static TypeName* Append(TypeName* typeName, string* identifier);
 
     string* ToDOT();
 };
@@ -84,7 +84,7 @@ public:
     list<Argument*>* arguments = NULL;
 
     ArgumentList(Argument* argument);
-    static void Append(ArgumentList* list, Argument* argument);
+    static ArgumentList* Append(ArgumentList* list, Argument* argument);
 
     string* ToDOT();
 };
@@ -124,7 +124,7 @@ public:
     list<MemberInitializer*>* initializers = NULL;
 
     MemberInitializerList(MemberInitializer* memberInitializer);
-    static void Append(MemberInitializerList* list, MemberInitializer* memberInitializer);
+    static MemberInitializerList* Append(MemberInitializerList* list, MemberInitializer* memberInitializer);
 
     string* ToDOT();
 };
@@ -223,7 +223,7 @@ public:
     list<Expression*>* expressions = NULL;
 
     ExpressionList(Expression* expression);
-    static void Append(ExpressionList* list, Expression* expression);
+    static ExpressionList* Append(ExpressionList* list, Expression* expression);
 
     string* ToDOT();
 };
@@ -308,7 +308,7 @@ public:
     list<VarDeclarator*>* declarators = NULL;
     VarDeclaratorList(VarDeclarator* declarator, Expression* expression = NULL);
     
-    static void Append(VarDeclaratorList* declarators, string* identifier, Expression* expression = NULL);
+    static VarDeclaratorList* Append(VarDeclaratorList* declarators, string* identifier, Expression* expression = NULL);
 
     string* ToDOT();
 };
@@ -351,7 +351,7 @@ public:
     list<Statement*>* statements = NULL;
 
     StatementList(Statement* statement);
-    static void Append(StatementList *statements, Statement* statement);
+    static StatementList* Append(StatementList *statements, Statement* statement);
 
     string* ToDOT();
 };
@@ -412,7 +412,7 @@ public:
     list<VarDeclarator*>* params = NULL;
 
     ParamList(VarDeclarator* param);
-    static void Append(ParamList* params, VarDeclarator* param);
+    static ParamList* Append(ParamList* params, VarDeclarator* param);
 
     string* ToDOT();
 };
@@ -447,7 +447,7 @@ public:
     list<Modifier*>* modifiers = NULL;
 
     ModifielrList(Modifier* modifier);
-    static void Append(ModifielrList* modifiers, Modifier* modifier);
+    static ModifielrList* Append(ModifielrList* modifiers, Modifier* modifier);
 
     string* ToDOT();
 };
@@ -507,7 +507,7 @@ public:
     list<ClassMember*>* members = NULL;
 
     ClassMemberList(ClassMember* member);
-    static void Append(ClassMemberList *members, ClassMember* member);
+    static ClassMemberList* Append(ClassMemberList *members, ClassMember* member);
 
     string* ToDOT();
 };
@@ -591,7 +591,7 @@ public:
     list<NamespaceMember*>* members = NULL;
 
     NamespaceMemberList(NamespaceMember* member);
-    static void Append(NamespaceMemberList* members, NamespaceMember* member);
+    static NamespaceMemberList* Append(NamespaceMemberList* members, NamespaceMember* member);
 
     string* ToDOT();
 };

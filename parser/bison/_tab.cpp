@@ -1197,7 +1197,7 @@ yyreduce:
     break; }
     case 6:
 #line 163 "./.y"
-    { NamespaceMemberList::Append(yyvsp[-1].namespaceMemberList, yyvsp[0].namespaceMember); ;
+    { yyval.namespaceMemberList = NamespaceMemberList::Append(yyvsp[-1].namespaceMemberList, yyvsp[0].namespaceMember); ;
     break; }
     case 7:
 #line 167 "./.y"
@@ -1229,7 +1229,7 @@ yyreduce:
     break; }
     case 14:
 #line 183 "./.y"
-    { ClassMemberList::Append(yyvsp[-1].classMemberList, yyvsp[0].classMember); ;
+    { yyval.classMemberList = ClassMemberList::Append(yyvsp[-1].classMemberList, yyvsp[0].classMember); ;
     break; }
     case 15:
 #line 187 "./.y"
@@ -1341,7 +1341,7 @@ yyreduce:
     break; }
     case 42:
 #line 229 "./.y"
-    { ModifielrList::Append(yyvsp[-1].modifielrList, yyvsp[0].modifier); ;
+    { yyval.modifielrList = ModifielrList::Append(yyvsp[-1].modifielrList, yyvsp[0].modifier); ;
     break; }
     case 43:
 #line 233 "./.y"
@@ -1389,7 +1389,7 @@ yyreduce:
     break; }
     case 54:
 #line 250 "./.y"
-    { ParamList::Append(yyvsp[-2].paramList, yyvsp[0].varDeclarator); ;
+    { yyval.paramList = ParamList::Append(yyvsp[-2].paramList, yyvsp[0].varDeclarator); ;
     break; }
     case 55:
 #line 254 "./.y"
@@ -1445,7 +1445,7 @@ yyreduce:
     break; }
     case 68:
 #line 273 "./.y"
-    { StatementList::Append(yyvsp[-1].statementList, yyvsp[0].statement); ;
+    { yyval.statementList = StatementList::Append(yyvsp[-1].statementList, yyvsp[0].statement); ;
     break; }
     case 69:
 #line 277 "./.y"
@@ -1501,11 +1501,11 @@ yyreduce:
     break; }
     case 82:
 #line 311 "./.y"
-    { VarDeclaratorList::Append(yyvsp[-2].varDeclaratorList, yyvsp[0].identifier); ;
+    { yyval.varDeclaratorList = VarDeclaratorList::Append(yyvsp[-2].varDeclaratorList, yyvsp[0].identifier); ;
     break; }
     case 83:
 #line 312 "./.y"
-    { VarDeclaratorList::Append(yyvsp[-4].varDeclaratorList, yyvsp[-2].identifier, yyvsp[0].expression); ;
+    { yyval.varDeclaratorList = VarDeclaratorList::Append(yyvsp[-4].varDeclaratorList, yyvsp[-2].identifier, yyvsp[0].expression); ;
     break; }
     case 84:
 #line 316 "./.y"
@@ -1797,7 +1797,7 @@ yyreduce:
     break; }
     case 156:
 #line 409 "./.y"
-    { ExpressionList::Append(yyvsp[-2].expressionList, yyvsp[0].expression); ;
+    { yyval.expressionList = ExpressionList::Append(yyvsp[-2].expressionList, yyvsp[0].expression); ;
     break; }
     case 157:
 #line 413 "./.y"
@@ -1853,7 +1853,7 @@ yyreduce:
     break; }
     case 170:
 #line 438 "./.y"
-    { MemberInitializerList::Append(yyvsp[-2].memberInitializerList, yyvsp[0].memberInitializer); ;
+    { yyval.memberInitializerList = MemberInitializerList::Append(yyvsp[-2].memberInitializerList, yyvsp[0].memberInitializer); ;
     break; }
     case 171:
 #line 442 "./.y"
@@ -1885,7 +1885,7 @@ yyreduce:
     break; }
     case 178:
 #line 455 "./.y"
-    { ArgumentList::Append(yyvsp[-2].argumentList, yyvsp[0].argument);;
+    { yyval.argumentList = ArgumentList::Append(yyvsp[-2].argumentList, yyvsp[0].argument);;
     break; }
     case 179:
 #line 459 "./.y"
@@ -1925,7 +1925,7 @@ yyreduce:
     break; }
     case 188:
 #line 477 "./.y"
-    { TypeName::Append(yyvsp[-2].typeName, yyvsp[0].identifier); ;
+    { yyval.typeName = TypeName::Append(yyvsp[-2].typeName, yyvsp[0].identifier); ;
     break; }
     }
     /* the action file gets copied in in place of this dollarsign */

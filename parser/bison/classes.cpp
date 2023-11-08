@@ -33,9 +33,10 @@ TypeName::TypeName(string* identifier)
 	this->identifiers = new list <string*>{ identifier };
 }
 
-void TypeName::Append(TypeName* typeName, string* identifier)
+TypeName* TypeName::Append(TypeName* typeName, string* identifier)
 {
 	typeName->identifiers->push_back(identifier);
+	return typeName;
 }
 
 string* TypeName::ToDOT()
@@ -116,9 +117,10 @@ ArgumentList::ArgumentList(Argument* argument)
 	this->arguments = new list <Argument*>{ argument };
 }
 
-void ArgumentList::Append(ArgumentList* list, Argument* argument)
+ArgumentList* ArgumentList::Append(ArgumentList* list, Argument* argument)
 {
 	list->arguments->push_back(argument);
+	return list;
 }
 
 string* ArgumentList::ToDOT()
@@ -222,9 +224,10 @@ MemberInitializerList::MemberInitializerList(MemberInitializer* memberInitialize
 	this->initializers = new list <MemberInitializer*>{ memberInitializer };
 }
 
-void MemberInitializerList::Append(MemberInitializerList* list, MemberInitializer* memberInitializer)
+MemberInitializerList* MemberInitializerList::Append(MemberInitializerList* list, MemberInitializer* memberInitializer)
 {
 	list->initializers->push_back(memberInitializer);
+	return list;
 }
 
 string* MemberInitializerList::ToDOT()
@@ -445,9 +448,10 @@ ExpressionList::ExpressionList(Expression* expression)
 	this->expressions = new list <Expression*>{ expression };
 }
 
-void ExpressionList::Append(ExpressionList* list, Expression* expression)
+ExpressionList* ExpressionList::Append(ExpressionList* list, Expression* expression)
 {
 	list->expressions->push_back(expression);
+	return list;
 }
 
 string* ExpressionList::ToDOT()
@@ -668,7 +672,7 @@ VarDeclaratorList::VarDeclaratorList(VarDeclarator* declarator, Expression* expr
 	this->declarators = new list<VarDeclarator*>{ declarator };
 }
 
-void VarDeclaratorList::Append(VarDeclaratorList* declarators, string* identifier, Expression* expression)
+VarDeclaratorList* VarDeclaratorList::Append(VarDeclaratorList* declarators, string* identifier, Expression* expression)
 {
 	VarDeclarator* varDecl = NULL;
 	switch (declarators->type)
@@ -684,6 +688,7 @@ void VarDeclaratorList::Append(VarDeclaratorList* declarators, string* identifie
 		break;
 	}
 	declarators->declarators->push_back(varDecl);
+	return declarators;
 }
 
 string* VarDeclaratorList::ToDOT()
@@ -763,9 +768,10 @@ StatementList::StatementList(Statement* statement)
 	this->statements = new list <Statement*>{ statement };
 }
 
-void StatementList::Append(StatementList * statements, Statement* statement)
+StatementList* StatementList::Append(StatementList * statements, Statement* statement)
 {
 	statements->statements->push_back(statement);
+	return statements;
 }
 
 string* StatementList::ToDOT()
@@ -982,9 +988,10 @@ ParamList::ParamList(VarDeclarator* param)
 	this->params = new list < VarDeclarator*>{ param };
 }
 
-void ParamList::Append(ParamList* params, VarDeclarator* param)
+ParamList* ParamList::Append(ParamList* params, VarDeclarator* param)
 {
 	params->params->push_back(param);
+	return params;
 }
 
 string* ParamList::ToDOT()
@@ -1031,9 +1038,10 @@ ModifielrList::ModifielrList(Modifier* modifier)
 	this->modifiers = new list < Modifier*>{ modifier };
 }
 
-void ModifielrList::Append(ModifielrList* modifiers, Modifier* modifier)
+ModifielrList* ModifielrList::Append(ModifielrList* modifiers, Modifier* modifier)
 {
 	modifiers->modifiers->push_back(modifier);
+	return modifiers;
 }
 
 string* ModifielrList::ToDOT()
@@ -1071,9 +1079,10 @@ ClassMemberList::ClassMemberList(ClassMember* member)
 	this->members = new list < ClassMember*>{ member };
 }
 
-void ClassMemberList::Append(ClassMemberList *members, ClassMember* member)
+ClassMemberList* ClassMemberList::Append(ClassMemberList *members, ClassMember* member)
 {
 	members->members->push_back(member);
+	return members;
 }
 
 string* ClassMemberList::ToDOT()
@@ -1386,9 +1395,10 @@ NamespaceMemberList::NamespaceMemberList(NamespaceMember* member)
 	this->members = new list < NamespaceMember*>{ member };
 }
 
-void NamespaceMemberList::Append(NamespaceMemberList* members, NamespaceMember* member)
+NamespaceMemberList* NamespaceMemberList::Append(NamespaceMemberList* members, NamespaceMember* member)
 {
 	members->members->push_back(member);
+	return members;
 }
 
 string* NamespaceMemberList::ToDOT()
