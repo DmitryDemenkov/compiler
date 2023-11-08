@@ -723,15 +723,65 @@ Statement::Statement(Type type, StatementList* statements)
 	this->statements = statements;
 }
 
+string* Statement::ToDOT()
+{
+	string childId;
+	string* dotStr = NULL;
+	switch (type)
+	{
+	case Statement::t_EXPRESSION:
+		childId = to_string(expressions->id);
+		dotStr = expressions->ToDOT();
+		break;
+	case Statement::t_DECLARATOR:
+		childId = to_string(declarators->id);
+		dotStr = declarators->ToDOT();
+		break;
+	case Statement::t_BLOCK:
+		childId = to_string(statements->id);
+		dotStr = statements->ToDOT();
+		break;
+	}
+
+	if (dotStr != NULL)
+	{
+		*dotStr += to_string(id) + "[label=\";\"];\n";
+		*dotStr += to_string(id) + "->" + childId + "[label=\"\"];\n";
+	}
+	else
+	{
+		dotStr = new string();
+		*dotStr += to_string(id) + "[label=\";\"];\n";
+	}
+
+	return dotStr;
+}
+
 StatementList::StatementList(Statement* statement)
 {
-	this->id = ++maxId;
+	this->id = statement->id;
 	this->statements = new list <Statement*>{ statement };
 }
 
 void StatementList::Append(StatementList * statements, Statement* statement)
 {
 	statements->statements->push_back(statement);
+}
+
+string* StatementList::ToDOT()
+{
+	string* dotStr = new string();
+	Statement* previous = NULL;
+	for (auto i = statements->rbegin(); i != statements->rend(); i++)
+	{
+		*dotStr += *((*i)->ToDOT());
+		if (previous != NULL)
+		{
+			*dotStr += to_string((*i)->id) + "->" + to_string(previous->id) + "[label=\"next\"];\n";
+		}
+		previous = *i;
+	}
+	return dotStr;
 }
 
 IfStatement::IfStatement(Expression* expression, 
@@ -743,12 +793,51 @@ IfStatement::IfStatement(Expression* expression,
 	StatementList::Append(this->statements, alternative);
 }
 
+string* IfStatement::ToDOT()
+{
+	Expression* cond = expressions->expressions->front();
+	Statement* main = statements->statements->front();
+	Statement* alternative = NULL;
+	if (statements->statements->size() > 1)
+	{
+		alternative = statements->statements->back();
+	}
+
+	string* dotStr = cond->ToDOT();
+	*dotStr += *main->ToDOT();
+	*dotStr += to_string(id) + "[label=\"if_stmt\"];\n";
+	*dotStr += to_string(id) + "->" + to_string(cond->id) + "[label=\"cond\"];\n";
+	*dotStr += to_string(id) + "->" + to_string(main->id) + "[label=\"if\"];\n";
+
+	if (alternative != NULL)
+	{
+		*dotStr += *alternative->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(main->id) + "[label=\"else\"];\n";
+	}
+
+	return dotStr;
+}
+
 WhileStatement::WhileStatement(Expression* expression, 
 	Statement* statement) : Statement(Statement::t_WHILE)
 {
 	this->id = ++maxId;
 	this->expressions = new ExpressionList(expression);
 	this->statements = new StatementList(statement);
+}
+
+string* WhileStatement::ToDOT()
+{
+	Expression* cond = expressions->expressions->front();
+	Statement* stmt = statements->statements->front();
+
+	string* dotStr = cond->ToDOT();
+	*dotStr += *stmt->ToDOT();
+	*dotStr += to_string(id) + "[label=\"while_stmt\"];\n";
+	*dotStr += to_string(id) + "->" + to_string(cond->id) + "[label=\"cond\"];\n";
+	*dotStr += to_string(id) + "->" + to_string(stmt->id) + "[label=\"stmt\"];\n";
+
+	return dotStr;
 }
 
 DoStatement::DoStatement(Statement* statement, 
@@ -759,6 +848,20 @@ DoStatement::DoStatement(Statement* statement,
 	this->statements = new StatementList(statement);
 }
 
+string* DoStatement::ToDOT()
+{
+	Expression* cond = expressions->expressions->front();
+	Statement* stmt = statements->statements->front();
+
+	string* dotStr = cond->ToDOT();
+	*dotStr += *stmt->ToDOT();
+	*dotStr += to_string(id) + "[label=\"do_stmt\"];\n";
+	*dotStr += to_string(id) + "->" + to_string(cond->id) + "[label=\"cond\"];\n";
+	*dotStr += to_string(id) + "->" + to_string(stmt->id) + "[label=\"stmt\"];\n";
+
+	return dotStr;
+}
+
 ForeachStatement::ForeachStatement(VarDeclarator* declarator, 
 	Expression* expression, Statement* statement) : Statement(Statement::t_FOREACH)
 {
@@ -766,6 +869,22 @@ ForeachStatement::ForeachStatement(VarDeclarator* declarator,
 	this->declarators = new VarDeclaratorList(declarator);
 	this->expressions = new ExpressionList(expression);
 	this->statements = new StatementList(statement);
+}
+
+string* ForeachStatement::ToDOT()
+{
+	VarDeclarator* decl = declarators->declarators->front();
+	Expression* cond = expressions->expressions->front();
+	Statement* stmt = statements->statements->front();
+
+	string* dotStr = cond->ToDOT();
+	*dotStr += *stmt->ToDOT();
+	*dotStr += to_string(id) + "[label=\"foreach_stmt\"];\n";
+	*dotStr += to_string(id) + "->" + to_string(decl->id) + "[label=\"decl\"];\n";
+	*dotStr += to_string(id) + "->" + to_string(cond->id) + "[label=\"cond\"];\n";
+	*dotStr += to_string(id) + "->" + to_string(stmt->id) + "[label=\"stmt\"];\n";
+
+	return dotStr;
 }
 
 ForStatement::ForStatement(Expression* init, 
@@ -789,15 +908,77 @@ ForStatement::ForStatement(VarDeclaratorList* declarations,
 	this->statements = new StatementList(statement);
 }
 
+string* ForStatement::ToDOT()
+{
+	VarDeclaratorList* decls = NULL;
+	Expression* init = NULL;
+	Expression* cond = NULL;
+	Expression* incr = NULL;
+	Statement*  stmt = NULL;
+
+	if (declarators != NULL)
+	{
+		decls = declarators;
+		cond = expressions->expressions->front();
+		incr = expressions->expressions->back();
+	}
+	else
+	{
+		auto iter = expressions->expressions->begin();
+		init = *iter; iter++;
+		cond = *iter; iter++;
+		incr = *iter;
+	}
+	stmt = statements->statements->front();
+
+	string initID;
+	string* dotStr;
+	if (decls != NULL)
+	{
+		initID = to_string(decls->id);
+		dotStr = decls->ToDOT();
+	}
+	else
+	{
+		initID = to_string(init->id);
+		dotStr = init->ToDOT();
+	}
+
+	*dotStr += *cond->ToDOT();
+	*dotStr += *incr->ToDOT();
+	*dotStr += *stmt->ToDOT();
+
+	*dotStr += to_string(id) + "[label=\"for_stmt\"];\n";
+	*dotStr += to_string(id) + "->" + initID + "[label=\"init\"];\n";
+	*dotStr += to_string(id) + "->" + to_string(cond->id) + "[label=\"cond\"];\n";
+	*dotStr += to_string(id) + "->" + to_string(incr->id) + "[label=\"incr\"];\n";
+	*dotStr += to_string(id) + "->" + to_string(stmt->id) + "[label=\"stmt\"];\n";
+
+	return dotStr;
+}
+
 ReturnStatement::ReturnStatement(Expression* expression) : Statement(Statement::t_RETURN, expression)
 {
 	this->id = ++maxId;
 	this->expressions = new ExpressionList(expression);
 }
 
+string* ReturnStatement::ToDOT()
+{
+	string* dotStr = new string();
+	*dotStr += to_string(id) + "[label=\"return\"];\n";
+	if (expressions != NULL)
+	{
+		*dotStr += *expressions->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(expressions->id) + "[label=\"expr\"];\n";
+	}
+
+	return dotStr;
+}
+
 ParamList::ParamList(VarDeclarator* param)
 {
-	this->id = ++maxId;
+	this->id = param->id;
 	this->params = new list < VarDeclarator*>{ param };
 }
 
@@ -806,21 +987,69 @@ void ParamList::Append(ParamList* params, VarDeclarator* param)
 	params->params->push_back(param);
 }
 
+string* ParamList::ToDOT()
+{
+	string* dotStr = new string();
+	VarDeclarator* previous = NULL;
+	for (auto i = params->rbegin(); i != params->rend(); i++)
+	{
+		*dotStr += *((*i)->ToDOT());
+		if (previous != NULL)
+		{
+			*dotStr += to_string((*i)->id) + "->" + to_string(previous->id) + "[label=\"next\"];\n";
+		}
+		previous = *i;
+	}
+	return dotStr;
+}
+
 Modifier::Modifier(Type type)
 {
 	this->id = ++maxId;
 	this->type = type;
 }
 
+string* Modifier::ToDOT()
+{
+	switch (type)
+	{
+	case Modifier::t_PRIVATE:   return new string("private");
+	case Modifier::t_PROTECTED: return new string("protected");
+	case Modifier::t_PUBLIC:    return new string("public");
+	case Modifier::t_INTERNAL:  return new string("internal");
+	case Modifier::t_ABSTRACT:  return new string("abstract");
+	case Modifier::t_STATIC:    return new string("static");
+	case Modifier::t_OVERRIDE:  return new string("override");
+	case Modifier::t_VIRTUAL:   return new string("virtual");
+	default: return NULL;
+	}
+}
+
 ModifielrList::ModifielrList(Modifier* modifier)
 {
-	this->id = ++maxId;
+	this->id = modifier->id;
 	this->modifiers = new list < Modifier*>{ modifier };
 }
 
 void ModifielrList::Append(ModifielrList* modifiers, Modifier* modifier)
 {
 	modifiers->modifiers->push_back(modifier);
+}
+
+string* ModifielrList::ToDOT()
+{
+	string* dotStr = new string();
+	Modifier* previous = NULL;
+	for (auto i = modifiers->rbegin(); i != modifiers->rend(); i++)
+	{
+		*dotStr += *((*i)->ToDOT());
+		if (previous != NULL)
+		{
+			*dotStr += to_string((*i)->id) + "->" + to_string(previous->id) + "[label=\"next\"];\n";
+		}
+		previous = *i;
+	}
+	return dotStr;
 }
 
 ClassMember::ClassMember(Type type, ReturnValueType returnValue, BaseConstructorType baseConstructor)
@@ -831,15 +1060,36 @@ ClassMember::ClassMember(Type type, ReturnValueType returnValue, BaseConstructor
 	this->baseConstructor = baseConstructor;
 }
 
+string* ClassMember::ToDOT() 
+{
+	return NULL;
+}
+
 ClassMemberList::ClassMemberList(ClassMember* member)
 {
-	this->id = ++maxId;
+	this->id = member->id;
 	this->members = new list < ClassMember*>{ member };
 }
 
 void ClassMemberList::Append(ClassMemberList *members, ClassMember* member)
 {
 	members->members->push_back(member);
+}
+
+string* ClassMemberList::ToDOT()
+{
+	string* dotStr = new string();
+	ClassMember* previous = NULL;
+	for (auto i = members->rbegin(); i != members->rend(); i++)
+	{
+		*dotStr += *((*i)->ToDOT());
+		if (previous != NULL)
+		{
+			*dotStr += to_string((*i)->id) + "->" + to_string(previous->id) + "[label=\"next\"];\n";
+		}
+		previous = *i;
+	}
+	return dotStr;
 }
 
 Method::Method(ModifielrList* modifiers, ReturnValueType returnValue, 
@@ -890,6 +1140,55 @@ Method::Method(ModifielrList* modifiers, ReturnValueType returnValue,
 	this->statementList = statements;
 }
 
+string* Method::ToDOT()
+{
+	string* dotStr = new string();
+	*dotStr += to_string(id) + ".1[label=\"identifier\"];\n";
+	*dotStr += to_string(id) + "[label=\"method\"];\n";
+	*dotStr += to_string(id) + "->" + to_string(id) + ".1[label=\"id\"];\n";
+
+	if (modifiers != NULL) 
+	{
+		*dotStr += *modifiers->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(modifiers->id) + "[label=\"modifs\"];\n";
+	}
+
+	if (returnValue == Method::t_SIMPLE_TYPE)
+	{
+		*dotStr += *simpleType->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(simpleType->id) + "[label=\"type\"];\n";
+	}
+	else if (returnValue == Method::t_TYPENAME)
+	{
+		*dotStr += *typeName->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(typeName->id) + "[label=\"type\"];\n";
+	}
+	else if (returnValue == Method::t_ARRAY)
+	{
+		*dotStr += *arrayType->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(arrayType->id) + "[label=\"type\"];\n";
+	}
+	else
+	{
+		*dotStr += to_string(id) + ".2[label=\"void\"];\n";
+		*dotStr += to_string(id) + "->" + to_string(id) + ".2[label=\"type\"];\n";
+	}
+
+	if (paramList != NULL)
+	{
+		*dotStr += *paramList->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(paramList->id) + "[label=\"params\"];\n";
+	}
+
+	if (statementList != NULL)
+	{
+		*dotStr += *statementList->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(statementList->id) + "[label=\"stmt\"];\n";
+	}
+
+	return dotStr;
+}
+
 Field::Field(ModifielrList* modifiers, ReturnValueType returnValue, 
 	SimpleType* simpleType, string* identifier, Expression* expression)
 	: ClassMember(ClassMember::t_FIELD, returnValue, ClassMember::t_NULL)
@@ -923,6 +1222,44 @@ Field::Field(ModifielrList* modifiers, ReturnValueType returnValue,
 	this->expression = expression;
 }
 
+string* Field::ToDOT()
+{
+	string* dotStr = new string();
+	*dotStr += to_string(id) + ".1[label=\"identifier\"];\n";
+	*dotStr += to_string(id) + "[label=\"field\"];\n";
+	*dotStr += to_string(id) + "->" + to_string(id) + ".1[label=\"id\"];\n";
+
+	if (modifiers != NULL)
+	{
+		*dotStr += *modifiers->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(modifiers->id) + "[label=\"modifs\"];\n";
+	}
+
+	if (returnValue == Method::t_SIMPLE_TYPE)
+	{
+		*dotStr += *simpleType->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(simpleType->id) + "[label=\"type\"];\n";
+	}
+	else if (returnValue == Method::t_TYPENAME)
+	{
+		*dotStr += *typeName->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(typeName->id) + "[label=\"type\"];\n";
+	}
+	else if (returnValue == Method::t_ARRAY)
+	{
+		*dotStr += *arrayType->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(arrayType->id) + "[label=\"type\"];\n";
+	}
+
+	if (expression != NULL)
+	{
+		*dotStr += *expression->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(expression->id) + "[label=\"init\"];\n";
+	}
+
+	return dotStr;
+}
+
 Constructor::Constructor(ModifielrList* modifiers, string* identifier, 
 	ParamList* params, BaseConstructorType baseConstructor, StatementList* statements, ArgumentList* args)
 	: ClassMember(ClassMember::t_CONSTRUCTOR, ClassMember::t_EMPTY, baseConstructor)
@@ -935,6 +1272,51 @@ Constructor::Constructor(ModifielrList* modifiers, string* identifier,
 	this->argumentList = args;
 }
 
+string* Constructor::ToDOT()
+{
+	string* dotStr = new string();
+	*dotStr += to_string(id) + ".1[label=\"identifier\"];\n";
+	*dotStr += to_string(id) + "[label=\"constructor\"];\n";
+	*dotStr += to_string(id) + "->" + to_string(id) + ".1[label=\"id\"];\n";
+
+	if (modifiers != NULL)
+	{
+		*dotStr += *modifiers->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(modifiers->id) + "[label=\"modifs\"];\n";
+	}
+
+	if (paramList != NULL)
+	{
+		*dotStr += *paramList->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(paramList->id) + "[label=\"params\"];\n";
+	}
+
+	if (statementList != NULL)
+	{
+		*dotStr += *statementList->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(statementList->id) + "[label=\"stmt\"];\n";
+	}
+
+	if (baseConstructor == Constructor::t_BASE)
+	{
+		*dotStr += to_string(id) + ".2[label=\"base\"];\n";
+		*dotStr += to_string(id) + "->" + to_string(id) + ".2[label=\"baseConstruct\"];\n";
+	}
+	else if (baseConstructor == Constructor::t_THIS)
+	{
+		*dotStr += to_string(id) + ".2[label=\"this\"];\n";
+		*dotStr += to_string(id) + "->" + to_string(id) + ".2[label=\"thisConstruct\"];\n";
+	}
+
+	if (argumentList != NULL)
+	{
+		*dotStr += *argumentList->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(argumentList->id) + "[label=\"args\"];\n";
+	}
+
+	return dotStr;
+}
+
 ClassDeclaration::ClassDeclaration(ModifielrList* modifiers, 
 	string* identifier, ClassMemberList* members, TypeName* baseClass)
 	: ClassMember(ClassMember::t_CLASS, ClassMember::t_EMPTY, ClassMember::t_NULL)
@@ -944,6 +1326,34 @@ ClassDeclaration::ClassDeclaration(ModifielrList* modifiers,
 	this->classMemberList = members;
 	this->identifier = identifier;
 	this->typeName = baseClass;
+}
+
+string* ClassDeclaration::ToDOT()
+{
+	string* dotStr = new string();
+	*dotStr += to_string(id) + ".1[label=\"identifier\"];\n";
+	*dotStr += to_string(id) + "[label=\"constructor\"];\n";
+	*dotStr += to_string(id) + "->" + to_string(id) + ".1[label=\"id\"];\n";
+
+	if (modifiers != NULL)
+	{
+		*dotStr += *modifiers->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(modifiers->id) + "[label=\"modifs\"];\n";
+	}
+
+	if (typeName != NULL)
+	{
+		*dotStr += *typeName->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(typeName->id) + "[label=\"baseClass\"];\n";
+	}
+
+	if (classMemberList != NULL)
+	{
+		*dotStr += *classMemberList->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(classMemberList->id) + "[label=\"body\"];\n";
+	}
+
+	return dotStr;
 }
 
 NamespaceMember::NamespaceMember(ClassDeclaration* decl)
@@ -960,15 +1370,41 @@ NamespaceMember::NamespaceMember(NamespaceDeclaration* decl)
 	this->namespaceDecl = decl;
 }
 
+string* NamespaceMember::ToDOT()
+{
+	switch (type)
+	{
+	case NamespaceMember::t_NAMESPACE: return namespaceDecl->ToDOT();
+	case NamespaceMember::t_CLASS:     return classDecl->ToDOT();
+	default: return NULL;
+	}
+}
+
 NamespaceMemberList::NamespaceMemberList(NamespaceMember* member)
 {
-	this->id = ++maxId;
+	this->id = member->id;
 	this->members = new list < NamespaceMember*>{ member };
 }
 
 void NamespaceMemberList::Append(NamespaceMemberList* members, NamespaceMember* member)
 {
 	members->members->push_back(member);
+}
+
+string* NamespaceMemberList::ToDOT()
+{
+	string* dotStr = new string();
+	NamespaceMember* previous = NULL;
+	for (auto i = members->rbegin(); i != members->rend(); i++)
+	{
+		*dotStr += *((*i)->ToDOT());
+		if (previous != NULL)
+		{
+			*dotStr += to_string((*i)->id) + "->" + to_string(previous->id) + "[label=\"next\"];\n";
+		}
+		previous = *i;
+	}
+	return dotStr;
 }
 
 NamespaceDeclaration::NamespaceDeclaration(TypeName* typeName, NamespaceMemberList* members)
@@ -978,8 +1414,28 @@ NamespaceDeclaration::NamespaceDeclaration(TypeName* typeName, NamespaceMemberLi
 	this->members = members;
 }
 
+string* NamespaceDeclaration::ToDOT()
+{
+	string* dotStr = typeName->ToDOT();
+	*dotStr += to_string(id) + "[label=\"namespace\"];\n";
+	*dotStr += to_string(id) + "->" + to_string(typeName->id) + "[label=\"name\"];\n";
+
+	if (members != NULL)
+	{
+		*dotStr += *members->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(members->id) + "[label=\"body\"];\n";
+	}
+
+	return dotStr;
+}
+
 Programm::Programm(NamespaceMemberList* members)
 {
 	this->id = ++maxId;
 	this->members = members;
+}
+
+string* Programm::ToDOT()
+{
+	return members->ToDOT();
 }

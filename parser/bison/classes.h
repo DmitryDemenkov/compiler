@@ -340,6 +340,8 @@ public:
     Statement(Type type, Expression* expression = NULL);
     Statement(Type type, VarDeclaratorList* declarators);
     Statement(Type type, StatementList* statements);
+
+    virtual string* ToDOT();
 };
 
 class StatementList
@@ -350,30 +352,40 @@ public:
 
     StatementList(Statement* statement);
     static void Append(StatementList *statements, Statement* statement);
+
+    string* ToDOT();
 };
 
 class IfStatement : public Statement
 {
 public:
     IfStatement(Expression* expression, Statement* main, Statement* alternative = NULL);
+
+    string* ToDOT();
 };
 
 class WhileStatement : public Statement
 {
 public:
     WhileStatement(Expression* expression, Statement* statement);
+
+    string* ToDOT();
 };
 
 class DoStatement : public Statement
 {
 public:
     DoStatement(Statement* statement, Expression* expression);
+
+    string* ToDOT();
 };
 
 class ForeachStatement : public Statement
 {
 public:
     ForeachStatement(VarDeclarator* declarator, Expression* expression, Statement* statement);
+
+    string* ToDOT();
 };
 
 class ForStatement : public Statement
@@ -381,12 +393,16 @@ class ForStatement : public Statement
 public:
     ForStatement(Expression* init, Expression* cond, Expression* increment, Statement* statement);
     ForStatement(VarDeclaratorList* declarations, Expression* cond, Expression* increment, Statement* statement);
+
+    string* ToDOT();
 };
 
 class ReturnStatement : public Statement
 {
 public:
     ReturnStatement(Expression* expression = NULL);
+
+    string* ToDOT();
 };
 
 class ParamList
@@ -397,6 +413,8 @@ public:
 
     ParamList(VarDeclarator* param);
     static void Append(ParamList* params, VarDeclarator* param);
+
+    string* ToDOT();
 };
 
 class Modifier
@@ -418,6 +436,8 @@ public:
     Type type;
 
     Modifier(Type type);
+
+    string* ToDOT();
 };
 
 class ModifielrList
@@ -428,6 +448,8 @@ public:
 
     ModifielrList(Modifier* modifier);
     static void Append(ModifielrList* modifiers, Modifier* modifier);
+
+    string* ToDOT();
 };
 
 class ClassMember
@@ -474,6 +496,8 @@ public:
     ClassMemberList* classMemberList = NULL;
 
     ClassMember(Type type, ReturnValueType returnValue, BaseConstructorType baseConstructor);
+
+    virtual string* ToDOT();
 };
 
 class ClassMemberList
@@ -484,6 +508,8 @@ public:
 
     ClassMemberList(ClassMember* member);
     static void Append(ClassMemberList *members, ClassMember* member);
+
+    string* ToDOT();
 };
 
 class Method : public ClassMember
@@ -500,6 +526,8 @@ public:
 
     Method(ModifielrList* modifiers, ReturnValueType returnValue,
         ArrayType* arrayType, string* identifiers, ParamList* params, StatementList* statements = NULL);
+
+    string* ToDOT();
 };
 
 class Field : public ClassMember
@@ -513,6 +541,8 @@ public:
 
     Field(ModifielrList* modifiers, ReturnValueType returnValue,
         ArrayType* arraType, string* identifier, Expression* expression = NULL);
+
+    string* ToDOT();
 };
 
 class Constructor : public ClassMember
@@ -520,6 +550,8 @@ class Constructor : public ClassMember
 public:
     Constructor(ModifielrList* modifiers, string* identifier, 
         ParamList* params, BaseConstructorType baseConstructor, StatementList* statements = NULL, ArgumentList* args = NULL);
+
+    string* ToDOT();
 };
 
 class ClassDeclaration : public ClassMember
@@ -527,6 +559,8 @@ class ClassDeclaration : public ClassMember
 public:
     ClassDeclaration(ModifielrList* modifiers, 
         string* identifier, ClassMemberList* members, TypeName* baseClass = NULL);
+
+    string* ToDOT();
 };
 
 class NamespaceMember
@@ -546,6 +580,8 @@ public:
 
     NamespaceMember(ClassDeclaration* decl);
     NamespaceMember(NamespaceDeclaration* decl);
+
+    string* ToDOT();
 };
 
 class NamespaceMemberList
@@ -556,6 +592,8 @@ public:
 
     NamespaceMemberList(NamespaceMember* member);
     static void Append(NamespaceMemberList* members, NamespaceMember* member);
+
+    string* ToDOT();
 };
 
 class NamespaceDeclaration
@@ -566,6 +604,8 @@ public:
     NamespaceMemberList* members = NULL;
 
     NamespaceDeclaration(TypeName* typeName, NamespaceMemberList* members);
+
+    string* ToDOT();
 };
 
 class Programm
@@ -575,4 +615,6 @@ public:
     NamespaceMemberList* members = NULL;
 
     Programm(NamespaceMemberList* members);
+
+    string* ToDOT();
 };
