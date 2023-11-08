@@ -539,7 +539,9 @@ char* yytext;
 #line 1 "./.l"
 #define INITIAL 0
 #line 2 "./.l"
+#include <fstream>
 #include "_tab.h"
+#include "classes.h"
 extern int yyparse();
 #define YY_NEVER_INTERACTIVE 1
 #define STRING_STATE 1
@@ -550,9 +552,9 @@ extern int yyparse();
 
 #define COMMENT_STATE 4
 
-#line 20 "./.l"
+#line 22 "./.l"
 void delete_underlines(char* str, char* newStr);
-#line 556 "lex.yy.c"
+#line 558 "lex.yy.c"
 
 /* Macros after this point can all be overridden by user definitions in
  * section 1.
@@ -699,7 +701,7 @@ register yy_state_type yy_current_state;
 register char* yy_cp,* yy_bp;
 register int yy_act;
 
-#line 23 "./.l"
+#line 25 "./.l"
 
 
 
@@ -711,7 +713,7 @@ char* buffer = 0;
 char digit[1024] = "";
 
 
-#line 715 "lex.yy.c"
+#line 717 "lex.yy.c"
 
 	if (yy_init)
 		{
@@ -795,157 +797,157 @@ do_action:	/* This label is used only to access EOF actions. */
 
 	case 1:
 	YY_RULE_SETUP
-	#line 34 "./.l"
+	#line 36 "./.l"
 	{ return ABSTRACT; }
 		YY_BREAK
 	case 2:
 	YY_RULE_SETUP
-	#line 35 "./.l"
+	#line 37 "./.l"
 	{ return VIRTUAL; }
 		YY_BREAK
 	case 3:
 	YY_RULE_SETUP
-	#line 36 "./.l"
+	#line 38 "./.l"
 	{ return OVERRIDE; }
 		YY_BREAK
 	case 4:
 	YY_RULE_SETUP
-	#line 38 "./.l"
+	#line 40 "./.l"
 	{ return BASE; }
 		YY_BREAK
 	case 5:
 	YY_RULE_SETUP
-	#line 39 "./.l"
+	#line 41 "./.l"
 	{ return THIS; }
 		YY_BREAK
 	case 6:
 	YY_RULE_SETUP
-	#line 40 "./.l"
+	#line 42 "./.l"
 	{ return CLASS; }
 		YY_BREAK
 	case 7:
 	YY_RULE_SETUP
-	#line 41 "./.l"
+	#line 43 "./.l"
 	{ return NAMESPACE; }
 		YY_BREAK
 	case 8:
 	YY_RULE_SETUP
-	#line 42 "./.l"
+	#line 44 "./.l"
 	{ return STATIC; }
 		YY_BREAK
 	case 9:
 	YY_RULE_SETUP
-	#line 43 "./.l"
+	#line 45 "./.l"
 	{ return RETURN; }
 		YY_BREAK
 	case 10:
 	YY_RULE_SETUP
-	#line 45 "./.l"
+	#line 47 "./.l"
 	{ return NEW; }
 		YY_BREAK
 	case 11:
 	YY_RULE_SETUP
-	#line 46 "./.l"
+	#line 48 "./.l"
 	{ return AS; }
 		YY_BREAK
 	case 12:
 	YY_RULE_SETUP
-	#line 47 "./.l"
+	#line 49 "./.l"
 	{ return IS; }
 		YY_BREAK
 	case 13:
 	YY_RULE_SETUP
-	#line 48 "./.l"
+	#line 50 "./.l"
 	{ return IN; }
 		YY_BREAK
 	case 14:
 	YY_RULE_SETUP
-	#line 50 "./.l"
+	#line 52 "./.l"
 	{ return PUBLIC; }
 		YY_BREAK
 	case 15:
 	YY_RULE_SETUP
-	#line 51 "./.l"
+	#line 53 "./.l"
 	{ return INTERNAL; }
 		YY_BREAK
 	case 16:
 	YY_RULE_SETUP
-	#line 52 "./.l"
+	#line 54 "./.l"
 	{ return PROTECTED; }
 		YY_BREAK
 	case 17:
 	YY_RULE_SETUP
-	#line 53 "./.l"
+	#line 55 "./.l"
 	{ return PRIVATE; }
 		YY_BREAK
 	case 18:
 	YY_RULE_SETUP
-	#line 55 "./.l"
+	#line 57 "./.l"
 	{ return DO; }
 		YY_BREAK
 	case 19:
 	YY_RULE_SETUP
-	#line 56 "./.l"
+	#line 58 "./.l"
 	{ return IF; }
 		YY_BREAK
 	case 20:
 	YY_RULE_SETUP
-	#line 57 "./.l"
+	#line 59 "./.l"
 	{ return ELSE; }
 		YY_BREAK
 	case 21:
 	YY_RULE_SETUP
-	#line 58 "./.l"
+	#line 60 "./.l"
 	{ return FOR; }
 		YY_BREAK
 	case 22:
 	YY_RULE_SETUP
-	#line 59 "./.l"
+	#line 61 "./.l"
 	{ return FOREACH; }
 		YY_BREAK
 	case 23:
 	YY_RULE_SETUP
-	#line 60 "./.l"
+	#line 62 "./.l"
 	{ return WHILE; }
 		YY_BREAK
 	case 24:
 	YY_RULE_SETUP
-	#line 62 "./.l"
+	#line 64 "./.l"
 	{ return VOID; }
 		YY_BREAK
 	case 25:
 	YY_RULE_SETUP
-	#line 63 "./.l"
+	#line 65 "./.l"
 	{ return INT; }
 		YY_BREAK
 	case 26:
 	YY_RULE_SETUP
-	#line 64 "./.l"
+	#line 66 "./.l"
 	{ return CHAR; }
 		YY_BREAK
 	case 27:
 	YY_RULE_SETUP
-	#line 65 "./.l"
+	#line 67 "./.l"
 	{ return STRING; }
 		YY_BREAK
 	case 28:
 	YY_RULE_SETUP
-	#line 66 "./.l"
+	#line 68 "./.l"
 	{ return BOOL; }
 		YY_BREAK
 	case 29:
 	YY_RULE_SETUP
-	#line 68 "./.l"
+	#line 70 "./.l"
 	{ yylval.boolean_literal = true; return BOOLEAN_LITERAL; }
 		YY_BREAK
 	case 30:
 	YY_RULE_SETUP
-	#line 69 "./.l"
+	#line 71 "./.l"
 	{ yylval.boolean_literal = false; return BOOLEAN_LITERAL; }
 		YY_BREAK
 	case 31:
 	YY_RULE_SETUP
-	#line 72 "./.l"
+	#line 74 "./.l"
 	{
 		buffer = yytext;
 		if (buffer[0] == '@') { buffer++; }
@@ -955,132 +957,132 @@ do_action:	/* This label is used only to access EOF actions. */
 		YY_BREAK
 	case 32:
 	YY_RULE_SETUP
-	#line 80 "./.l"
+	#line 82 "./.l"
 	{ return '{'; }
 		YY_BREAK
 	case 33:
 	YY_RULE_SETUP
-	#line 81 "./.l"
+	#line 83 "./.l"
 	{ return '}'; }
 		YY_BREAK
 	case 34:
 	YY_RULE_SETUP
-	#line 82 "./.l"
+	#line 84 "./.l"
 	{ return '['; }
 		YY_BREAK
 	case 35:
 	YY_RULE_SETUP
-	#line 83 "./.l"
+	#line 85 "./.l"
 	{ return ']'; }
 		YY_BREAK
 	case 36:
 	YY_RULE_SETUP
-	#line 84 "./.l"
+	#line 86 "./.l"
 	{ return '('; }
 		YY_BREAK
 	case 37:
 	YY_RULE_SETUP
-	#line 85 "./.l"
+	#line 87 "./.l"
 	{ return ')'; }
 		YY_BREAK
 	case 38:
 	YY_RULE_SETUP
-	#line 87 "./.l"
+	#line 89 "./.l"
 	{ return '.'; }
 		YY_BREAK
 	case 39:
 	YY_RULE_SETUP
-	#line 88 "./.l"
+	#line 90 "./.l"
 	{ return ','; }
 		YY_BREAK
 	case 40:
 	YY_RULE_SETUP
-	#line 89 "./.l"
+	#line 91 "./.l"
 	{ return ':'; }
 		YY_BREAK
 	case 41:
 	YY_RULE_SETUP
-	#line 90 "./.l"
+	#line 92 "./.l"
 	{ return ';'; }
 		YY_BREAK
 	case 42:
 	YY_RULE_SETUP
-	#line 92 "./.l"
+	#line 94 "./.l"
 	{ return '+'; }
 		YY_BREAK
 	case 43:
 	YY_RULE_SETUP
-	#line 93 "./.l"
+	#line 95 "./.l"
 	{ return '-'; }
 		YY_BREAK
 	case 44:
 	YY_RULE_SETUP
-	#line 94 "./.l"
+	#line 96 "./.l"
 	{ return '*'; }
 		YY_BREAK
 	case 45:
 	YY_RULE_SETUP
-	#line 95 "./.l"
+	#line 97 "./.l"
 	{ return '/'; }
 		YY_BREAK
 	case 46:
 	YY_RULE_SETUP
-	#line 96 "./.l"
+	#line 98 "./.l"
 	{ return '%'; }
 		YY_BREAK
 	case 47:
 	YY_RULE_SETUP
-	#line 98 "./.l"
+	#line 100 "./.l"
 	{ return '<'; }
 		YY_BREAK
 	case 48:
 	YY_RULE_SETUP
-	#line 99 "./.l"
+	#line 101 "./.l"
 	{ return '>'; }
 		YY_BREAK
 	case 49:
 	YY_RULE_SETUP
-	#line 100 "./.l"
+	#line 102 "./.l"
 	{ return LESS_EQUAL; }
 		YY_BREAK
 	case 50:
 	YY_RULE_SETUP
-	#line 101 "./.l"
+	#line 103 "./.l"
 	{ return GREATER_EQUAL; }
 		YY_BREAK
 	case 51:
 	YY_RULE_SETUP
-	#line 102 "./.l"
+	#line 104 "./.l"
 	{ return EQUALITY; }
 		YY_BREAK
 	case 52:
 	YY_RULE_SETUP
-	#line 103 "./.l"
+	#line 105 "./.l"
 	{ return INEQUALITY; }
 		YY_BREAK
 	case 53:
 	YY_RULE_SETUP
-	#line 105 "./.l"
+	#line 107 "./.l"
 	{ return '='; }
 		YY_BREAK
 	case 54:
 	YY_RULE_SETUP
-	#line 107 "./.l"
+	#line 109 "./.l"
 	{ return '!'; }
 		YY_BREAK
 	case 55:
 	YY_RULE_SETUP
-	#line 108 "./.l"
+	#line 110 "./.l"
 	{ return AND; }
 		YY_BREAK
 	case 56:
 	YY_RULE_SETUP
-	#line 109 "./.l"
+	#line 111 "./.l"
 	{ return OR; }
 		YY_BREAK
 	case 57:
 	YY_RULE_SETUP
-	#line 112 "./.l"
+	#line 114 "./.l"
 	{
 		buffer = yytext;
 		delete_underlines(buffer, digit);
@@ -1090,7 +1092,7 @@ do_action:	/* This label is used only to access EOF actions. */
 		YY_BREAK
 	case 58:
 	YY_RULE_SETUP
-	#line 119 "./.l"
+	#line 121 "./.l"
 	{
 		buffer = yytext;
 		printf("ERROR line#%d: invalid integer literal: %s\n", lineCounter + 1, buffer);
@@ -1099,7 +1101,7 @@ do_action:	/* This label is used only to access EOF actions. */
 		YY_BREAK
 	case 59:
 	YY_RULE_SETUP
-	#line 125 "./.l"
+	#line 127 "./.l"
 	{
 		buffer = yytext + 2;
 		delete_underlines(buffer, digit);
@@ -1110,7 +1112,7 @@ do_action:	/* This label is used only to access EOF actions. */
 		YY_BREAK
 	case 60:
 	YY_RULE_SETUP
-	#line 133 "./.l"
+	#line 135 "./.l"
 	{
 		buffer = yytext;
 		printf("ERROR line#%d: invalid integer literal: %s\n", lineCounter + 1, buffer);
@@ -1119,7 +1121,7 @@ do_action:	/* This label is used only to access EOF actions. */
 		YY_BREAK
 	case 61:
 	YY_RULE_SETUP
-	#line 139 "./.l"
+	#line 141 "./.l"
 	{
 		buffer = yytext + 2;
 		delete_underlines(buffer, digit);
@@ -1131,7 +1133,7 @@ do_action:	/* This label is used only to access EOF actions. */
 		YY_BREAK
 	case 62:
 	YY_RULE_SETUP
-	#line 148 "./.l"
+	#line 150 "./.l"
 	{
 		buffer = yytext;
 		printf("ERROR line#%d: invalid integer literal: %s\n", lineCounter + 1, buffer);
@@ -1140,22 +1142,22 @@ do_action:	/* This label is used only to access EOF actions. */
 		YY_BREAK
 	case 63:
 	YY_RULE_SETUP
-	#line 154 "./.l"
+	#line 156 "./.l"
 	{ literal = ""; lastState = lineCounter + 1; BEGIN(CHAR_STATE); }
 		YY_BREAK
 	case 64:
 	YY_RULE_SETUP
-	#line 155 "./.l"
+	#line 157 "./.l"
 	{ literal += yytext; }
 		YY_BREAK
 	case 65:
 	YY_RULE_SETUP
-	#line 156 "./.l"
+	#line 158 "./.l"
 	{ printf("ERROR line#%d: incorrect character in a char literal\n", lineCounter + 1); lineCounter++; return -1; }
 		YY_BREAK
 	case 66:
 	YY_RULE_SETUP
-	#line 157 "./.l"
+	#line 159 "./.l"
 	{
 		if (literal.size() == 0) {
 			printf("ERROR line#%d: empty char literal\n", lineCounter + 1);
@@ -1163,6 +1165,7 @@ do_action:	/* This label is used only to access EOF actions. */
 		}
 		else if (literal.size() == 1) {
 			yylval.char_literal = literal[0];
+			BEGIN(INITIAL);
 			return CHAR_LITERAL;
 		}
 		else {
@@ -1172,91 +1175,91 @@ do_action:	/* This label is used only to access EOF actions. */
 	}
 		YY_BREAK
 	case YY_STATE_EOF(CHAR_STATE):
-	#line 171 "./.l"
+	#line 174 "./.l"
 	{ printf("ERROR line#%d: no closing single quote\n", lastState); return -1; }
 		YY_BREAK
 	case 67:
 	YY_RULE_SETUP
-	#line 173 "./.l"
+	#line 176 "./.l"
 	{ literal = ""; lastState = lineCounter + 1; BEGIN(STRING_STATE); }
 		YY_BREAK
 	case 68:
 	YY_RULE_SETUP
-	#line 174 "./.l"
+	#line 177 "./.l"
 	{ literal += yytext; }
 		YY_BREAK
 	case 69:
 	YY_RULE_SETUP
-	#line 175 "./.l"
+	#line 178 "./.l"
 	{ printf("ERROR line#%d: incorrect character in a string literal\n", lineCounter + 1); lineCounter++; return -1; }
 		YY_BREAK
 	case 70:
 	YY_RULE_SETUP
-	#line 176 "./.l"
-	{ yylval.string_literal = new string(literal); return STRING_LITERAL; }
+	#line 179 "./.l"
+	{ yylval.string_literal = new string(literal); BEGIN(INITIAL); return STRING_LITERAL; }
 		YY_BREAK
 	case YY_STATE_EOF(STRING_STATE):
-	#line 177 "./.l"
+	#line 180 "./.l"
 	{ printf("ERROR line#%d: no closing double quote\n", lastState); return -1; }
 		YY_BREAK
 	case 71:
 	YY_RULE_SETUP
-	#line 179 "./.l"
+	#line 182 "./.l"
 	{ literal.push_back('\''); }
 		YY_BREAK
 	case 72:
 	YY_RULE_SETUP
-	#line 180 "./.l"
+	#line 183 "./.l"
 	{ literal.push_back('\"'); }
 		YY_BREAK
 	case 73:
 	YY_RULE_SETUP
-	#line 181 "./.l"
+	#line 184 "./.l"
 	{ literal.push_back('\\'); }
 		YY_BREAK
 	case 74:
 	YY_RULE_SETUP
-	#line 182 "./.l"
+	#line 185 "./.l"
 	{ literal.push_back('\0'); }
 		YY_BREAK
 	case 75:
 	YY_RULE_SETUP
-	#line 183 "./.l"
+	#line 186 "./.l"
 	{ literal.push_back('\a'); }
 		YY_BREAK
 	case 76:
 	YY_RULE_SETUP
-	#line 184 "./.l"
+	#line 187 "./.l"
 	{ literal.push_back('\b'); }
 		YY_BREAK
 	case 77:
 	YY_RULE_SETUP
-	#line 185 "./.l"
+	#line 188 "./.l"
 	{ literal.push_back('\f'); }
 		YY_BREAK
 	case 78:
 	YY_RULE_SETUP
-	#line 186 "./.l"
+	#line 189 "./.l"
 	{ literal.push_back('\n'); }
 		YY_BREAK
 	case 79:
 	YY_RULE_SETUP
-	#line 187 "./.l"
+	#line 190 "./.l"
 	{ literal.push_back('\r'); }
 		YY_BREAK
 	case 80:
 	YY_RULE_SETUP
-	#line 188 "./.l"
+	#line 191 "./.l"
 	{ literal.push_back('\t'); }
 		YY_BREAK
 	case 81:
 	YY_RULE_SETUP
-	#line 189 "./.l"
+	#line 192 "./.l"
 	{ literal.push_back('\v'); }
 		YY_BREAK
 	case 82:
 	YY_RULE_SETUP
-	#line 190 "./.l"
+	#line 193 "./.l"
 	{
 		buffer = yytext + 2;
 		char* a;
@@ -1272,83 +1275,83 @@ do_action:	/* This label is used only to access EOF actions. */
 		YY_BREAK
 	case 83:
 	YY_RULE_SETUP
-	#line 203 "./.l"
+	#line 206 "./.l"
 	{ literal = ""; lastState = lineCounter + 1; BEGIN(VERBATIM_STRING_STATE); }
 		YY_BREAK
 	case 84:
 	YY_RULE_SETUP
-	#line 204 "./.l"
+	#line 207 "./.l"
 	{ literal += yytext; }
 		YY_BREAK
 	case 85:
 	YY_RULE_SETUP
-	#line 205 "./.l"
+	#line 208 "./.l"
 	{ literal.push_back('\"'); }
 		YY_BREAK
 	case 86:
 	YY_RULE_SETUP
-	#line 206 "./.l"
-	{ yylval.string_literal = new string(literal); return STRING_LITERAL; }
+	#line 209 "./.l"
+	{ yylval.string_literal = new string(literal); BEGIN(INITIAL); return STRING_LITERAL; }
 		YY_BREAK
 	case YY_STATE_EOF(VERBATIM_STRING_STATE):
-	#line 207 "./.l"
+	#line 210 "./.l"
 	{ printf("ERROR line#%d: no closing double quote\n", lastState); return -1; }
 		YY_BREAK
 	case 87:
 	YY_RULE_SETUP
-	#line 210 "./.l"
+	#line 213 "./.l"
 		/* eat up single line comments */
 			YY_BREAK
 		case 88:
 		YY_RULE_SETUP
-		#line 212 "./.l"
+		#line 215 "./.l"
 		{ comment = ""; lastState = lineCounter + 1; BEGIN(COMMENT_STATE); }
 			YY_BREAK
 		case 89:
 		YY_RULE_SETUP
-		#line 213 "./.l"
+		#line 216 "./.l"
 		{ comment += yytext; }
 			YY_BREAK
 		case 90:
 		YY_RULE_SETUP
-		#line 214 "./.l"
+		#line 217 "./.l"
 		{ comment += yytext; }
 			YY_BREAK
 		case 91:
 		YY_RULE_SETUP
-		#line 215 "./.l"
+		#line 218 "./.l"
 		{ comment.push_back('\n'); lineCounter++; }
 			YY_BREAK
 		case 92:
 		YY_RULE_SETUP
-		#line 216 "./.l"
+		#line 219 "./.l"
 		{ BEGIN(INITIAL); }
 			YY_BREAK
 		case YY_STATE_EOF(COMMENT_STATE):
-		#line 217 "./.l"
+		#line 220 "./.l"
 		{ printf("ERROR line#%d: no closing delimited comment", lastState); return -1; }
 			YY_BREAK
 		case 93:
 		YY_RULE_SETUP
-		#line 220 "./.l"
+		#line 223 "./.l"
 		{ lineCounter++; }
 			YY_BREAK
 		case 94:
 		YY_RULE_SETUP
-		#line 222 "./.l"
+		#line 225 "./.l"
 		{ /* eat up whitespace */ }
 			YY_BREAK
 		case 95:
 		YY_RULE_SETUP
-		#line 224 "./.l"
+		#line 227 "./.l"
 		{ printf("ERROR line#%d: unrecognized character: %s\n", lineCounter + 1, yytext); return -1; }
 			YY_BREAK
 		case 96:
 		YY_RULE_SETUP
-		#line 226 "./.l"
+		#line 229 "./.l"
 		ECHO;
 			YY_BREAK
-		#line 1353 "lex.yy.c"
+		#line 1356 "lex.yy.c"
 		case YY_STATE_EOF(INITIAL):
 			yyterminate();
 
@@ -2208,7 +2211,7 @@ int main()
 	return 0;
 }
 #endif
-#line 226 "./.l"
+#line 229 "./.l"
 
 
 void delete_underlines(char* str, char* newStr)
@@ -2231,5 +2234,24 @@ void main(int argc, char** argv)
 	else
 		yyin = stdin;
 
-	yylex();
+	cout << "start parsing" << endl;
+	yyparse();
+
+	cout << "parsed" << endl;
+
+	if (Programm::main == NULL)
+		cout << "null prg" << endl;
+
+	string dotStr = "digraph tree{ rankdir=\"LR\"\n" + *Programm::main->ToDOT() + "}";
+	ofstream file;
+	file.open("tree.gv");
+	if (file.is_open())
+	{
+		file << dotStr;
+		cout << "Success";
+	}
+	else
+	{
+		cout << "Error";
+	}
 }

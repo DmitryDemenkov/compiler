@@ -251,30 +251,25 @@ Expression::Expression(Type type, string* name)
 	this->id = ++maxId;
 	this->type = type;
 	this->name = name;
+	cout << type << endl;
 }
 
-Expression::Expression(int intLiteral)
+Expression::Expression(Type type, int intLiteral)
 {
 	this->id = ++maxId;
 	this->type = Expression::t_INT_LITER;
 	this->intLiteral = intLiteral;
+	cout << intLiteral << endl;
 }
 
-Expression::Expression(char charLiteral)
+Expression::Expression(Type type, char charLiteral)
 {
 	this->id = ++maxId;
 	this->type = Expression::t_CHAR_LITER;
 	this->charLiteral = charLiteral;
 }
 
-Expression::Expression(string* stringliteral)
-{
-	this->id = ++maxId;
-	this->type = Expression::t_STRING_LITER;
-	this->name = stringliteral;
-}
-
-Expression::Expression(bool boolLiteral)
+Expression::Expression(Type type, bool boolLiteral)
 {
 	this->id = ++maxId;
 	this->type = Expression::t_BOOL_LITER;
@@ -311,6 +306,7 @@ Expression::Expression(Type type, Expression* left, Expression* right)
 	this->type = type;
 	this->left = left;
 	this->right = right;
+	cout << "expression created" << endl;
 }
 
 Expression::Expression(Type type, Expression* left, ArgumentList* arguments)
@@ -324,6 +320,7 @@ Expression::Expression(Type type, Expression* left, ArgumentList* arguments)
 string* Expression::ToDOT()
 {
 	string* dotStr = GetName();
+	cout << type << endl;
 	*dotStr = to_string(id) + "[label=\"" + *dotStr + "\"];\n";
 
 	if (left != NULL)
@@ -362,7 +359,7 @@ string* Expression::GetName()
 	case Expression::t_INT_LITER: return new string(to_string(intLiteral));
 	case Expression::t_CHAR_LITER: return new string("\'" + to_string(charLiteral) + "\'");
 	case Expression::t_BOOL_LITER: return new string(to_string(boolLiteral));
-	case Expression::t_STRING_LITER: return new string("\"" + *name + "\"");
+	case Expression::t_STRING_LITER: return new string("\\\"" + *name + "\\\"");
 	case Expression::t_ID: return name;
 	case Expression::t_SIMPLE_TYPE: simpleType->GetName();
 	case Expression::t_THIS: return new string("this");
@@ -592,7 +589,7 @@ InvocationExpression::InvocationExpression(Expression* expr,
 string* InvocationExpression::ToDOT()
 {
 	string* dotStr = left->ToDOT();
-	*dotStr += to_string(id) + "[label\"invocation\"];\n";
+	*dotStr += to_string(id) + "[label=\"invocation\"];\n";
 	*dotStr += to_string(id) + "->" + to_string(left->id) + "[label=\"expr\"];\n";
 
 	if (argumentList != NULL)
@@ -711,7 +708,11 @@ Statement::Statement(Type type, Expression* expression)
 {
 	this->id = ++maxId;
 	this->type = type;
-	this->expressions = new ExpressionList(expression);
+	if (expression != NULL)
+	{
+		this->expressions = new ExpressionList(expression);
+	}
+	cout << "statemnet creted" << endl;
 }
 
 Statement::Statement(Type type, VarDeclaratorList* declarators)
@@ -735,6 +736,7 @@ string* Statement::ToDOT()
 	switch (type)
 	{
 	case Statement::t_EXPRESSION:
+		cout << expressions << endl;
 		childId = to_string(expressions->id);
 		dotStr = expressions->ToDOT();
 		break;
@@ -776,6 +778,7 @@ StatementList* StatementList::Append(StatementList * statements, Statement* stat
 
 string* StatementList::ToDOT()
 {
+	cout << "list" << endl;
 	string* dotStr = new string();
 	Statement* previous = NULL;
 	for (auto i = statements->rbegin(); i != statements->rend(); i++)
@@ -1018,18 +1021,38 @@ Modifier::Modifier(Type type)
 
 string* Modifier::ToDOT()
 {
+	string name;
 	switch (type)
 	{
-	case Modifier::t_PRIVATE:   return new string("private");
-	case Modifier::t_PROTECTED: return new string("protected");
-	case Modifier::t_PUBLIC:    return new string("public");
-	case Modifier::t_INTERNAL:  return new string("internal");
-	case Modifier::t_ABSTRACT:  return new string("abstract");
-	case Modifier::t_STATIC:    return new string("static");
-	case Modifier::t_OVERRIDE:  return new string("override");
-	case Modifier::t_VIRTUAL:   return new string("virtual");
-	default: return NULL;
+	case Modifier::t_PRIVATE:   
+		name = "private";
+		break;
+	case Modifier::t_PROTECTED: 
+		name = "protected";
+		break;
+	case Modifier::t_PUBLIC:    
+		name = "public";
+		break;
+	case Modifier::t_INTERNAL:  
+		name = "internal";
+		break;
+	case Modifier::t_ABSTRACT:  
+		name = "abstract";
+		break;
+	case Modifier::t_STATIC:   
+		name = "static";
+		break;
+	case Modifier::t_OVERRIDE:  
+		name = "override";
+		break;
+	case Modifier::t_VIRTUAL:   
+		name = "virtual";
+		break;
 	}
+	
+	string* dotStr = new string();
+	*dotStr = to_string(id) + "[label=\"" + name + "\"];\n";
+	return dotStr;
 }
 
 ModifielrList::ModifielrList(Modifier* modifier)
@@ -1110,6 +1133,7 @@ Method::Method(ModifielrList* modifiers, ReturnValueType returnValue,
 	this->identifier = identifiers;
 	this->paramList = params;
 	this->statementList = statements;
+	cout << "method created" << endl;
 
 }
 
@@ -1152,7 +1176,7 @@ Method::Method(ModifielrList* modifiers, ReturnValueType returnValue,
 string* Method::ToDOT()
 {
 	string* dotStr = new string();
-	*dotStr += to_string(id) + ".1[label=\"identifier\"];\n";
+	*dotStr += to_string(id) + ".1[label=\"" + *identifier + "\"];\n";
 	*dotStr += to_string(id) + "[label=\"method\"];\n";
 	*dotStr += to_string(id) + "->" + to_string(id) + ".1[label=\"id\"];\n";
 
@@ -1191,6 +1215,7 @@ string* Method::ToDOT()
 
 	if (statementList != NULL)
 	{
+		cout << "stmt" << endl;
 		*dotStr += *statementList->ToDOT();
 		*dotStr += to_string(id) + "->" + to_string(statementList->id) + "[label=\"stmt\"];\n";
 	}
@@ -1234,7 +1259,7 @@ Field::Field(ModifielrList* modifiers, ReturnValueType returnValue,
 string* Field::ToDOT()
 {
 	string* dotStr = new string();
-	*dotStr += to_string(id) + ".1[label=\"identifier\"];\n";
+	*dotStr += to_string(id) + ".1[label=\"" + *identifier + "\"];\n";
 	*dotStr += to_string(id) + "[label=\"field\"];\n";
 	*dotStr += to_string(id) + "->" + to_string(id) + ".1[label=\"id\"];\n";
 
@@ -1284,7 +1309,7 @@ Constructor::Constructor(ModifielrList* modifiers, string* identifier,
 string* Constructor::ToDOT()
 {
 	string* dotStr = new string();
-	*dotStr += to_string(id) + ".1[label=\"identifier\"];\n";
+	*dotStr += to_string(id) + ".1[label=\"" + *identifier + "\"];\n";
 	*dotStr += to_string(id) + "[label=\"constructor\"];\n";
 	*dotStr += to_string(id) + "->" + to_string(id) + ".1[label=\"id\"];\n";
 
@@ -1340,8 +1365,8 @@ ClassDeclaration::ClassDeclaration(ModifielrList* modifiers,
 string* ClassDeclaration::ToDOT()
 {
 	string* dotStr = new string();
-	*dotStr += to_string(id) + ".1[label=\"identifier\"];\n";
-	*dotStr += to_string(id) + "[label=\"constructor\"];\n";
+	*dotStr += to_string(id) + ".1[label=\"" + *identifier + "\"];\n";
+	*dotStr += to_string(id) + "[label=\"class\"];\n";
 	*dotStr += to_string(id) + "->" + to_string(id) + ".1[label=\"id\"];\n";
 
 	if (modifiers != NULL)
@@ -1444,6 +1469,8 @@ Programm::Programm(NamespaceMemberList* members)
 	this->id = ++maxId;
 	this->members = members;
 }
+
+Programm* Programm::main = NULL;
 
 string* Programm::ToDOT()
 {

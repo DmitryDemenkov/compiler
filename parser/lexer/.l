@@ -1,5 +1,7 @@
 %{
+#include <fstream>
 #include "_tab.h"
+#include "classes.h"
 extern int yyparse();
 %}
 
@@ -161,6 +163,7 @@ false     { yylval.boolean_literal = false; return BOOLEAN_LITERAL; }
     }
     else if (literal.size() == 1) {
 		yylval.char_literal = literal[0];
+        BEGIN(INITIAL);
 		return CHAR_LITERAL;
     }
     else {
@@ -173,7 +176,7 @@ false     { yylval.boolean_literal = false; return BOOLEAN_LITERAL; }
 \" { literal = ""; lastState = lineCounter+1; BEGIN(STRING_STATE); }
 <STRING_STATE>[^\"\\\r\n]+ { literal += yytext; }
 <STRING_STATE>[\r\n] { printf("ERROR line#%d: incorrect character in a string literal\n", lineCounter+1); lineCounter++; return -1; }
-<STRING_STATE>\" { yylval.string_literal = new string(literal); return STRING_LITERAL; }
+<STRING_STATE>\" { yylval.string_literal = new string(literal); BEGIN(INITIAL); return STRING_LITERAL; }
 <STRING_STATE><<EOF>> { printf("ERROR line#%d: no closing double quote\n", lastState); return -1; }
 
 <STRING_STATE,CHAR_STATE>\\\'  { literal.push_back('\''); }
@@ -203,7 +206,7 @@ false     { yylval.boolean_literal = false; return BOOLEAN_LITERAL; }
 \@\" { literal = ""; lastState = lineCounter+1; BEGIN(VERBATIM_STRING_STATE); }
 <VERBATIM_STRING_STATE>[^\"]+ { literal += yytext; }
 <VERBATIM_STRING_STATE>\"\"   { literal.push_back('\"'); }
-<VERBATIM_STRING_STATE>\" { yylval.string_literal = new string(literal); return STRING_LITERAL; }
+<VERBATIM_STRING_STATE>\" { yylval.string_literal = new string(literal); BEGIN(INITIAL); return STRING_LITERAL; }
 <VERBATIM_STRING_STATE><<EOF>> { printf("ERROR line#%d: no closing double quote\n", lastState); return -1; }
 
 
@@ -240,10 +243,29 @@ void delete_underlines(char* str, char* newStr)
 void main( int argc, char** argv )
 {
     ++argv, --argc;
-    if ( argc > 0 )
-        yyin = fopen( argv[0], "r" );
-    else
-        yyin = stdin;
+	if (argc > 0)
+		yyin = fopen(argv[0], "r");
+	else
+		yyin = stdin;
 
-    yylex();
+	cout << "start parsing" << endl;
+	yyparse();
+
+	cout << "parsed" << endl;
+
+	if (Programm::main == NULL)
+		cout << "null prg" << endl;
+
+	string dotStr = "digraph tree{ rankdir=\"LR\"\n" + *Programm::main->ToDOT() + "}";
+	ofstream file;
+	file.open("tree.gv");
+	if (file.is_open())
+	{
+		file << dotStr;
+		cout << "Success";
+	}
+	else
+	{
+		cout << "Error";
+	}
 }

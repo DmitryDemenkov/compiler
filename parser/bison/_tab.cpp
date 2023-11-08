@@ -1177,7 +1177,7 @@ yyreduce:
 
     case 1:
 #line 149 "./.y"
-    { yyval.programm = new Programm(yyvsp[0].namespaceMemberList); ;
+    { yyval.programm = Programm::main = new Programm(yyvsp[0].namespaceMemberList); ;
     break; }
     case 2:
 #line 153 "./.y"
@@ -1397,7 +1397,7 @@ yyreduce:
     break; }
     case 56:
 #line 255 "./.y"
-    { yyval.statement = new Statement(Statement::t_EXPRESSION); ;
+    { yyval.statement = new Statement(Statement::t_EXPRESSION, yyvsp[-1].expression); ;
     break; }
     case 57:
 #line 256 "./.y"
@@ -1521,19 +1521,19 @@ yyreduce:
     break; }
     case 87:
 #line 322 "./.y"
-    { yyval.expression = new Expression(Expression::t_INT_LITER); ;
+    { yyval.expression = new Expression(Expression::t_INT_LITER, yyvsp[0].int_literal); ;
     break; }
     case 88:
 #line 323 "./.y"
-    { yyval.expression = new Expression(Expression::t_CHAR_LITER); ;
+    { yyval.expression = new Expression(Expression::t_CHAR_LITER, yyvsp[0].char_literal); ;
     break; }
     case 89:
 #line 324 "./.y"
-    { yyval.expression = new Expression(Expression::t_STRING_LITER); ;
+    { yyval.expression = new Expression(Expression::t_STRING_LITER, yyvsp[0].string_literal); ;
     break; }
     case 90:
 #line 325 "./.y"
-    { yyval.expression = new Expression(Expression::t_BOOL_LITER); ;
+    { yyval.expression = new Expression(Expression::t_BOOL_LITER, yyvsp[0].boolean_literal); ;
     break; }
     case 91:
 #line 326 "./.y"

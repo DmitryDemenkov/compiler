@@ -188,10 +188,9 @@ public:
     Expression* right = NULL;
 
     Expression(Type type, string* name = NULL);
-    Expression(int intLiteral);
-    Expression(char charLiteral);
-    Expression(string* stringliteral);
-    Expression(bool boolLiteral);
+    Expression(Type type, int intLiteral);
+    Expression(Type type, char charLiteral);
+    Expression(Type type, bool boolLiteral);
     Expression(Type type, SimpleType* simpleType, Expression* expr = NULL);
     Expression(Type type, ArrayType* arrayType, Expression* expr = NULL);
     Expression(Type type, TypeName* typeName, Expression* expr = NULL);
@@ -611,6 +610,8 @@ public:
 class Programm
 {
 public:
+    static Programm* main;
+
     int id;
     NamespaceMemberList* members = NULL;
 

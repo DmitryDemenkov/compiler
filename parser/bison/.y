@@ -146,7 +146,7 @@ using namespace std;
 
 %%
 
-program: namespace_member_declaration_list_em { $$ = new Programm($1); }
+program: namespace_member_declaration_list_em { $$ = Programm::main = new Programm($1); }
        ;
 
 
@@ -252,7 +252,7 @@ param_list: var_declarator { $$ = new ParamList($1); }
 
 
 stmt: ';' { $$ = new Statement(Statement::t_EMPTY); }
-    | expr ';' { $$ = new Statement(Statement::t_EXPRESSION); }
+    | expr ';' { $$ = new Statement(Statement::t_EXPRESSION, $1); }
     | var_declarator_list ';' { $$ = new Statement(Statement::t_DECLARATOR); }
     | if_stmt { $$ = new Statement(Statement::t_IF); }
     | while_stmt { $$ = new Statement(Statement::t_WHILE); }
@@ -319,10 +319,10 @@ var_declarator: type ID { $$ = new VarDeclarator($1, $2); }
               ;
 
 
-expr: INT_LITERAL { $$ = new Expression(Expression::t_INT_LITER); }
-    | CHAR_LITERAL { $$ = new Expression(Expression::t_CHAR_LITER); }
-    | STRING_LITERAL { $$ = new Expression(Expression::t_STRING_LITER); }
-    | BOOLEAN_LITERAL { $$ = new Expression(Expression::t_BOOL_LITER); }
+expr: INT_LITERAL { $$ = new Expression(Expression::t_INT_LITER, $1); }
+    | CHAR_LITERAL { $$ = new Expression(Expression::t_CHAR_LITER, $1); }
+    | STRING_LITERAL { $$ = new Expression(Expression::t_STRING_LITER, $1); }
+    | BOOLEAN_LITERAL { $$ = new Expression(Expression::t_BOOL_LITER, $1); }
     | '(' expr ')' { $$ = new Expression(Expression::t_PARENTHESIZED, $2); }
     | member_access { $$ = $1; }
     | invocation_expression { $$ = $1; }
