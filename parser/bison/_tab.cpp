@@ -1297,19 +1297,19 @@ yyreduce:
     break; }
     case 31:
 #line 212 "./.y"
-    { yyval.method = new Method(yyvsp[-8].modifielrList, ClassMember::t_SIMPLE_TYPE, yyvsp[-6].identifier, yyvsp[-4].paramList, yyvsp[-1].statementList); ;
+    { yyval.method = new Method(yyvsp[-8].modifielrList, ClassMember::t_SIMPLE_TYPE, yyvsp[-7].simpleType, yyvsp[-6].identifier, yyvsp[-4].paramList, yyvsp[-1].statementList); ;
     break; }
     case 32:
 #line 213 "./.y"
-    { yyval.method = new Method(yyvsp[-6].modifielrList, ClassMember::t_SIMPLE_TYPE, yyvsp[-4].identifier, yyvsp[-2].paramList); ;
+    { yyval.method = new Method(yyvsp[-6].modifielrList, ClassMember::t_SIMPLE_TYPE, yyvsp[-5].simpleType, yyvsp[-4].identifier, yyvsp[-2].paramList); ;
     break; }
     case 33:
 #line 214 "./.y"
-    { yyval.method = new Method(yyvsp[-8].modifielrList, ClassMember::t_TYPENAME, yyvsp[-6].identifier, yyvsp[-4].paramList, yyvsp[-1].statementList); ;
+    { yyval.method = new Method(yyvsp[-8].modifielrList, ClassMember::t_TYPENAME, yyvsp[-7].typeName, yyvsp[-6].identifier, yyvsp[-4].paramList, yyvsp[-1].statementList); ;
     break; }
     case 34:
 #line 215 "./.y"
-    { yyval.method = new Method(yyvsp[-6].modifielrList, ClassMember::t_TYPENAME, yyvsp[-4].identifier, yyvsp[-2].paramList); ;
+    { yyval.method = new Method(yyvsp[-6].modifielrList, ClassMember::t_TYPENAME, yyvsp[-5].typeName, yyvsp[-4].identifier, yyvsp[-2].paramList); ;
     break; }
     case 35:
 #line 216 "./.y"
@@ -1321,11 +1321,11 @@ yyreduce:
     break; }
     case 37:
 #line 218 "./.y"
-    { yyval.method = new Method(yyvsp[-8].modifielrList, ClassMember::t_ARRAY, yyvsp[-6].identifier, yyvsp[-4].paramList, yyvsp[-1].statementList); ;
+    { yyval.method = new Method(yyvsp[-8].modifielrList, ClassMember::t_ARRAY, yyvsp[-7].arrayType, yyvsp[-6].identifier, yyvsp[-4].paramList, yyvsp[-1].statementList); ;
     break; }
     case 38:
 #line 219 "./.y"
-    { yyval.method = new Method(yyvsp[-6].modifielrList, ClassMember::t_ARRAY, yyvsp[-4].identifier, yyvsp[-2].paramList); ;
+    { yyval.method = new Method(yyvsp[-6].modifielrList, ClassMember::t_ARRAY, yyvsp[-5].arrayType, yyvsp[-4].identifier, yyvsp[-2].paramList); ;
     break; }
     case 39:
 #line 223 "./.y"
@@ -1401,35 +1401,35 @@ yyreduce:
     break; }
     case 57:
 #line 256 "./.y"
-    { yyval.statement = new Statement(Statement::t_DECLARATOR); ;
+    { yyval.statement = new Statement(Statement::t_DECLARATOR, yyvsp[-1].varDeclaratorList); ;
     break; }
     case 58:
 #line 257 "./.y"
-    { yyval.statement = new Statement(Statement::t_IF); ;
+    { yyval.statement = yyvsp[0].ifStatement; ;
     break; }
     case 59:
 #line 258 "./.y"
-    { yyval.statement = new Statement(Statement::t_WHILE); ;
+    { yyval.statement = yyvsp[0].whileStatement; ;
     break; }
     case 60:
 #line 259 "./.y"
-    { yyval.statement = new Statement(Statement::t_DO); ;
+    { yyval.statement = yyvsp[0].doStatement; ;
     break; }
     case 61:
 #line 260 "./.y"
-    { yyval.statement = new Statement(Statement::t_FOR); ;
+    { yyval.statement = yyvsp[0].forStatement; ;
     break; }
     case 62:
 #line 261 "./.y"
-    { yyval.statement = new Statement(Statement::t_FOREACH); ;
+    { yyval.statement = yyvsp[0].foreachStatement; ;
     break; }
     case 63:
 #line 262 "./.y"
-    { yyval.statement = new Statement(Statement::t_RETURN); ;
+    { yyval.statement = yyvsp[0].returnStatement; ;
     break; }
     case 64:
 #line 263 "./.y"
-    { yyval.statement = new Statement(Statement::t_BLOCK); ;
+    { yyval.statement = new Statement(Statement::t_BLOCK, yyvsp[-1].statementList); ;
     break; }
     case 65:
 #line 267 "./.y"
@@ -1657,7 +1657,7 @@ yyreduce:
     break; }
     case 121:
 #line 356 "./.y"
-    { yyval.expression = new Expression(Expression::t_IS, yyvsp[-2].expression, yyvsp[0].expression); ;
+    { yyval.expression = new Expression(Expression::t_ASSIGNMENT, yyvsp[-2].expression, yyvsp[0].expression); ;
     break; }
     case 122:
 #line 360 "./.y"

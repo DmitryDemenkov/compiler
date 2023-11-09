@@ -209,14 +209,14 @@ field_declaration: modifier_list_em type ID ';' { $$ = new Field($1,ClassMember:
                  ;
 
 
-method_declaration: modifier_list_em type ID '(' param_list_em ')' '{' stmt_list_em '}' { $$ = new Method($1,ClassMember::t_SIMPLE_TYPE,$3,$5,$8); }
-                  | modifier_list_em type ID '(' param_list_em ')' ';' { $$ = new Method($1,ClassMember::t_SIMPLE_TYPE,$3,$5); }
-                  | modifier_list_em type_name ID '(' param_list_em ')' '{' stmt_list_em '}' { $$ = new Method($1,ClassMember::t_TYPENAME,$3,$5,$8); }
-                  | modifier_list_em type_name ID '(' param_list_em ')' ';' { $$ = new Method($1,ClassMember::t_TYPENAME,$3,$5); }
+method_declaration: modifier_list_em type ID '(' param_list_em ')' '{' stmt_list_em '}' { $$ = new Method($1,ClassMember::t_SIMPLE_TYPE,$2,$3,$5,$8); }
+                  | modifier_list_em type ID '(' param_list_em ')' ';' { $$ = new Method($1,ClassMember::t_SIMPLE_TYPE,$2,$3,$5); }
+                  | modifier_list_em type_name ID '(' param_list_em ')' '{' stmt_list_em '}' { $$ = new Method($1,ClassMember::t_TYPENAME,$2,$3,$5,$8); }
+                  | modifier_list_em type_name ID '(' param_list_em ')' ';' { $$ = new Method($1,ClassMember::t_TYPENAME,$2,$3,$5); }
                   | modifier_list_em VOID ID '(' param_list_em ')' '{' stmt_list_em '}' { $$ = new Method($1,ClassMember::t_VOID,$3,$5,$8); }
                   | modifier_list_em VOID ID '(' param_list_em ')' ';' { $$ = new Method($1,ClassMember::t_VOID,$3,$5); }
-                  | modifier_list_em array_type ID '(' param_list_em ')' '{' stmt_list_em '}' { $$ = new Method($1,ClassMember::t_ARRAY,$3,$5,$8); }
-                  | modifier_list_em array_type ID '(' param_list_em ')' ';' { $$ = new Method($1,ClassMember::t_ARRAY,$3,$5); }
+                  | modifier_list_em array_type ID '(' param_list_em ')' '{' stmt_list_em '}' { $$ = new Method($1,ClassMember::t_ARRAY,$2,$3,$5,$8); }
+                  | modifier_list_em array_type ID '(' param_list_em ')' ';' { $$ = new Method($1,ClassMember::t_ARRAY,$2,$3,$5); }
                   ;
 
 
@@ -253,14 +253,14 @@ param_list: var_declarator { $$ = new ParamList($1); }
 
 stmt: ';' { $$ = new Statement(Statement::t_EMPTY); }
     | expr ';' { $$ = new Statement(Statement::t_EXPRESSION, $1); }
-    | var_declarator_list ';' { $$ = new Statement(Statement::t_DECLARATOR); }
-    | if_stmt { $$ = new Statement(Statement::t_IF); }
-    | while_stmt { $$ = new Statement(Statement::t_WHILE); }
-    | do_stmt { $$ = new Statement(Statement::t_DO); }
-    | for_stmt { $$ = new Statement(Statement::t_FOR); }
-    | foreach_stmt { $$ = new Statement(Statement::t_FOREACH); }
-    | return_stmt { $$ = new Statement(Statement::t_RETURN); }
-    | '{' stmt_list_em '}' { $$ = new Statement(Statement::t_BLOCK); }
+    | var_declarator_list ';' { $$ = new Statement(Statement::t_DECLARATOR, $1); }
+    | if_stmt { $$ = $1; }
+    | while_stmt { $$ = $1; }
+    | do_stmt { $$ = $1; }
+    | for_stmt { $$ = $1; }
+    | foreach_stmt { $$ = $1; }
+    | return_stmt { $$ = $1; }
+    | '{' stmt_list_em '}' { $$ = new Statement(Statement::t_BLOCK, $2); }
     ;
 
 
@@ -353,7 +353,7 @@ expr: INT_LITERAL { $$ = new Expression(Expression::t_INT_LITER, $1); }
     | expr INEQUALITY expr { $$ = new Expression(Expression::t_INEQUALITY, $1 ,$3); }
     | expr AND expr { $$ = new Expression(Expression::t_AND, $1, $3); }
     | expr OR expr { $$ = new Expression(Expression::t_OR, $1, $3); }
-    | expr '=' expr { $$ = new Expression(Expression::t_IS, $1, $3); }
+    | expr '=' expr { $$ = new Expression(Expression::t_ASSIGNMENT, $1, $3); }
     ;
 
 

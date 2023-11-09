@@ -45,7 +45,12 @@ string* TypeName::ToDOT()
 	int n = identifiers->size() - 1;
 	for (auto i = identifiers->rbegin(); i != identifiers->rend(); i++, n--)
 	{
-		string strId = to_string(id) + "." + to_string(n);
+		string strId = to_string(id);
+		if (n != 0)
+		{
+			strId += "." + to_string(n);
+		}
+
 		*dotStr += strId + "[label=\"" + **i + "\"];\n";
 		if (i != identifiers->rbegin())
 		{
@@ -141,16 +146,13 @@ string* ArgumentList::ToDOT()
 
 ObjectInitializer::ObjectInitializer(MemberInitializerList* initializers)
 {
-	this->id = ++maxId;
+	this->id = initializers->id;
 	this->initializers = initializers;
 }
 
 string* ObjectInitializer::ToDOT()
 {
-	string* dotStr = initializers->ToDOT();
-	*dotStr += to_string(id) + "[label=\"objInit\"];";
-	*dotStr += to_string(id) + "->" + to_string(initializers->id);
-	return dotStr;
+	return initializers->ToDOT();
 }
 
 MemberInitializer::MemberInitializer(string* identifier, Expression* expression)
@@ -220,7 +222,7 @@ string* MemberInitializer::ToDOT()
 
 MemberInitializerList::MemberInitializerList(MemberInitializer* memberInitializer)
 {
-	this->id = memberInitializer->id;
+	this->id = ++maxId;
 	this->initializers = new list <MemberInitializer*>{ memberInitializer };
 }
 
@@ -233,15 +235,11 @@ MemberInitializerList* MemberInitializerList::Append(MemberInitializerList* list
 string* MemberInitializerList::ToDOT()
 {
 	string* dotStr = new string();
-	MemberInitializer* previous = NULL;
+	*dotStr = to_string(id) + "[label=\"mebmersInits\"];\n";
 	for (auto i = initializers->rbegin(); i != initializers->rend(); i++)
 	{
 		*dotStr += *((*i)->ToDOT());
-		if (previous != NULL)
-		{
-			*dotStr += to_string((*i)->id) + "->" + to_string(previous->id) + "[label=\"next\"];\n";
-		}
-		previous = *i;
+		*dotStr += to_string(id) + "->" + to_string((*i)->id) + "[label=\"init\"];\n";
 	}
 	return dotStr;
 }
@@ -487,7 +485,6 @@ ArrayCreation::ArrayCreation(ArrayType* arrType,
 	this->id = ++maxId;
 	this->arrayType = arrType;
 	this->arrayInitializer = arrInit;
-
 }
 
 ArrayCreation::ArrayCreation(SimpleType* simpleType, 
@@ -496,6 +493,7 @@ ArrayCreation::ArrayCreation(SimpleType* simpleType,
 	this->id = ++maxId;
 	this->simpleType = simpleType;
 	this->left = expr;
+	this->arrayInitializer = arrInit;
 }
 
 ArrayCreation::ArrayCreation(TypeName* typeName, 
@@ -732,19 +730,22 @@ Statement::Statement(Type type, StatementList* statements)
 string* Statement::ToDOT()
 {
 	string childId;
+	string exprName;
 	string* dotStr = NULL;
 	switch (type)
 	{
 	case Statement::t_EXPRESSION:
-		cout << expressions << endl;
+		exprName = ";";
 		childId = to_string(expressions->id);
 		dotStr = expressions->ToDOT();
 		break;
 	case Statement::t_DECLARATOR:
+		exprName = ";";
 		childId = to_string(declarators->id);
 		dotStr = declarators->ToDOT();
 		break;
 	case Statement::t_BLOCK:
+		exprName = "block";
 		childId = to_string(statements->id);
 		dotStr = statements->ToDOT();
 		break;
@@ -752,7 +753,7 @@ string* Statement::ToDOT()
 
 	if (dotStr != NULL)
 	{
-		*dotStr += to_string(id) + "[label=\";\"];\n";
+		*dotStr += to_string(id) + "[label=\"" + exprName + "\"];\n";
 		*dotStr += to_string(id) + "->" + childId + "[label=\"\"];\n";
 	}
 	else
@@ -799,7 +800,11 @@ IfStatement::IfStatement(Expression* expression,
 	this->id = ++maxId;
 	this->expressions = new ExpressionList(expression);
 	this->statements = new StatementList(main);
-	StatementList::Append(this->statements, alternative);
+
+	if (alternative != NULL)
+	{
+		this->statements = StatementList::Append(this->statements, alternative);
+	}
 }
 
 string* IfStatement::ToDOT()
@@ -821,7 +826,7 @@ string* IfStatement::ToDOT()
 	if (alternative != NULL)
 	{
 		*dotStr += *alternative->ToDOT();
-		*dotStr += to_string(id) + "->" + to_string(main->id) + "[label=\"else\"];\n";
+		*dotStr += to_string(id) + "->" + to_string(alternative->id) + "[label=\"else\"];\n";
 	}
 
 	return dotStr;
@@ -1098,7 +1103,7 @@ string* ClassMember::ToDOT()
 
 ClassMemberList::ClassMemberList(ClassMember* member)
 {
-	this->id = member->id;
+	this->id = ++maxId;
 	this->members = new list < ClassMember*>{ member };
 }
 
@@ -1111,15 +1116,11 @@ ClassMemberList* ClassMemberList::Append(ClassMemberList *members, ClassMember* 
 string* ClassMemberList::ToDOT()
 {
 	string* dotStr = new string();
-	ClassMember* previous = NULL;
+	*dotStr = to_string(id) + "[label=\"members\"];\n";
 	for (auto i = members->rbegin(); i != members->rend(); i++)
 	{
 		*dotStr += *((*i)->ToDOT());
-		if (previous != NULL)
-		{
-			*dotStr += to_string((*i)->id) + "->" + to_string(previous->id) + "[label=\"next\"];\n";
-		}
-		previous = *i;
+		*dotStr += to_string(id) + "->" + to_string((*i)->id) + "[label=\"member\"];\n";
 	}
 	return dotStr;
 }
