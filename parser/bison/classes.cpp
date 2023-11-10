@@ -146,13 +146,29 @@ string* ArgumentList::ToDOT()
 
 ObjectInitializer::ObjectInitializer(MemberInitializerList* initializers)
 {
-	this->id = initializers->id;
-	this->initializers = initializers;
+	if (initializers != NULL)
+	{
+		this->id = initializers->id;
+		this->initializers = initializers;
+	}
+	else
+	{
+		this->id = ++maxId;
+	}
 }
 
 string* ObjectInitializer::ToDOT()
 {
-	return initializers->ToDOT();
+	if (initializers != NULL)
+	{
+		return initializers->ToDOT();
+	}
+	else
+	{
+		string* dotStr = new string();
+		*dotStr += to_string(id) + "[label=\"empty\"];\n";
+		return dotStr;
+	}
 }
 
 MemberInitializer::MemberInitializer(string* identifier, Expression* expression)
@@ -253,7 +269,6 @@ Expression::Expression(Type type, string* name)
 	this->id = ++maxId;
 	this->type = type;
 	this->name = name;
-	cout << type << endl;
 }
 
 Expression::Expression(Type type, int intLiteral)
@@ -261,7 +276,6 @@ Expression::Expression(Type type, int intLiteral)
 	this->id = ++maxId;
 	this->type = Expression::t_INT_LITER;
 	this->intLiteral = intLiteral;
-	cout << intLiteral << endl;
 }
 
 Expression::Expression(Type type, char charLiteral)
@@ -308,7 +322,6 @@ Expression::Expression(Type type, Expression* left, Expression* right)
 	this->type = type;
 	this->left = left;
 	this->right = right;
-	cout << "expression created" << endl;
 }
 
 Expression::Expression(Type type, Expression* left, ArgumentList* arguments)
@@ -322,7 +335,6 @@ Expression::Expression(Type type, Expression* left, ArgumentList* arguments)
 string* Expression::ToDOT()
 {
 	string* dotStr = GetName();
-	cout << type << endl;
 	*dotStr = to_string(id) + "[label=\"" + *dotStr + "\"];\n";
 
 	if (left != NULL)
@@ -359,7 +371,7 @@ string* Expression::GetName()
 	switch (type)
 	{
 	case Expression::t_INT_LITER: return new string(to_string(intLiteral));
-	case Expression::t_CHAR_LITER: return new string("\'" + to_string(charLiteral) + "\'");
+	case Expression::t_CHAR_LITER: return new string("\'" + string(1, charLiteral) + "\'");
 	case Expression::t_BOOL_LITER: return new string(to_string(boolLiteral));
 	case Expression::t_STRING_LITER: return new string("\\\"" + *name + "\\\"");
 	case Expression::t_ID: return name;
@@ -477,9 +489,13 @@ ArrayInitializer::ArrayInitializer(ExpressionList* expressions)
 
 string* ArrayInitializer::ToDOT()
 {
-	string* dotStr = expressions->ToDOT();
+	string* dotStr = new string();
 	*dotStr += to_string(id) + "[label=\"arrInit\"];\n";
-	*dotStr += to_string(id) + "->" + to_string(expressions->id) + "[label=\"expressions\"];\n";
+	if (expressions != NULL)
+	{
+		*dotStr += *expressions->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(expressions->id) + "[label=\"expressions\"];\n";
+	}
 	return dotStr;
 }
 
@@ -534,7 +550,7 @@ string* ArrayCreation::ToDOT()
 	if (left != NULL)
 	{
 		*dotStr += *left->ToDOT();
-		*dotStr += to_string(id) + "->" + to_string(left->id) + "[label=\"expr\"];\n";
+		*dotStr += to_string(id) + "->" + to_string(left->id) + "[label=\"size\"];\n";
 	}
 
 	if (arrayInitializer != NULL)
@@ -714,7 +730,6 @@ Statement::Statement(Type type, Expression* expression)
 	{
 		this->expressions = new ExpressionList(expression);
 	}
-	cout << "statemnet creted" << endl;
 }
 
 Statement::Statement(Type type, VarDeclaratorList* declarators)
@@ -783,7 +798,6 @@ StatementList* StatementList::Append(StatementList * statements, Statement* stat
 
 string* StatementList::ToDOT()
 {
-	cout << "list" << endl;
 	string* dotStr = new string();
 	Statement* previous = NULL;
 	for (auto i = statements->begin(); i != statements->end(); i++)
@@ -920,8 +934,7 @@ ForStatement::ForStatement(VarDeclaratorList* declarations,
 {
 	this->id = ++maxId;
 	this->declarators = declarations;
-	this->expressions = new ExpressionList(NULL);
-	ExpressionList::Append(this->expressions, cond);
+	this->expressions = new ExpressionList(cond);
 	ExpressionList::Append(this->expressions, increment);
 	this->statements = new StatementList(statement);
 }
@@ -1142,7 +1155,6 @@ Method::Method(ModifielrList* modifiers, ReturnValueType returnValue,
 	this->identifier = identifiers;
 	this->paramList = params;
 	this->statementList = statements;
-	cout << "method created" << endl;
 
 }
 
@@ -1224,7 +1236,6 @@ string* Method::ToDOT()
 
 	if (statementList != NULL)
 	{
-		cout << "stmt" << endl;
 		*dotStr += *statementList->ToDOT();
 		*dotStr += to_string(id) + "->" + to_string(statementList->id) + "[label=\"body\"];\n";
 	}
@@ -1425,7 +1436,7 @@ string* NamespaceMember::ToDOT()
 
 NamespaceMemberList::NamespaceMemberList(NamespaceMember* member)
 {
-	this->id = ++maxId;
+	this->id = member->id;
 	this->members = new list < NamespaceMember*>{ member };
 }
 
