@@ -118,7 +118,7 @@ string* Argument::ToDOT()
 
 ArgumentList::ArgumentList(Argument* argument)
 {
-	this->id = ++maxId;
+	this->id = argument->id;
 	this->arguments = new list <Argument*>{ argument };
 }
 
@@ -131,11 +131,15 @@ ArgumentList* ArgumentList::Append(ArgumentList* list, Argument* argument)
 string* ArgumentList::ToDOT()
 {
 	string* dotStr = new string();
-	*dotStr = to_string(id) + "[label=\"args\"];\n";
+	Argument* previous = NULL;
 	for (auto i = arguments->begin(); i != arguments->end(); i++)
 	{
 		*dotStr += *((*i)->ToDOT());
-		*dotStr += to_string(id) + "->" + to_string((*i)->id) + ";\n";
+		if (previous != NULL)
+		{
+			*dotStr += to_string(previous->id) + "->" + to_string((*i)->id) + "[label=\"next\"];\n";
+		}
+		previous = *i;
 	}
 	return dotStr;
 }
@@ -218,7 +222,7 @@ string* MemberInitializer::ToDOT()
 
 MemberInitializerList::MemberInitializerList(MemberInitializer* memberInitializer)
 {
-	this->id = ++maxId;
+	this->id = memberInitializer->id;
 	this->initializers = new list <MemberInitializer*>{ memberInitializer };
 }
 
@@ -231,11 +235,15 @@ MemberInitializerList* MemberInitializerList::Append(MemberInitializerList* list
 string* MemberInitializerList::ToDOT()
 {
 	string* dotStr = new string();
-	*dotStr = to_string(id) + "[label=\"mebmersInits\"];\n";
+	MemberInitializer* previous = NULL;
 	for (auto i = initializers->begin(); i != initializers->end(); i++)
 	{
 		*dotStr += *((*i)->ToDOT());
-		*dotStr += to_string(id) + "->" + to_string((*i)->id) + ";\n";
+		if (previous != NULL)
+		{
+			*dotStr += to_string(previous->id) + "->" + to_string((*i)->id) + "[label=\"next\"];\n";
+		}
+		previous = *i;
 	}
 	return dotStr;
 }
@@ -449,12 +457,12 @@ string* ExpressionList::ToDOT()
 {
 	string* dotStr = new string();
 	Expression* previous = NULL;
-	for (auto i = expressions->rbegin(); i != expressions->rend(); i++)
+	for (auto i = expressions->begin(); i != expressions->end(); i++)
 	{
 		*dotStr += *((*i)->ToDOT());
 		if (previous != NULL)
 		{
-			*dotStr += to_string((*i)->id) + "->" + to_string(previous->id) + "[label=\"next\"];\n";
+			*dotStr += to_string(previous->id) + "->" + to_string((*i)->id) + "[label=\"next\"];\n";
 		}
 		previous = *i;
 	}
@@ -686,12 +694,12 @@ string* VarDeclaratorList::ToDOT()
 {
 	string* dotStr = new string();
 	VarDeclarator* previous = NULL;
-	for (auto i = declarators->rbegin(); i != declarators->rend(); i++)
+	for (auto i = declarators->begin(); i != declarators->end(); i++)
 	{
 		*dotStr += *((*i)->ToDOT());
 		if (previous != NULL)
 		{
-			*dotStr += to_string((*i)->id) + "->" + to_string(previous->id) + "[label=\"next\"];\n";
+			*dotStr += to_string(previous->id) + "->" + to_string((*i)->id) + "[label=\"next\"];\n";
 		}
 		previous = *i;
 	}
@@ -763,7 +771,7 @@ string* Statement::ToDOT()
 
 StatementList::StatementList(Statement* statement)
 {
-	this->id = ++maxId;
+	this->id = statement->id;
 	this->statements = new list <Statement*>{ statement };
 }
 
@@ -777,11 +785,15 @@ string* StatementList::ToDOT()
 {
 	cout << "list" << endl;
 	string* dotStr = new string();
-	*dotStr = to_string(id) + "[label=\"statements\"];\n";
+	Statement* previous = NULL;
 	for (auto i = statements->begin(); i != statements->end(); i++)
 	{
 		*dotStr += *((*i)->ToDOT());
-		*dotStr += to_string(id) + "->" + to_string((*i)->id) + "[label=\"stmt\"];\n";
+		if (previous != NULL)
+		{
+			*dotStr += to_string(previous->id) + "->" + to_string((*i)->id) + "[label=\"next\"];\n";
+		}
+		previous = *i;
 	}
 	return dotStr;
 }
@@ -998,12 +1010,12 @@ string* ParamList::ToDOT()
 {
 	string* dotStr = new string();
 	VarDeclarator* previous = NULL;
-	for (auto i = params->rbegin(); i != params->rend(); i++)
+	for (auto i = params->begin(); i != params->end(); i++)
 	{
 		*dotStr += *((*i)->ToDOT());
 		if (previous != NULL)
 		{
-			*dotStr += to_string((*i)->id) + "->" + to_string(previous->id) + "[label=\"next\"];\n";
+			*dotStr += to_string(previous->id) + "->" + to_string((*i)->id) + "[label=\"next\"];\n";
 		}
 		previous = *i;
 	}
@@ -1095,7 +1107,7 @@ string* ClassMember::ToDOT()
 
 ClassMemberList::ClassMemberList(ClassMember* member)
 {
-	this->id = ++maxId;
+	this->id = member->id;
 	this->members = new list < ClassMember*>{ member };
 }
 
@@ -1108,11 +1120,15 @@ ClassMemberList* ClassMemberList::Append(ClassMemberList *members, ClassMember* 
 string* ClassMemberList::ToDOT()
 {
 	string* dotStr = new string();
-	*dotStr = to_string(id) + "[label=\"members\"];\n";
+	ClassMember* previous = NULL;
 	for (auto i = members->begin(); i != members->end(); i++)
 	{
 		*dotStr += *((*i)->ToDOT());
-		*dotStr += to_string(id) + "->" + to_string((*i)->id) + "[label=\"member\"];\n";
+		if (previous != NULL)
+		{
+			*dotStr += to_string(previous->id) + "->" + to_string((*i)->id) + "[label=\"next\"];\n";
+		}
+		previous = *i;
 	}
 	return dotStr;
 }
@@ -1385,14 +1401,14 @@ string* ClassDeclaration::ToDOT()
 
 NamespaceMember::NamespaceMember(ClassDeclaration* decl)
 {
-	this->id = ++maxId;
+	this->id = decl->id;
 	this->type = NamespaceMember::t_CLASS;
 	this->classDecl = decl;
 }
 
 NamespaceMember::NamespaceMember(NamespaceDeclaration* decl)
 {
-	this->id = ++maxId;
+	this->id = decl->id;
 	this->type = NamespaceMember::t_NAMESPACE;
 	this->namespaceDecl = decl;
 }
@@ -1409,7 +1425,7 @@ string* NamespaceMember::ToDOT()
 
 NamespaceMemberList::NamespaceMemberList(NamespaceMember* member)
 {
-	this->id = member->id;
+	this->id = ++maxId;
 	this->members = new list < NamespaceMember*>{ member };
 }
 
@@ -1423,12 +1439,12 @@ string* NamespaceMemberList::ToDOT()
 {
 	string* dotStr = new string();
 	NamespaceMember* previous = NULL;
-	for (auto i = members->rbegin(); i != members->rend(); i++)
+	for (auto i = members->begin(); i != members->end(); i++)
 	{
 		*dotStr += *((*i)->ToDOT());
 		if (previous != NULL)
 		{
-			*dotStr += to_string((*i)->id) + "->" + to_string(previous->id) + "[label=\"next\"];\n";
+			*dotStr += to_string(previous->id) + "->" + to_string((*i)->id) + "[label=\"next\"];\n";
 		}
 		previous = *i;
 	}
