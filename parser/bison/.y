@@ -18,7 +18,6 @@ using namespace std;
 	ArrayType* arrayType;
 	Argument* argument;
 	ArgumentList* argumentList;
-	ObjectInitializer* objectInitializer;
 	ObjectCreation* objectCreation;
 	MemberInitializer* memberInitializer;
 	MemberInitializerList* memberInitializerList;
@@ -111,8 +110,7 @@ using namespace std;
 %type <argument>argm
 %type <argumentList>argm_list argm_list_em
 %type <memberInitializer>member_initializer
-%type <memberInitializerList>member_initializer_list member_initializer_list_em
-%type <objectInitializer>obj_initializer
+%type <memberInitializerList>member_initializer_list member_initializer_list_em obj_initializer
 %type <objectCreation>obj_creation_expr
 %type <expression>expr member_access for_expr
 %type <expressionList>expr_list expr_list_em
@@ -424,8 +422,8 @@ obj_creation_expr: NEW type '(' argm_list_em ')' { $$ = new ObjectCreation($2,$4
                  ;
                  
 
-obj_initializer: '{' member_initializer_list_em '}' { $$ = new ObjectInitializer($2); }
-               | '{' member_initializer_list ',' '}' { $$ = new ObjectInitializer($2); }
+obj_initializer: '{' member_initializer_list_em '}' { $$ = $2; }
+               | '{' member_initializer_list ',' '}' { $$ = $2; }
                ;
 
 

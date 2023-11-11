@@ -144,33 +144,6 @@ string* ArgumentList::ToDOT()
 	return dotStr;
 }
 
-ObjectInitializer::ObjectInitializer(MemberInitializerList* initializers)
-{
-	if (initializers != NULL)
-	{
-		this->id = initializers->id;
-		this->initializers = initializers;
-	}
-	else
-	{
-		this->id = ++maxId;
-	}
-}
-
-string* ObjectInitializer::ToDOT()
-{
-	if (initializers != NULL)
-	{
-		return initializers->ToDOT();
-	}
-	else
-	{
-		string* dotStr = new string();
-		*dotStr += to_string(id) + "[label=\"empty\"];\n";
-		return dotStr;
-	}
-}
-
 MemberInitializer::MemberInitializer(string* identifier, Expression* expression)
 {
 	this->id = ++maxId;
@@ -178,7 +151,7 @@ MemberInitializer::MemberInitializer(string* identifier, Expression* expression)
 	this->expression = expression;	
 }
 
-MemberInitializer::MemberInitializer(string* identifier, ObjectInitializer* objectInitializer)
+MemberInitializer::MemberInitializer(string* identifier, MemberInitializerList* objectInitializer)
 {
 	this->id = ++maxId;
 	this->objectInitializer = objectInitializer;
@@ -192,7 +165,7 @@ MemberInitializer::MemberInitializer(ArgumentList* argumentList, Expression* exp
 	this->expression = expression;
 }
 
-MemberInitializer::MemberInitializer(ArgumentList* argumentList, ObjectInitializer* objectInitializer)
+MemberInitializer::MemberInitializer(ArgumentList* argumentList, MemberInitializerList* objectInitializer)
 {
 	this->id = ++maxId;
 	this->argumentList = argumentList;
@@ -223,7 +196,7 @@ string* MemberInitializer::ToDOT()
 	}
 	else
 	{
-		initId = objectInitializer->id;
+		initId = to_string(objectInitializer->id);
 		initDot = objectInitializer->ToDOT();
 	}
 
@@ -406,7 +379,7 @@ string* Expression::GetName()
 }
 
 ObjectCreation::ObjectCreation(SimpleType* simpleType, 
-	ArgumentList* argumentList, ObjectInitializer* objInit) : Expression(Expression::t_OBJ_CREATION)
+	ArgumentList* argumentList, MemberInitializerList* objInit) : Expression(Expression::t_OBJ_CREATION)
 {
 	this->simpleType = simpleType;
 	this->argumentList = argumentList;
@@ -414,7 +387,7 @@ ObjectCreation::ObjectCreation(SimpleType* simpleType,
 }
 
 ObjectCreation::ObjectCreation(TypeName* typeName, 
-	ArgumentList* argumentList, ObjectInitializer* objInit) : Expression(Expression::t_OBJ_CREATION)
+	ArgumentList* argumentList, MemberInitializerList* objInit) : Expression(Expression::t_OBJ_CREATION)
 {
 	this->typeName = typeName;
 	this->argumentList = argumentList;

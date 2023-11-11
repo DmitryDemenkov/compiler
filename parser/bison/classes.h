@@ -89,17 +89,6 @@ public:
     string* ToDOT();
 };
 
-class ObjectInitializer
-{
-public:
-    int id;
-    MemberInitializerList* initializers = NULL;
-
-    ObjectInitializer(MemberInitializerList* initializers);
-
-    string* ToDOT();
-};
-
 class MemberInitializer
 {
 public:
@@ -107,12 +96,12 @@ public:
     string* identifier = NULL;
     Expression* expression = NULL;
     ArgumentList* argumentList = NULL;
-    ObjectInitializer* objectInitializer = NULL;
+    MemberInitializerList* objectInitializer = NULL;
 
     MemberInitializer(string* identifier, Expression* expression);
-    MemberInitializer(string* identifier, ObjectInitializer* objectInitializer);
+    MemberInitializer(string* identifier, MemberInitializerList* objectInitializer);
     MemberInitializer(ArgumentList* argumentList, Expression* expression);
-    MemberInitializer(ArgumentList* argumentList, ObjectInitializer* objectInitializer);
+    MemberInitializer(ArgumentList* argumentList, MemberInitializerList* objectInitializer);
 
     string* ToDOT();
 };
@@ -182,7 +171,7 @@ public:
     TypeName* typeName = NULL;
     ArrayType* arrayType = NULL;
     ArgumentList* argumentList = NULL;
-    ObjectInitializer* objInitializer = NULL;
+    MemberInitializerList* objInitializer = NULL;
     ArrayInitializer* arrayInitializer = NULL;
     Expression* left = NULL;
     Expression* right = NULL;
@@ -207,10 +196,10 @@ class ObjectCreation : public Expression
 {
 public:
     ObjectCreation(SimpleType* simpleType,
-        ArgumentList* argumentList = NULL, ObjectInitializer* objInit = NULL);
+        ArgumentList* argumentList = NULL, MemberInitializerList* objInit = NULL);
 
     ObjectCreation(TypeName* typeName,
-        ArgumentList* argumentList = NULL, ObjectInitializer* objInit = NULL);
+        ArgumentList* argumentList = NULL, MemberInitializerList* objInit = NULL);
 
     string* ToDOT();
 };

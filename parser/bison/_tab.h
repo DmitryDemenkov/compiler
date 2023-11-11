@@ -13,7 +13,6 @@ typedef union {
 	ArrayType* arrayType;
 	Argument* argument;
 	ArgumentList* argumentList;
-	ObjectInitializer* objectInitializer;
 	ObjectCreation* objectCreation;
 	MemberInitializer* memberInitializer;
 	MemberInitializerList* memberInitializerList;
