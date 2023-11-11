@@ -454,26 +454,8 @@ string* ExpressionList::ToDOT()
 	return dotStr;
 }
 
-ArrayInitializer::ArrayInitializer(ExpressionList* expressions)
-{
-	this->id = ++maxId;
-	this->expressions = expressions;
-}
-
-string* ArrayInitializer::ToDOT()
-{
-	string* dotStr = new string();
-	*dotStr += to_string(id) + "[label=\"arrInit\"];\n";
-	if (expressions != NULL)
-	{
-		*dotStr += *expressions->ToDOT();
-		*dotStr += to_string(id) + "->" + to_string(expressions->id) + "[label=\"expressions\"];\n";
-	}
-	return dotStr;
-}
-
 ArrayCreation::ArrayCreation(ArrayType* arrType, 
-	ArrayInitializer* arrInit) : Expression(Expression::t_ARR_CREATION)
+	ExpressionList* arrInit) : Expression(Expression::t_ARR_CREATION)
 {
 	this->id = ++maxId;
 	this->arrayType = arrType;
@@ -481,7 +463,7 @@ ArrayCreation::ArrayCreation(ArrayType* arrType,
 }
 
 ArrayCreation::ArrayCreation(SimpleType* simpleType, 
-	Expression* expr, ArrayInitializer* arrInit) : Expression(Expression::t_ARR_CREATION)
+	Expression* expr, ExpressionList* arrInit) : Expression(Expression::t_ARR_CREATION)
 {
 	this->id = ++maxId;
 	this->simpleType = simpleType;
@@ -490,7 +472,7 @@ ArrayCreation::ArrayCreation(SimpleType* simpleType,
 }
 
 ArrayCreation::ArrayCreation(TypeName* typeName, 
-	Expression* expr, ArrayInitializer* arrInit) : Expression(Expression::t_ARR_CREATION)
+	Expression* expr, ExpressionList* arrInit) : Expression(Expression::t_ARR_CREATION)
 {
 	this->id = ++maxId;
 	this->typeName = typeName;

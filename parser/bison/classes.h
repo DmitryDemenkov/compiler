@@ -7,7 +7,7 @@ using namespace std;
 
 class Expression;
 class MemberInitializerList;
-class ArrayInitializer;
+class ExpressionList;
 class StatementList;
 class ClassMemberList;
 class NamespaceDeclaration;
@@ -172,7 +172,7 @@ public:
     ArrayType* arrayType = NULL;
     ArgumentList* argumentList = NULL;
     MemberInitializerList* objInitializer = NULL;
-    ArrayInitializer* arrayInitializer = NULL;
+    ExpressionList* arrayInitializer = NULL;
     Expression* left = NULL;
     Expression* right = NULL;
 
@@ -216,27 +216,16 @@ public:
     string* ToDOT();
 };
 
-class ArrayInitializer
-{
-public:
-    int id;
-    ExpressionList* expressions = NULL;
-
-    ArrayInitializer(ExpressionList* expressions);
-
-    string* ToDOT();
-};
-
 class ArrayCreation : public Expression
 {
 public:
-    ArrayCreation(ArrayType* arrType, ArrayInitializer* arrInit = NULL);
+    ArrayCreation(ArrayType* arrType, ExpressionList* arrInit = NULL);
     
     ArrayCreation(SimpleType* simpleType,
-        Expression* expr = NULL, ArrayInitializer* arrInit = NULL);
+        Expression* expr = NULL, ExpressionList* arrInit = NULL);
     
     ArrayCreation(TypeName* typeName,
-        Expression* expr = NULL, ArrayInitializer* arrInit = NULL);
+        Expression* expr = NULL, ExpressionList* arrInit = NULL);
 
     string* ToDOT();
 };

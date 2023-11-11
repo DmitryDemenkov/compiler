@@ -23,7 +23,6 @@ using namespace std;
 	MemberInitializerList* memberInitializerList;
 	Expression* expression;
 	ExpressionList* expressionList;
-	ArrayInitializer* arrayInitializer;
 	ArrayCreation* arrayCreation;
 	ElementAccess* elementAccess;
 	InvocationExpression* invocationExpression;
@@ -113,8 +112,7 @@ using namespace std;
 %type <memberInitializerList>member_initializer_list member_initializer_list_em obj_initializer
 %type <objectCreation>obj_creation_expr
 %type <expression>expr member_access for_expr
-%type <expressionList>expr_list expr_list_em
-%type <arrayInitializer>array_initializer
+%type <expressionList>expr_list expr_list_em array_initializer
 %type <arrayCreation>array_creation_expr
 %type <elementAccess>element_access
 %type <invocationExpression>invocation_expression
@@ -398,8 +396,8 @@ array_creation_expr: NEW array_type { $$ = new ArrayCreation($2); }
                    ;
 
 
-array_initializer: '{' expr_list_em '}' { $$ = new ArrayInitializer($2); }
-                 | '{' expr_list ',' '}' { $$ = new ArrayInitializer($2); }
+array_initializer: '{' expr_list_em '}' { $$ = $2; }
+                 | '{' expr_list ',' '}' { $$ = $2; }
                  ;
 
 

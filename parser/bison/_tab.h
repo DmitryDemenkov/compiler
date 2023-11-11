@@ -18,7 +18,6 @@ typedef union {
 	MemberInitializerList* memberInitializerList;
 	Expression* expression;
 	ExpressionList* expressionList;
-	ArrayInitializer* arrayInitializer;
 	ArrayCreation* arrayCreation;
 	ElementAccess* elementAccess;
 	InvocationExpression* invocationExpression;
