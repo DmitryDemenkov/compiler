@@ -233,6 +233,7 @@ class MemberAccess : public Expression
 {
 public:
     static Expression* FromTypeName(TypeName* typeName, Expression* left = NULL);
+    static TypeName* ToTypeName(Expression* memberAccess);
 };
 
 class ElementAccess : public Expression

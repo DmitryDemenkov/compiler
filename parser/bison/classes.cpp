@@ -310,15 +310,18 @@ string* Expression::ToDOT()
 	string* dotStr = GetName();
 	*dotStr = to_string(id) + "[label=\"" + *dotStr + "\"];\n";
 
-	if (left != NULL)
+	if (type == t_TYPENAME_CAST)
 	{
-		*dotStr += *left->ToDOT();
-		*dotStr += to_string(id) + "->" + to_string(left->id) + "[label=\"left\"];\n";
-	}
-	if (right != NULL)
-	{
-		*dotStr += *right->ToDOT();;
-		*dotStr += to_string(id) + "->" + to_string(right->id) + "[label=\"right\"];\n";
+		try
+		{
+			typeName = MemberAccess::ToTypeName(left);
+		}
+		catch (const char* expr)
+		{
+			cout << expr << endl;
+		}
+		left = right;
+		right = NULL;
 	}
 	if (type != Expression::t_SIMPLE_TYPE && simpleType != NULL)
 	{
@@ -334,6 +337,16 @@ string* Expression::ToDOT()
 	{
 		*dotStr += *typeName->ToDOT();
 		*dotStr += to_string(id) + "->" + to_string(typeName->id) + "[label=\"type\"];\n";
+	}
+	if (left != NULL)
+	{
+		*dotStr += *left->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(left->id) + "[label=\"left\"];\n";
+	}
+	if (right != NULL)
+	{
+		*dotStr += *right->ToDOT();;
+		*dotStr += to_string(id) + "->" + to_string(right->id) + "[label=\"right\"];\n";
 	}
 
 	return dotStr;
@@ -530,6 +543,34 @@ Expression* MemberAccess::FromTypeName(TypeName* typeName, Expression* left)
 		}
 	}
 	return left;
+}
+
+TypeName* MemberAccess::ToTypeName(Expression* memberAccess)
+{
+	TypeName* typeName = NULL;
+	do 
+	{
+		if (memberAccess->type == t_ID)
+		{
+			if (typeName == NULL)
+				typeName = new TypeName(memberAccess->name);
+			else
+				typeName->identifiers->push_front(memberAccess->name);
+		}
+		else if (memberAccess->type == t_MEMBER_ACCESS)
+		{
+			if (typeName == NULL)
+				typeName = new TypeName(memberAccess->right->name);
+			else
+				typeName->identifiers->push_front(memberAccess->right->name);
+		}
+		else
+		{
+			throw "incorrect exprression type";
+		}
+		memberAccess = memberAccess->left;
+	} while (memberAccess != NULL);
+	return typeName;
 }
 
 ElementAccess::ElementAccess(Expression* expr, 
