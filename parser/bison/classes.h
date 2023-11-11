@@ -137,7 +137,6 @@ public:
         t_ELEMENT_ACCESS,
         t_MEMBER_ACCESS,
         t_INVOCATION,
-        t_PARENTHESIZED,
         t_UNMINUS,
         t_NOT,
         t_SIMPLE_TYPE_CAST,

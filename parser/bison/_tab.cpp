@@ -1535,7 +1535,7 @@ yyreduce:
     break; }
     case 91:
 #line 322 "./.y"
-    { yyval.expression = new Expression(Expression::t_PARENTHESIZED, yyvsp[-1].expression); ;
+    { yyval.expression = yyvsp[-1].expression; ;
     break; }
     case 92:
 #line 323 "./.y"
@@ -1683,7 +1683,7 @@ yyreduce:
     break; }
     case 128:
 #line 362 "./.y"
-    { yyval.expression = MemberAccess::FromTypeName(yyvsp[0].typeName, new Expression(Expression::t_PARENTHESIZED, yyvsp[-3].expression)); ;
+    { yyval.expression = MemberAccess::FromTypeName(yyvsp[0].typeName, yyvsp[-3].expression); ;
     break; }
     case 129:
 #line 363 "./.y"
@@ -1727,7 +1727,7 @@ yyreduce:
     break; }
     case 139:
 #line 379 "./.y"
-    { yyval.elementAccess = new ElementAccess(MemberAccess::FromTypeName(yyvsp[-3].typeName, new Expression(Expression::t_PARENTHESIZED, yyvsp[-6].expression)), yyvsp[-1].argumentList); ;
+    { yyval.elementAccess = new ElementAccess(MemberAccess::FromTypeName(yyvsp[-3].typeName, yyvsp[-6].expression), yyvsp[-1].argumentList); ;
     break; }
     case 140:
 #line 380 "./.y"
@@ -1755,7 +1755,7 @@ yyreduce:
     break; }
     case 146:
 #line 386 "./.y"
-    { yyval.elementAccess = new ElementAccess(new Expression(Expression::t_PARENTHESIZED, yyvsp[-4].expression), yyvsp[-1].argumentList); ;
+    { yyval.elementAccess = new ElementAccess(yyvsp[-4].expression, yyvsp[-1].argumentList); ;
     break; }
     case 147:
 #line 390 "./.y"

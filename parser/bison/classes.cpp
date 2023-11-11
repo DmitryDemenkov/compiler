@@ -348,11 +348,10 @@ string* Expression::GetName()
 	case Expression::t_BOOL_LITER: return new string(to_string(boolLiteral));
 	case Expression::t_STRING_LITER: return new string("\\\"" + *name + "\\\"");
 	case Expression::t_ID: return name;
-	case Expression::t_SIMPLE_TYPE: simpleType->GetName();
+	case Expression::t_SIMPLE_TYPE: return simpleType->GetName();
 	case Expression::t_THIS: return new string("this");
 	case Expression::t_BASE: return new string("base");
 	case Expression::t_MEMBER_ACCESS: return new string(".");
-	case Expression::t_PARENTHESIZED: return new string("(expr)");
 	case Expression::t_UNMINUS: return new string("-");
 	case Expression::t_NOT: return new string("!");
 	case Expression::t_SIMPLE_TYPE_CAST: return new string("cast");
@@ -545,7 +544,7 @@ string* ElementAccess::ToDOT()
 {
 	string* dotStr = left->ToDOT();
 	*dotStr += *argumentList->ToDOT();
-	*dotStr += to_string(id) + "[label\"elemAccess\"];\n";
+	*dotStr += to_string(id) + "[label=\"elemAccess\"];\n";
 	*dotStr += to_string(id) + "->" + to_string(left->id) + "[label=\"expr\"];\n";
 	*dotStr += to_string(id) + "->" + to_string(argumentList->id) + "[label=\"args\"];\n";
 	return dotStr;

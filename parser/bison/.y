@@ -319,7 +319,7 @@ expr: INT_LITERAL { $$ = new Expression(Expression::t_INT_LITER, $1); }
     | CHAR_LITERAL { $$ = new Expression(Expression::t_CHAR_LITER, $1); }
     | STRING_LITERAL { $$ = new Expression(Expression::t_STRING_LITER, $1); }
     | BOOLEAN_LITERAL { $$ = new Expression(Expression::t_BOOL_LITER, $1); }
-    | '(' expr ')' { $$ = new Expression(Expression::t_PARENTHESIZED, $2); }
+    | '(' expr ')' { $$ = $2; }
     | member_access { $$ = $1; }
     | invocation_expression { $$ = $1; }
     | obj_creation_expr { $$ = $1; }
@@ -359,7 +359,7 @@ member_access: type_name { $$ = MemberAccess::FromTypeName($1); }
              | THIS '.' type_name { $$ = MemberAccess::FromTypeName($3, new Expression(Expression::t_THIS)); }
              | BASE '.' type_name { $$ = MemberAccess::FromTypeName($3, new Expression(Expression::t_BASE)); }
              | invocation_expression '.' type_name { $$ = MemberAccess::FromTypeName($3, $1); }
-             | '(' expr ')' '.' type_name { $$ = MemberAccess::FromTypeName($5, new Expression(Expression::t_PARENTHESIZED, $2)); }
+             | '(' expr ')' '.' type_name { $$ = MemberAccess::FromTypeName($5, $2); }
              | obj_creation_expr '.' type_name { $$ = MemberAccess::FromTypeName($3, $1); }
              | array_creation_expr '.' type_name { $$ = MemberAccess::FromTypeName($3, $1); }
              | element_access '.' type_name { $$ = MemberAccess::FromTypeName($3, $1); }
@@ -376,14 +376,14 @@ element_access: type_name '[' argm_list ']' { $$ = new ElementAccess(MemberAcces
               | THIS '.' type_name '[' argm_list ']' { $$ = new ElementAccess(MemberAccess::FromTypeName($3, new Expression(Expression::t_THIS)), $5); }
               | BASE '.' type_name '[' argm_list ']' { $$ = new ElementAccess(MemberAccess::FromTypeName($3, new Expression(Expression::t_BASE)), $5); }
               | invocation_expression '.' type_name '[' argm_list ']' { $$ = new ElementAccess(MemberAccess::FromTypeName($3, $1), $5); }
-              | '(' expr ')' '.' type_name '[' argm_list ']' { $$ = new ElementAccess(MemberAccess::FromTypeName($5, new Expression(Expression::t_PARENTHESIZED, $2)), $7); }
+              | '(' expr ')' '.' type_name '[' argm_list ']' { $$ = new ElementAccess(MemberAccess::FromTypeName($5, $2), $7); }
               | obj_creation_expr '.' type_name '[' argm_list ']' { $$ = new ElementAccess(MemberAccess::FromTypeName($3, $1), $5); }
               | array_creation_expr '.' type_name '[' argm_list ']' { $$ = new ElementAccess(MemberAccess::FromTypeName($3, $1), $5); }
               | element_access '.' type_name '[' argm_list ']' { $$ = new ElementAccess(MemberAccess::FromTypeName($3, $1), $5); }
               | obj_creation_expr '[' argm_list ']' { $$ = new ElementAccess($1, $3); }
               | invocation_expression '[' argm_list ']' { $$ = new ElementAccess($1, $3); }
               | element_access '[' argm_list ']' { $$ = new ElementAccess($1, $3); }
-              | '(' expr ')' '[' argm_list ']' { $$ = new ElementAccess(new Expression(Expression::t_PARENTHESIZED, $2), $5); }
+              | '(' expr ')' '[' argm_list ']' { $$ = new ElementAccess($2, $5); }
               ;
 
 
