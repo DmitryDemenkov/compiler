@@ -8,6 +8,12 @@ SimpleType::SimpleType(Type type)
 	this->type = type; 
 }
 
+SimpleType::SimpleType(SimpleType* other)
+{
+	this->id = ++maxId;
+	this->type = other->type;
+}
+
 string* SimpleType::ToDOT()
 {
 	string* dotStr = GetName();
@@ -31,6 +37,22 @@ TypeName::TypeName(string* identifier)
 {
 	this->id = ++maxId;
 	this->identifiers = new list <string*>{ identifier };
+}
+
+TypeName::TypeName(TypeName* other)
+{
+	this->id = ++maxId;
+	for (auto identifier : *other->identifiers)
+	{
+		if (this->identifiers == NULL)
+		{
+			this->identifiers = new list <string*>{ identifier };
+		}
+		else
+		{
+			this->identifiers->push_back(identifier);
+		}
+	}
 }
 
 TypeName* TypeName::Append(TypeName* typeName, string* identifier)
@@ -73,6 +95,17 @@ ArrayType::ArrayType(TypeName* typeName)
 	this->id = ++maxId;
 	this->type = ArrayType::t_TYPE_NAME;
 	this->typeName = typeName;
+}
+
+ArrayType::ArrayType(ArrayType* other)
+{
+	this->id = ++maxId;
+	this->type = other->type;
+	
+	if (this->type == t_SIMPLE_TYPE)
+		this->simpleType = new SimpleType(other->simpleType);
+	else
+		this->typeName = new TypeName(other->typeName);
 }
 
 string* ArrayType::ToDOT()
@@ -688,13 +721,13 @@ VarDeclaratorList* VarDeclaratorList::Append(VarDeclaratorList* declarators, str
 	switch (declarators->type)
 	{
 	case VarDeclarator::t_SIMPLE_TYPE:
-		varDecl = new VarDeclarator(declarators->declarators->front()->simpleType, identifier, expression);
+		varDecl = new VarDeclarator(new SimpleType(declarators->declarators->front()->simpleType), identifier, expression);
 		break;
 	case VarDeclarator::t_ARRAY_TYPE:
-		varDecl = new VarDeclarator(declarators->declarators->front()->arrayType, identifier, expression);
+		varDecl = new VarDeclarator(new ArrayType(declarators->declarators->front()->arrayType), identifier, expression);
 		break;
 	case VarDeclarator::t_TYPE_NAME:
-		varDecl = new VarDeclarator(declarators->declarators->front()->typeName, identifier, expression);
+		varDecl = new VarDeclarator(new TypeName(declarators->declarators->front()->typeName), identifier, expression);
 		break;
 	}
 	declarators->declarators->push_back(varDecl);

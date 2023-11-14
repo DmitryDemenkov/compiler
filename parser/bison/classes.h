@@ -27,6 +27,7 @@ public:
     Type type;
 
     SimpleType(Type type);
+    SimpleType(SimpleType* other);
 
     string* ToDOT();
     string* GetName();
@@ -36,9 +37,10 @@ class TypeName
 {
 public:
     int id;
-    list<string*>* identifiers;
+    list<string*>* identifiers = NULL;
 
     TypeName(string* identifier);
+    TypeName(TypeName* other);
     static TypeName* Append(TypeName* typeName, string* identifier);
 
     string* ToDOT();
@@ -61,6 +63,7 @@ public:
 
     ArrayType(SimpleType* simpleType);
     ArrayType(TypeName* typeName);
+    ArrayType(ArrayType* other);
 
     string* ToDOT();
 };
