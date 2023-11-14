@@ -937,11 +937,12 @@ string* ForeachStatement::ToDOT()
 	Expression* cond = expressions->expressions->front();
 	Statement* stmt = statements->statements->front();
 
-	string* dotStr = cond->ToDOT();
+	string* dotStr = decl->ToDOT();
+	*dotStr += *cond->ToDOT();
 	*dotStr += *stmt->ToDOT();
 	*dotStr += to_string(id) + "[label=\"foreach_stmt\"];\n";
 	*dotStr += to_string(id) + "->" + to_string(decl->id) + "[label=\"decl\"];\n";
-	*dotStr += to_string(id) + "->" + to_string(cond->id) + "[label=\"cond\"];\n";
+	*dotStr += to_string(id) + "->" + to_string(cond->id) + "[label=\"iterator\"];\n";
 	*dotStr += to_string(id) + "->" + to_string(stmt->id) + "[label=\"stmt\"];\n";
 
 	return dotStr;
