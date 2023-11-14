@@ -1453,7 +1453,7 @@ yyreduce:
     break; }
     case 69:
 #line 273 "./.y"
-    { yyval.returnStatement = new ReturnStatement(NULL); ;
+    { yyval.returnStatement = new ReturnStatement(); ;
     break; }
     case 70:
 #line 274 "./.y"

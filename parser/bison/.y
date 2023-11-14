@@ -270,7 +270,7 @@ stmt_list: stmt { $$ = new StatementList($1); }
          ;
 
 
-return_stmt: RETURN ';' { $$ = new ReturnStatement(NULL); }
+return_stmt: RETURN ';' { $$ = new ReturnStatement(); }
            | RETURN expr ';' { $$ = new ReturnStatement($2); }
            ; 
 

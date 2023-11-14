@@ -1011,7 +1011,8 @@ string* ForStatement::ToDOT()
 ReturnStatement::ReturnStatement(Expression* expression) : Statement(Statement::t_RETURN, expression)
 {
 	this->id = ++maxId;
-	this->expressions = new ExpressionList(expression);
+	if (expression != NULL)
+		this->expressions = new ExpressionList(expression);
 }
 
 string* ReturnStatement::ToDOT()
