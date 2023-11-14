@@ -948,71 +948,62 @@ string* ForeachStatement::ToDOT()
 	return dotStr;
 }
 
-ForStatement::ForStatement(Expression* init, 
-	Expression* cond, Expression* increment, Statement* statement) : Statement(Statement::t_FOR)
+ForStatement::ForStatement(ExpressionList* init, 
+	Expression* cond, ExpressionList* increment, Statement* statement) : Statement(Statement::t_FOR)
 {
 	this->id = ++maxId;
-	this->expressions = new ExpressionList(init);
-	ExpressionList::Append(this->expressions, cond);
-	ExpressionList::Append(this->expressions, increment);
+	if (init != NULL)
+		this->inits = init;
+	if (cond != NULL)
+		this->expressions = new ExpressionList(cond);
+	if (increment != NULL)
+		this->incrs = increment;
 	this->statements = new StatementList(statement);
 }
 
 ForStatement::ForStatement(VarDeclaratorList* declarations, 
-	Expression* cond, Expression* increment, Statement* statement) : Statement(Statement::t_FOR)
+	Expression* cond, ExpressionList* increment, Statement* statement) : Statement(Statement::t_FOR)
 {
 	this->id = ++maxId;
-	this->declarators = declarations;
-	this->expressions = new ExpressionList(cond);
-	ExpressionList::Append(this->expressions, increment);
+	if (declarations != NULL)
+		this->declarators = declarations;
+	if (cond != NULL)
+		this->expressions = new ExpressionList(cond);
+	if (increment != NULL)
+		this->incrs = increment;
 	this->statements = new StatementList(statement);
 }
 
 string* ForStatement::ToDOT()
 {
-	VarDeclaratorList* decls = NULL;
-	Expression* init = NULL;
-	Expression* cond = NULL;
-	Expression* incr = NULL;
-	Statement*  stmt = NULL;
-
+	string* dotStr = new string();
+	*dotStr += to_string(id) + "[label=\"for_stmt\"];\n";
+	
 	if (declarators != NULL)
 	{
-		decls = declarators;
-		cond = expressions->expressions->front();
-		incr = expressions->expressions->back();
+		*dotStr += *declarators->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(declarators->id) + "[label=\"init\"];\n";
 	}
-	else
+	if (inits != NULL)
 	{
-		auto iter = expressions->expressions->begin();
-		init = *iter; iter++;
-		cond = *iter; iter++;
-		incr = *iter;
+		*dotStr += *inits->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(inits->id) + "[label=\"init\"];\n";
 	}
-	stmt = statements->statements->front();
-
-	string initID;
-	string* dotStr;
-	if (decls != NULL)
+	if (expressions != NULL)
 	{
-		initID = to_string(decls->id);
-		dotStr = decls->ToDOT();
+		*dotStr += *expressions->expressions->front()->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(expressions->id) + "[label=\"cond\"];\n";
 	}
-	else
+	if (incrs != NULL)
 	{
-		initID = to_string(init->id);
-		dotStr = init->ToDOT();
+		*dotStr += *incrs->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(incrs->id) + "[label=\"incr\"];\n";
 	}
-
-	*dotStr += *cond->ToDOT();
-	*dotStr += *incr->ToDOT();
-	*dotStr += *stmt->ToDOT();
-
-	*dotStr += to_string(id) + "[label=\"for_stmt\"];\n";
-	*dotStr += to_string(id) + "->" + initID + "[label=\"init\"];\n";
-	*dotStr += to_string(id) + "->" + to_string(cond->id) + "[label=\"cond\"];\n";
-	*dotStr += to_string(id) + "->" + to_string(incr->id) + "[label=\"incr\"];\n";
-	*dotStr += to_string(id) + "->" + to_string(stmt->id) + "[label=\"stmt\"];\n";
+	if (statements != NULL)
+	{
+		*dotStr += *statements->ToDOT();
+		*dotStr += to_string(id) + "->" + to_string(statements->id) + "[label=\"stmt\"];\n";
+	}
 
 	return dotStr;
 }

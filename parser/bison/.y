@@ -275,8 +275,8 @@ return_stmt: RETURN ';' { $$ = new ReturnStatement(NULL); }
            ; 
 
 
-for_stmt: FOR '(' for_expr ';' for_expr ';' for_expr ')' stmt { $$ = new ForStatement($3,$5,$7,$9); }
-        | FOR '(' var_declarator_list ';' for_expr ';' for_expr ')' stmt { $$ = new ForStatement($3,$5,$7,$9); }
+for_stmt: FOR '(' expr_list_em ';' for_expr ';' expr_list_em ')' stmt { $$ = new ForStatement($3,$5,$7,$9); }
+        | FOR '(' var_declarator_list ';' for_expr ';' expr_list_em ')' stmt { $$ = new ForStatement($3,$5,$7,$9); }
     	;
 
 

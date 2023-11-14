@@ -317,6 +317,9 @@ public:
     ExpressionList* expressions = NULL;
     StatementList* statements = NULL;
 
+    ExpressionList* inits = NULL;
+    ExpressionList* incrs = NULL;
+
     Statement(Type type, Expression* expression = NULL);
     Statement(Type type, VarDeclaratorList* declarators);
     Statement(Type type, StatementList* statements);
@@ -371,8 +374,8 @@ public:
 class ForStatement : public Statement
 {
 public:
-    ForStatement(Expression* init, Expression* cond, Expression* increment, Statement* statement);
-    ForStatement(VarDeclaratorList* declarations, Expression* cond, Expression* increment, Statement* statement);
+    ForStatement(ExpressionList* init, Expression* cond, ExpressionList* increment, Statement* statement);
+    ForStatement(VarDeclaratorList* declarations, Expression* cond, ExpressionList* increment, Statement* statement);
 
     string* ToDOT();
 };
