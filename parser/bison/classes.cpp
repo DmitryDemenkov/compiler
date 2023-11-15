@@ -1141,7 +1141,7 @@ string* ClassMember::ToDOT()
 
 ClassMemberList::ClassMemberList(ClassMember* member)
 {
-	this->id = member->id;
+	this->id = ++maxId;
 	this->members = new list < ClassMember*>{ member };
 }
 
@@ -1154,15 +1154,11 @@ ClassMemberList* ClassMemberList::Append(ClassMemberList *members, ClassMember* 
 string* ClassMemberList::ToDOT()
 {
 	string* dotStr = new string();
-	ClassMember* previous = NULL;
+	*dotStr = to_string(id) + "[label=\"members\"];\n";
 	for (auto i = members->begin(); i != members->end(); i++)
 	{
 		*dotStr += *((*i)->ToDOT());
-		if (previous != NULL)
-		{
-			*dotStr += to_string(previous->id) + "->" + to_string((*i)->id) + "[label=\"next\"];\n";
-		}
-		previous = *i;
+		*dotStr += to_string(id) + "->" + to_string((*i)->id) + ";\n";
 	}
 	return dotStr;
 }
@@ -1424,8 +1420,16 @@ string* ClassDeclaration::ToDOT()
 
 	if (classMemberList != NULL)
 	{
-		*dotStr += *classMemberList->ToDOT();
-		*dotStr += to_string(id) + "->" + to_string(classMemberList->id) + "[label=\"body\"];\n";
+		if (classMemberList->members->size() > 1)
+		{
+			*dotStr += *classMemberList->ToDOT();
+			*dotStr += to_string(id) + "->" + to_string(classMemberList->id) + "[label=\"body\"];\n";
+		}
+		else
+		{
+			*dotStr += *classMemberList->members->front()->ToDOT();
+			*dotStr += to_string(id) + "->" + to_string(classMemberList->members->front()->id) + "[label=\"body\"];\n";
+		}
 	}
 
 	return dotStr;
