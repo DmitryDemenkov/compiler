@@ -1461,7 +1461,7 @@ string* NamespaceMember::ToDOT()
 
 NamespaceMemberList::NamespaceMemberList(NamespaceMember* member)
 {
-	this->id = member->id;
+	this->id = ++maxId;
 	this->members = new list < NamespaceMember*>{ member };
 }
 
@@ -1474,15 +1474,11 @@ NamespaceMemberList* NamespaceMemberList::Append(NamespaceMemberList* members, N
 string* NamespaceMemberList::ToDOT()
 {
 	string* dotStr = new string();
-	NamespaceMember* previous = NULL;
+	*dotStr = to_string(id) + "[label=\"members\"];\n";
 	for (auto i = members->begin(); i != members->end(); i++)
 	{
 		*dotStr += *((*i)->ToDOT());
-		if (previous != NULL)
-		{
-			*dotStr += to_string(previous->id) + "->" + to_string((*i)->id) + "[label=\"next\"];\n";
-		}
-		previous = *i;
+		*dotStr += to_string(id) + "->" + to_string((*i)->id) + ";\n";
 	}
 	return dotStr;
 }
@@ -1502,8 +1498,16 @@ string* NamespaceDeclaration::ToDOT()
 
 	if (members != NULL)
 	{
-		*dotStr += *members->ToDOT();
-		*dotStr += to_string(id) + "->" + to_string(members->id) + "[label=\"body\"];\n";
+		if (members->members->size() > 1)
+		{
+			*dotStr += *members->ToDOT();
+			*dotStr += to_string(id) + "->" + to_string(members->id) + "[label=\"body\"];\n";
+		}
+		else
+		{
+			*dotStr += *members->members->front()->ToDOT();
+			*dotStr += to_string(id) + "->" + to_string(members->members->front()->id) + "[label=\"body\"];\n";
+		}
 	}
 
 	return dotStr;
