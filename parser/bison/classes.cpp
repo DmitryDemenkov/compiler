@@ -1435,6 +1435,59 @@ string* ClassDeclaration::ToDOT()
 	return dotStr;
 }
 
+AbstractNamespaceMember* ClassDeclaration::CreateClassTable(AbstractNamespaceMember* outer)
+{
+	if (outer->GetInnerMember(identifier) != NULL)
+	{
+		throw("Identifier already exists");
+	}
+	
+	Class* current =  new Class(identifier, outer);
+	for (auto modifier : *modifiers->modifiers)
+	{
+		switch (modifier->type)
+		{
+		case Modifier::t_PUBLIC:
+			current->SetAccesModifier(e_PUBLIC);
+			break;
+		case Modifier::t_PROTECTED:
+			current->SetAccesModifier(e_PROTECTED);
+			break;
+		case Modifier::t_INTERNAL:
+			current->SetAccesModifier(e_INTERNAL);
+			break;
+		case Modifier::t_PRIVATE:
+			current->SetAccesModifier(e_PRIVATE);
+			break;
+		case Modifier::t_ABSTRACT:
+			current->SetAbstract(true);
+			break;
+		case Modifier::t_STATIC:
+			current->SetStatic(true);
+			break;
+		default:
+			throw("Illigal class modifier");
+			break;
+		}
+	}
+	if (current->GetAccessModifier() == e_NONE)
+	{
+		current->SetAccesModifier(e_PRIVATE);
+	}
+
+	if (classMemberList != NULL)
+	{
+		for (auto member : *classMemberList->members)
+		{
+			if (member->type == ClassMember::t_CLASS)
+			{
+				current->Append(((ClassDeclaration*)member)->CreateClassTable(current));
+			}
+		}
+	}
+	return current;
+}
+
 NamespaceMember::NamespaceMember(ClassDeclaration* decl)
 {
 	this->id = decl->id;
@@ -1459,6 +1512,20 @@ string* NamespaceMember::ToDOT()
 	}
 }
 
+AbstractNamespaceMember* NamespaceMember::CreateClassTable(AbstractNamespaceMember* outer)
+{
+	AbstractNamespaceMember* current;
+	if (type == t_NAMESPACE)
+	{
+		current = namespaceDecl->CreateClassTable(outer);
+	}
+	else
+	{
+		current = classDecl->CreateClassTable(outer);
+	}
+	return current;
+}
+
 NamespaceMemberList::NamespaceMemberList(NamespaceMember* member)
 {
 	this->id = ++maxId;
@@ -1481,6 +1548,15 @@ string* NamespaceMemberList::ToDOT()
 		*dotStr += to_string(id) + "->" + to_string((*i)->id) + ";\n";
 	}
 	return dotStr;
+}
+
+AbstractNamespaceMember* NamespaceMemberList::CreateClassTable(AbstractNamespaceMember* outer)
+{
+	for (auto namespaceMember : *members)
+	{
+		outer->Append(namespaceMember->CreateClassTable(outer));
+	}
+	return outer;
 }
 
 NamespaceDeclaration::NamespaceDeclaration(TypeName* typeName, NamespaceMemberList* members)
@@ -1513,6 +1589,36 @@ string* NamespaceDeclaration::ToDOT()
 	return dotStr;
 }
 
+AbstractNamespaceMember* NamespaceDeclaration::CreateClassTable(AbstractNamespaceMember* outer)
+{
+	AbstractNamespaceMember* current = outer->GetInnerMember(typeName->identifiers->front());
+	if (current != NULL && dynamic_cast<Class*>(current))
+	{
+		throw("Identifier already exists");
+	}
+
+	if (current == NULL)
+	{
+		current = new Namespace(typeName->identifiers->front(), outer);
+	}
+	
+	if (typeName->identifiers->size() > 1)
+	{
+		TypeName* childName = typeName;
+		childName->identifiers->pop_front();
+		NamespaceDeclaration* child = new NamespaceDeclaration(childName, members);
+		current->Append(child->CreateClassTable(current));
+	}
+	else
+	{
+		if (members != NULL)
+		{
+			current = members->CreateClassTable(current);
+		}
+	}
+	return current;
+}
+
 Programm::Programm(NamespaceMemberList* members)
 {
 	this->id = ++maxId;
@@ -1524,4 +1630,11 @@ Programm* Programm::main = NULL;
 string* Programm::ToDOT()
 {
 	return members->ToDOT();
+}
+
+AbstractNamespaceMember* Programm::CreateClassTable()
+{
+	AbstractNamespaceMember* global = new Namespace(new string("<global>"), NULL);
+	global = members->CreateClassTable(global);
+	return global;
 }

@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <list>
+#include "../Parser/Parser/tables.h"
 using namespace std;
 
 class Expression;
@@ -544,6 +545,7 @@ public:
         string* identifier, ClassMemberList* members, TypeName* baseClass = NULL);
 
     string* ToDOT();
+    AbstractNamespaceMember* CreateClassTable(AbstractNamespaceMember* outer);
 };
 
 class NamespaceMember
@@ -565,6 +567,8 @@ public:
     NamespaceMember(NamespaceDeclaration* decl);
 
     string* ToDOT();
+
+    AbstractNamespaceMember* CreateClassTable(AbstractNamespaceMember* outer);
 };
 
 class NamespaceMemberList
@@ -577,6 +581,8 @@ public:
     static NamespaceMemberList* Append(NamespaceMemberList* members, NamespaceMember* member);
 
     string* ToDOT();
+
+    AbstractNamespaceMember* CreateClassTable(AbstractNamespaceMember* outer);
 };
 
 class NamespaceDeclaration
@@ -589,6 +595,7 @@ public:
     NamespaceDeclaration(TypeName* typeName, NamespaceMemberList* members);
 
     string* ToDOT();
+    AbstractNamespaceMember* CreateClassTable(AbstractNamespaceMember* outer);
 };
 
 class Programm
@@ -602,4 +609,6 @@ public:
     Programm(NamespaceMemberList* members);
 
     string* ToDOT();
+
+    AbstractNamespaceMember* CreateClassTable();
 };

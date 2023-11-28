@@ -2248,10 +2248,31 @@ void main(int argc, char** argv)
 	if (file.is_open())
 	{
 		file << dotStr;
-		cout << "Success";
+		cout << "Success" << endl;
 	}
 	else
 	{
-		cout << "Error";
+		cout << "Error" << endl;
+	}
+	file.close();
+
+	try
+	{
+		AbstractNamespaceMember* global = Programm::main->CreateClassTable();
+		dotStr = "graph table{ rankdir=\"LR\"\n" + *global->ToDOT() + "}";
+		file.open("classTable.gv");
+		if (file.is_open())
+		{
+			file << dotStr;
+			cout << "Success" << endl;
+		}
+		else
+		{
+			cout << "Error" << endl;
+		}
+	}
+	catch (const char* e)
+	{
+		cout << e << endl;
 	}
 }
