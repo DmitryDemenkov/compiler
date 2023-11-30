@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <list>
+#include <queue>
 #include "../Parser/Parser/tables.h"
 using namespace std;
 

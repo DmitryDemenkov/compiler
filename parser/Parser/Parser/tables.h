@@ -8,6 +8,10 @@ using namespace std;
 class FieldTable;
 class MethodTable;
 class ClassDeclaration;
+class Field;
+class SimpleType;
+class DataType;
+class ClassMember;
 
 class Constant
 {
@@ -47,8 +51,9 @@ public:
 	virtual int GetId() = 0;
 	virtual string* GetName() = 0;
 	virtual string GetFullName() = 0;
-	AbstractNamespaceMember* GetOuterMember();
+	virtual AbstractNamespaceMember* GetOuterMember() = 0;
 	virtual AbstractNamespaceMember* GetInnerMember(string* name) = 0;
+	virtual vector<AbstractNamespaceMember*> GetAllMembers() = 0;
 	virtual void Append(AbstractNamespaceMember* member) = 0;
 	virtual string* ToDOT() = 0;
 };
@@ -66,8 +71,9 @@ public:
 	int GetId() override;
 	string* GetName() override;
 	string GetFullName() override;
-	AbstractNamespaceMember* GetOuterMember();
+	AbstractNamespaceMember* GetOuterMember() override;
 	AbstractNamespaceMember* GetInnerMember(string* name) override;
+	vector<AbstractNamespaceMember*> GetAllMembers() override;
 	void Append(AbstractNamespaceMember* member) override;
 	string* ToDOT() override;
 };
@@ -91,6 +97,9 @@ private:
 	AbstractNamespaceMember* outerMember = NULL;
 	vector<Class*> innerMembers;
 
+	DataType* CreateDataType(ClassMember* member);
+	void AppendField(Field* field);
+
 public:
 	Class(string* name, AbstractNamespaceMember* outer, ClassDeclaration* decl);
 	int GetId() override;
@@ -100,6 +109,7 @@ public:
 
 	MethodTable* GetMethod(string* name);
 	FieldTable* GetField(string* name);
+	vector<FieldTable*> GetAllFields();
 
 	void SetStatic(bool value);
 	bool IsStatic();
@@ -108,7 +118,11 @@ public:
 	void SetAccesModifier(AccessModifier modifier);
 	AccessModifier GetAccessModifier();
 
+	void CreateFields();
+
+	AbstractNamespaceMember* GetOuterMember() override;
 	AbstractNamespaceMember* GetInnerMember(string* name) override;
+	vector<AbstractNamespaceMember*> GetAllMembers() override;
 	void Append(AbstractNamespaceMember* member) override;
 	string* ToDOT() override;
 };
@@ -124,10 +138,12 @@ public:
 		t_CHAR,
 		t_TYPENAME
 	};
-	Type type;
+	Type type = t_INT;
 	Class* classType = NULL;
-	bool isArray;
+	bool isArray = false;
 
+	static Type GetType(SimpleType* simpleType);
+	string* ToString();
 	bool operator== (const DataType& other) const;
 };
 
@@ -136,12 +152,19 @@ class FieldTable
 private:
 	string* name;
 	DataType* type;
-	bool isStatic;
-	AccessModifier accessModifier;
+	bool isStatic = false;
+	AccessModifier accessModifier = e_NONE;
 
 public:
+	FieldTable(string* name, DataType* type);
+	void SetStatic(bool value);
+	bool IsStatic();
+	void SetAccessModifier(AccessModifier modifier);
+	AccessModifier GetAccessModifier();
+
 	string* GetName();
 	DataType* GetType();
+	string ToString();
 };
 
 class Variable

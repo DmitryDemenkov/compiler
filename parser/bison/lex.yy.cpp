@@ -2244,7 +2244,7 @@ void main(int argc, char** argv)
 
 	string dotStr = "digraph tree{ rankdir=\"LR\"\n" + *Programm::main->ToDOT() + "}";
 	ofstream file;
-	file.open("tree.gv");
+	/*file.open("tree.gv");
 	if (file.is_open())
 	{
 		file << dotStr;
@@ -2254,11 +2254,12 @@ void main(int argc, char** argv)
 	{
 		cout << "Error" << endl;
 	}
-	file.close();
+	file.close();*/
 
+	AbstractNamespaceMember* global;
 	try
 	{
-		AbstractNamespaceMember* global = Programm::main->CreateClassTable();
+		global = Programm::main->CreateClassTable();
 		dotStr = "graph table{ rankdir=\"LR\"\n" + *global->ToDOT() + "}";
 		file.open("classTable.gv");
 		if (file.is_open())
@@ -2270,9 +2271,60 @@ void main(int argc, char** argv)
 		{
 			cout << "Error" << endl;
 		}
+		file.close();
 	}
 	catch (const char* e)
 	{
 		cout << e << endl;
 	}
+
+	vector<Class*> classes;
+	queue<AbstractNamespaceMember*> members; members.push(global);
+	while (members.size() > 0)
+	{
+		AbstractNamespaceMember* member = members.front();
+		if (dynamic_cast<Class*>(member) != NULL)
+		{
+			classes.push_back((Class*)member);
+		}
+		members.pop();
+		for (auto inner : member->GetAllMembers())
+		{
+			members.push(inner);
+		}
+	}
+
+	cout << endl << "Classes" << endl;
+	for (auto cl : classes)
+	{
+		cout << cl->GetFullName() << endl;
+		try
+		{
+			cl->CreateFields();
+		}
+		catch (const char* e)
+		{
+			cout << e << endl;
+		}
+		
+		cout << "Fields" << endl;
+		for (auto fl : cl->GetAllFields())
+		{
+			cout << fl->ToString() << endl;
+		}
+		cout << endl;
+	}
+
+	dotStr = "digraph tree{ rankdir=\"LR\"\n" + *Programm::main->ToDOT() + "}";
+	file.open("tree.gv");
+	if (file.is_open())
+	{
+		file << dotStr;
+		cout << "Success" << endl;
+	}
+	else
+	{
+		cout << "Error" << endl;
+	}
+	file.close();
 }
