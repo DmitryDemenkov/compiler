@@ -1606,8 +1606,10 @@ AbstractNamespaceMember* NamespaceDeclaration::CreateClassTable(AbstractNamespac
 	if (typeName->identifiers->size() > 1)
 	{
 		TypeName* childName = typeName;
+		typeName = new TypeName(childName->identifiers->front());
 		childName->identifiers->pop_front();
 		NamespaceDeclaration* child = new NamespaceDeclaration(childName, members);
+		members = new NamespaceMemberList(new NamespaceMember(child));
 		current->Append(child->CreateClassTable(current));
 	}
 	else
