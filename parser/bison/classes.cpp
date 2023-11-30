@@ -1442,7 +1442,12 @@ AbstractNamespaceMember* ClassDeclaration::CreateClassTable(AbstractNamespaceMem
 		throw("Identifier already exists");
 	}
 	
-	Class* current =  new Class(identifier, outer);
+	Class* current =  new Class(identifier, outer, this);
+	if (modifiers == NULL)
+	{
+		modifiers = new ModifielrList(new Modifier(Modifier::t_PRIVATE));
+	}
+
 	for (auto modifier : *modifiers->modifiers)
 	{
 		switch (modifier->type)
@@ -1469,10 +1474,6 @@ AbstractNamespaceMember* ClassDeclaration::CreateClassTable(AbstractNamespaceMem
 			throw("Illigal class modifier");
 			break;
 		}
-	}
-	if (current->GetAccessModifier() == e_NONE)
-	{
-		current->SetAccesModifier(e_PRIVATE);
 	}
 
 	if (classMemberList != NULL)

@@ -3,11 +3,11 @@
 #include <iostream>
 #include <vector>
 #include <map>
-//#include "../../bison/classes.h"
 using namespace std;
 
 class FieldTable;
 class MethodTable;
+class ClassDeclaration;
 
 class Constant
 {
@@ -44,7 +44,9 @@ enum AccessModifier
 class AbstractNamespaceMember 
 {
 public:
+	virtual int GetId() = 0;
 	virtual string* GetName() = 0;
+	virtual string GetFullName() = 0;
 	AbstractNamespaceMember* GetOuterMember();
 	virtual AbstractNamespaceMember* GetInnerMember(string* name) = 0;
 	virtual void Append(AbstractNamespaceMember* member) = 0;
@@ -54,13 +56,16 @@ public:
 class Namespace : public AbstractNamespaceMember
 {
 private:
+	int id;
 	string* name;
 	vector<AbstractNamespaceMember*> members;
 	AbstractNamespaceMember* outerMember;
 
 public:
 	Namespace(string* name, AbstractNamespaceMember* outer);
+	int GetId() override;
 	string* GetName() override;
+	string GetFullName() override;
 	AbstractNamespaceMember* GetOuterMember();
 	AbstractNamespaceMember* GetInnerMember(string* name) override;
 	void Append(AbstractNamespaceMember* member) override;
@@ -70,13 +75,15 @@ public:
 class Class : public AbstractNamespaceMember
 {
 private:
+	int id;
 	vector<Constant*> constantTable;
-	int nameIndex;
 	bool isStatic = false;
 	bool isAbstract = false;
 	AccessModifier accessModifier = e_NONE;
 
+	string* name;
 	Class* parent = NULL;
+	ClassDeclaration* decl = NULL;
 
 	map<string, FieldTable*> fields;
 	map<string, MethodTable*> methods;
@@ -85,8 +92,10 @@ private:
 	vector<Class*> innerMembers;
 
 public:
-	Class(string* name, AbstractNamespaceMember* outer);
+	Class(string* name, AbstractNamespaceMember* outer, ClassDeclaration* decl);
+	int GetId() override;
 	string* GetName() override;
+	string GetFullName() override;
 	Class* GetParent();
 
 	MethodTable* GetMethod(string* name);
