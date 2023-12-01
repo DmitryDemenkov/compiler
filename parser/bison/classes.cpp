@@ -1445,7 +1445,10 @@ AbstractNamespaceMember* ClassDeclaration::CreateClassTable(AbstractNamespaceMem
 	Class* current =  new Class(identifier, outer, this);
 	if (modifiers == NULL)
 	{
-		modifiers = new ModifielrList(new Modifier(Modifier::t_PRIVATE));
+		if (dynamic_cast<Class*>(outer))
+			modifiers = new ModifielrList(new Modifier(Modifier::t_PRIVATE));
+		else
+			modifiers = new ModifielrList(new Modifier(Modifier::t_PUBLIC));
 	}
 
 	for (auto modifier : *modifiers->modifiers)

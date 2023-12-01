@@ -2276,6 +2276,7 @@ void main(int argc, char** argv)
 	catch (const char* e)
 	{
 		cout << e << endl;
+		return;
 	}
 
 	vector<Class*> classes;
@@ -2297,7 +2298,7 @@ void main(int argc, char** argv)
 	cout << endl << "Classes" << endl;
 	for (auto cl : classes)
 	{
-		cout << cl->GetFullName() << endl;
+		cout << cl->ToString() << endl;
 		try
 		{
 			cl->CreateFields();
@@ -2305,6 +2306,7 @@ void main(int argc, char** argv)
 		catch (const char* e)
 		{
 			cout << e << endl;
+			return;
 		}
 		
 		cout << "Fields" << endl;

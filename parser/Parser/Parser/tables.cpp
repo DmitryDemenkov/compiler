@@ -235,6 +235,14 @@ void Class::SetAccesModifier(AccessModifier modifier)
 	{
 		throw("Class can not have nore than 1 acces modifier");
 	}
+	if ((modifier == e_PRIVATE || modifier == e_PROTECTED) && dynamic_cast<Namespace*>(outerMember))
+	{
+		throw("Class in namespace can be internal or public");
+	}
+	if (modifier == e_INTERNAL && dynamic_cast<Class*>(outerMember))
+	{
+		throw("Class in class can not be internal");
+	}
 	accessModifier = modifier;
 }
 
@@ -305,6 +313,12 @@ string* Class::ToDOT()
 		*dotStr += to_string(id) + "--" + to_string(member->GetId()) + ";\n";
 	}
 	return dotStr;
+}
+
+string Class::ToString()
+{
+	return GetFullName() + ";" + GetAccessModifierName(accessModifier) + ";abstract:" +
+		to_string(IsAbstract()) + ";static:" + to_string(IsStatic());
 }
 
 Constant::Constant(Type type)
@@ -383,5 +397,18 @@ DataType* FieldTable::GetType()
 
 string FieldTable::ToString()
 {
-	return *GetType()->ToString() + " " + *GetName();
+	return *GetName() + ";" + *GetType()->ToString() 
+		+ ";" + GetAccessModifierName(GetAccessModifier()) + ";static:" + to_string(IsStatic());
+}
+
+string GetAccessModifierName(AccessModifier modifier)
+{
+	switch (modifier)
+	{
+	case e_PRIVATE:   return "private";
+	case e_PROTECTED: return "protected";
+	case e_INTERNAL:  return "internal";
+	case e_PUBLIC:	  return "public";
+	default: return "";
+	}
 }

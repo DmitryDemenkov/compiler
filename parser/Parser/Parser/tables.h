@@ -45,6 +45,8 @@ enum AccessModifier
 	e_PUBLIC
 };
 
+string GetAccessModifierName(AccessModifier modifier);
+
 class AbstractNamespaceMember 
 {
 public:
@@ -125,6 +127,7 @@ public:
 	vector<AbstractNamespaceMember*> GetAllMembers() override;
 	void Append(AbstractNamespaceMember* member) override;
 	string* ToDOT() override;
+	string ToString();
 };
 
 class DataType
