@@ -115,6 +115,41 @@ DataType* Class::CreateDataType(ClassMember* member)
 	return dataType;
 }
 
+DataType* Class::CreateDataType(VarDeclarator* varDecl)
+{
+	DataType* dataType = new DataType();
+	TypeName* typeName = NULL;
+	switch (varDecl->type)
+	{
+	case VarDeclarator::t_SIMPLE_TYPE:
+		dataType->type = DataType::GetType(varDecl->simpleType);
+		break;
+	case VarDeclarator::t_TYPE_NAME:
+		dataType->type = DataType::t_TYPENAME;
+		typeName = varDecl->typeName;
+		break;
+	case VarDeclarator::t_ARRAY_TYPE:
+		if (varDecl->arrayType->type == ArrayType::t_SIMPLE_TYPE) {
+			dataType->type = DataType::GetType(varDecl->arrayType->simpleType);
+		}
+		else {
+			dataType->type = DataType::t_TYPENAME;
+		}
+		typeName = varDecl->arrayType->typeName;
+		dataType->isArray = true;
+		break;
+	default:
+		break;
+	}
+
+	if (typeName != NULL)
+	{
+		dataType->classType = FindClass(typeName);
+	}
+
+	return dataType;
+}
+
 Class* Class::FindClass(TypeName* typeName)
 {
 	AbstractNamespaceMember* neededMember = NULL;
@@ -169,6 +204,46 @@ void Class::AppendField(Field* field)
 	fields[*newField->GetName()] = newField;
 }
 
+void Class::AppendMethod(Method* method)
+{
+	DataType* dataType = CreateDataType(method);
+	if (methods.count(*method->identifier) > 0)
+	{
+		throw("Method already exists");
+	}
+
+	MethodTable* newMethod = new MethodTable(method->identifier, dataType);
+	if (method->modifiers == NULL)
+	{
+		method->modifiers = new ModifielrList(new Modifier(Modifier::t_PRIVATE));
+	}
+
+	for (auto modifier : *method->modifiers->modifiers)
+	{
+		switch (modifier->type)
+		{
+		case Modifier::t_PRIVATE:   newMethod->SetAccessModifier(e_PRIVATE);   break;
+		case Modifier::t_PROTECTED: newMethod->SetAccessModifier(e_PROTECTED); break;
+		case Modifier::t_PUBLIC:	newMethod->SetAccessModifier(e_PUBLIC);	  break;
+		case Modifier::t_STATIC:	newMethod->SetStatic(true);   break;
+		case Modifier::t_ABSTRACT:  newMethod->SetAbstract(true); break;
+		case Modifier::t_VIRTUAL:   newMethod->SetVirtual(true);  break;
+		default: throw("Illigal modifier");
+		}
+	}
+
+	if (method->paramList != NULL)
+	{
+		for (auto param : *method->paramList->params)
+		{
+			DataType* paramType = CreateDataType(param);
+			newMethod->AddParam(param->identifier, paramType);
+		}
+	}
+
+	methods[*newMethod->GetName()] = newMethod;
+}
+
 void Class::AppendParent(TypeName* parentName)
 {
 	parent = FindClass(parentName);;
@@ -209,6 +284,16 @@ vector<FieldTable*> Class::GetAllFields()
 		fls.push_back(field.second);
 	}
 	return fls;
+}
+
+vector<MethodTable*> Class::GetAllMethods()
+{
+	vector<MethodTable*> mtds;
+	for (auto method : methods)
+	{
+		mtds.push_back(method.second);
+	}
+	return mtds;
 }
 
 void Class::SetStatic(bool value)
@@ -284,6 +369,10 @@ void Class::CreateTables()
 		if (classMember->type == ClassMember::t_FIELD)
 		{
 			AppendField((Field*)classMember);
+		}
+		else if (classMember->type == ClassMember::t_METHOD)
+		{
+			AppendMethod((Method*)classMember);
 		}
 	}
 }
@@ -439,4 +528,115 @@ string GetAccessModifierName(AccessModifier modifier)
 	case e_PUBLIC:	  return "public";
 	default: return "";
 	}
+}
+
+MethodTable::MethodTable(string* name, DataType* dataType)
+{
+	this->name = name;
+	this->returnValue = dataType;
+}
+
+void MethodTable::SetStatic(bool value)
+{
+	if (IsAbstract() || IsVirtual())
+	{
+		throw("Illigle modifier static");
+	}
+	isStatic = value;
+}
+
+bool MethodTable::IsStatic()
+{
+	return isStatic;
+}
+
+void MethodTable::SetAbstract(bool value)
+{
+	if (IsStatic() || IsVirtual())
+	{
+		throw("Illigal modifier abstract");
+	}
+	isAbstract = value;
+}
+
+bool MethodTable::IsAbstract()
+{
+	return isAbstract;
+}
+
+void MethodTable::SetVirtual(bool value)
+{
+	if (IsStatic() || IsAbstract())
+	{
+		throw("Illigal mofifier virtual");
+	}
+	isStatic = value;
+}
+
+bool MethodTable::IsVirtual()
+{
+	return isVirtual;
+}
+
+void MethodTable::SetAccessModifier(AccessModifier modifier)
+{
+	if (accessModifier != e_NONE)
+	{
+		throw("Method can not have more than 1 access modifier");
+	}
+	accessModifier = modifier;
+}
+
+AccessModifier MethodTable::GetAccessModifier()
+{
+	return accessModifier;
+}
+
+void MethodTable::AddParam(string* name, DataType* type)
+{
+	if (GetParam(name) != NULL)
+	{
+		throw("Duplicated param name");
+	}
+
+	Variable* newParam = new Variable();
+	newParam->name = name;
+	newParam->type = type;
+	params.push_back(newParam);
+}
+
+Variable* MethodTable::GetParam(string* name)
+{
+	for (auto param : params)
+	{
+		if (*param->name == *name)
+		{
+			return param;
+		}
+	}
+	return NULL;
+}
+
+DataType* MethodTable::GetReturnValue()
+{
+	return returnValue;
+}
+
+string* MethodTable::GetName()
+{
+	return name;
+}
+
+string MethodTable::ToString()
+{
+	string str = *GetName() + ";" + *GetReturnValue()->ToString() + ";"
+		+ GetAccessModifierName(accessModifier) + ";static:" + to_string(IsStatic()) + ";abstract:" + to_string(IsAbstract())
+		+ ";virtual:" + to_string(IsVirtual()) + "\nParams\n";
+
+	for (auto param : params)
+	{
+		str += *param->name + ";" + *param->type->ToString() + "\n";
+	}
+
+	return str;
 }

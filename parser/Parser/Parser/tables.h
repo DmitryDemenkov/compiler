@@ -9,10 +9,12 @@ class FieldTable;
 class MethodTable;
 class ClassDeclaration;
 class Field;
+class Method;
 class SimpleType;
 class DataType;
 class ClassMember;
 class TypeName;
+class VarDeclarator;
 
 class Constant
 {
@@ -101,8 +103,10 @@ private:
 	vector<Class*> innerMembers;
 
 	DataType* CreateDataType(ClassMember* member);
+	DataType* CreateDataType(VarDeclarator* varDecl);
 	Class* FindClass(TypeName* typeName);
 	void AppendField(Field* field);
+	void AppendMethod(Method* method);
 	void AppendParent(TypeName* parentName);
 
 public:
@@ -115,6 +119,7 @@ public:
 	MethodTable* GetMethod(string* name);
 	FieldTable* GetField(string* name);
 	vector<FieldTable*> GetAllFields();
+	vector<MethodTable*> GetAllMethods();
 
 	void SetStatic(bool value);
 	bool IsStatic();
@@ -184,10 +189,10 @@ class MethodTable
 {
 private:
 	string* name;
-	bool isStatic;
-	bool isAbstract;
-	bool isVirtual;
-	AccessModifier accessModifier;
+	bool isStatic = false;
+	bool isAbstract = false;
+	bool isVirtual = false;
+	AccessModifier accessModifier = e_NONE;
 
 	DataType* returnValue;
 	vector<Variable*> params;
@@ -195,7 +200,21 @@ private:
 	//StatementList* body;
 
 public:
+	MethodTable(string* name, DataType* dataType);
+	void SetStatic(bool value);
+	bool IsStatic();
+	void SetAbstract(bool value);
+	bool IsAbstract();
+	void SetVirtual(bool value);
+	bool IsVirtual();
+	void SetAccessModifier(AccessModifier modifier);
+	AccessModifier GetAccessModifier();
+	void AddParam(string* name, DataType* type);
+	Variable* GetParam(string* name);
+
 	DataType* GetReturnValue();
+	string* GetName();
 	bool CompareParamsSet(map<DataType, int>* args);
 	int GetParamIndex(string* name);
+	string ToString();
 };

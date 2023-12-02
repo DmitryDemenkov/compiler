@@ -2318,6 +2318,13 @@ void main(int argc, char** argv)
 			cout << fl->ToString() << endl;
 		}
 		cout << endl;
+
+		cout << "Methods" << endl;
+		for (auto md : cl->GetAllMethods())
+		{
+			cout << md->ToString() << endl;
+		}
+		cout << endl;
 	}
 
 	dotStr = "digraph tree{ rankdir=\"LR\"\n" + *Programm::main->ToDOT() + "}";
