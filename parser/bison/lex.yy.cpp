@@ -2260,6 +2260,9 @@ void main(int argc, char** argv)
 	try
 	{
 		global = Programm::main->CreateClassTable();
+		AbstractNamespaceMember* system = new Namespace(new string("<system>"), global);
+		global->Append(system);
+		system->Append(new Class(new string("Object"), system, NULL));
 		dotStr = "graph table{ rankdir=\"LR\"\n" + *global->ToDOT() + "}";
 		file.open("classTable.gv");
 		if (file.is_open())
@@ -2298,16 +2301,16 @@ void main(int argc, char** argv)
 	cout << endl << "Classes" << endl;
 	for (auto cl : classes)
 	{
-		cout << cl->ToString() << endl;
 		try
 		{
-			cl->CreateFields();
+			cl->CreateTables();
 		}
 		catch (const char* e)
 		{
 			cout << e << endl;
 			return;
 		}
+		cout << cl->ToString() << endl;
 		
 		cout << "Fields" << endl;
 		for (auto fl : cl->GetAllFields())

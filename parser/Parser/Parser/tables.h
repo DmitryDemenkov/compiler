@@ -12,6 +12,7 @@ class Field;
 class SimpleType;
 class DataType;
 class ClassMember;
+class TypeName;
 
 class Constant
 {
@@ -100,7 +101,9 @@ private:
 	vector<Class*> innerMembers;
 
 	DataType* CreateDataType(ClassMember* member);
+	Class* FindClass(TypeName* typeName);
 	void AppendField(Field* field);
+	void AppendParent(TypeName* parentName);
 
 public:
 	Class(string* name, AbstractNamespaceMember* outer, ClassDeclaration* decl);
@@ -120,7 +123,7 @@ public:
 	void SetAccesModifier(AccessModifier modifier);
 	AccessModifier GetAccessModifier();
 
-	void CreateFields();
+	void CreateTables();
 
 	AbstractNamespaceMember* GetOuterMember() override;
 	AbstractNamespaceMember* GetInnerMember(string* name) override;

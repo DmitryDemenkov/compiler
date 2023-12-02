@@ -109,30 +109,35 @@ DataType* Class::CreateDataType(ClassMember* member)
 
 	if (typeName != NULL)
 	{
-		AbstractNamespaceMember* neededMember = NULL;
-		AbstractNamespaceMember* outer = this;
-		while (neededMember == NULL && outer != NULL)
-		{
-			neededMember = outer->GetInnerMember(typeName->identifiers->front());
-			outer = outer->GetOuterMember();
-		}
-
-		auto currentName = typeName->identifiers->begin(); currentName++;
-		while (neededMember != NULL && currentName != typeName->identifiers->end())
-		{
-			neededMember = neededMember->GetInnerMember(*currentName);
-			currentName++;
-		}
-
-		if (dynamic_cast<Class*>(neededMember) == NULL)
-		{
-			throw("Not such identifier");
-		}
-
-		dataType->classType = (Class*)neededMember;
+		dataType->classType = FindClass(typeName);
 	}
 
 	return dataType;
+}
+
+Class* Class::FindClass(TypeName* typeName)
+{
+	AbstractNamespaceMember* neededMember = NULL;
+	AbstractNamespaceMember* outer = this;
+	while (neededMember == NULL && outer != NULL)
+	{
+		neededMember = outer->GetInnerMember(typeName->identifiers->front());
+		outer = outer->GetOuterMember();
+	}
+
+	auto currentName = typeName->identifiers->begin(); currentName++;
+	while (neededMember != NULL && currentName != typeName->identifiers->end())
+	{
+		neededMember = neededMember->GetInnerMember(*currentName);
+		currentName++;
+	}
+
+	if (dynamic_cast<Class*>(neededMember) == NULL)
+	{
+		throw("Not such identifier");
+	}
+
+	return (Class*)neededMember;
 }
 
 void Class::AppendField(Field* field)
@@ -162,6 +167,11 @@ void Class::AppendField(Field* field)
 	}
 
 	fields[*newField->GetName()] = newField;
+}
+
+void Class::AppendParent(TypeName* parentName)
+{
+	parent = FindClass(parentName);;
 }
 
 Class::Class(string* name, AbstractNamespaceMember* outer, ClassDeclaration* decl)
@@ -251,11 +261,22 @@ AccessModifier Class::GetAccessModifier()
 	return accessModifier;
 }
 
-void Class::CreateFields()
+void Class::CreateTables()
 {
-	if (decl->classMemberList == NULL)
+	if (decl == NULL || decl->classMemberList == NULL)
 	{
 		return;
+	}
+
+	if (decl->typeName != NULL)
+	{
+		AppendParent(decl->typeName);
+	}
+	else
+	{
+		TypeName* typeName = new TypeName(new string("<system>"));
+		typeName->Append(typeName, new string("Object"));
+		AppendParent(typeName);
 	}
 
 	for (auto classMember : *decl->classMemberList->members)
@@ -317,8 +338,15 @@ string* Class::ToDOT()
 
 string Class::ToString()
 {
-	return GetFullName() + ";" + GetAccessModifierName(accessModifier) + ";abstract:" +
+	string str = GetFullName() + ";" + GetAccessModifierName(accessModifier) + ";abstract:" +
 		to_string(IsAbstract()) + ";static:" + to_string(IsStatic());
+
+	if (parent != NULL)
+	{
+		str += ";parent:" + parent->GetFullName();
+	}
+
+	return str;
 }
 
 Constant::Constant(Type type)
