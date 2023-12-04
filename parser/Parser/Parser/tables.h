@@ -10,6 +10,7 @@ class MethodTable;
 class ClassDeclaration;
 class Field;
 class Method;
+class Constructor;
 class SimpleType;
 class DataType;
 class ClassMember;
@@ -107,6 +108,7 @@ private:
 	Class* FindClass(TypeName* typeName);
 	void AppendField(Field* field);
 	void AppendMethod(Method* method);
+	void AppendConstructor(Constructor* constructor);
 	void AppendParent(TypeName* parentName);
 
 public:
@@ -147,7 +149,8 @@ public:
 		t_STRING,
 		t_BOOL,
 		t_CHAR,
-		t_TYPENAME
+		t_TYPENAME,
+		t_VOID
 	};
 	Type type = t_INT;
 	Class* classType = NULL;

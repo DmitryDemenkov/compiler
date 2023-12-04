@@ -86,14 +86,17 @@ DataType* Class::CreateDataType(ClassMember* member)
 	TypeName* typeName = NULL;
 	switch (member->returnValue)
 	{
-	case Field::t_SIMPLE_TYPE:
+	case ClassMember::t_SIMPLE_TYPE:
 		dataType->type = DataType::GetType(member->simpleType);
 		break;
-	case Field::t_TYPENAME:
+	case ClassMember::t_TYPENAME:
 		dataType->type = DataType::t_TYPENAME;
 		typeName = member->typeName;
 		break;
-	case Field::t_ARRAY:
+	case ClassMember::t_VOID:
+		dataType->type = DataType::t_VOID;
+		break;
+	case ClassMember::t_ARRAY:
 		if (member->arrayType->type == ArrayType::t_SIMPLE_TYPE) {
 			dataType->type = DataType::GetType(member->arrayType->simpleType);
 		}
@@ -244,6 +247,50 @@ void Class::AppendMethod(Method* method)
 	methods[*newMethod->GetName()] = newMethod;
 }
 
+void Class::AppendConstructor(Constructor* constructor)
+{
+	string* constructorName = new string("<init>");
+	if (methods.count(*constructorName) > 0)
+	{
+		throw("Illigle constructor overriding");
+	}
+	if (*this->name != *constructor->identifier)
+	{
+		throw("Illigle constructor name");
+	}
+
+	DataType* dataType = new DataType();
+	dataType->type = DataType::t_VOID;
+
+	MethodTable* newConstructor = new MethodTable(constructorName, dataType);
+	if (constructor->modifiers == NULL)
+	{
+		constructor->modifiers = new ModifielrList(new Modifier(Modifier::t_PRIVATE));
+	}
+
+	for (auto modifier : *constructor->modifiers->modifiers)
+	{
+		switch (modifier->type)
+		{
+		case Modifier::t_PRIVATE:   newConstructor->SetAccessModifier(e_PRIVATE);   break;
+		case Modifier::t_PROTECTED: newConstructor->SetAccessModifier(e_PROTECTED); break;
+		case Modifier::t_PUBLIC:	newConstructor->SetAccessModifier(e_PUBLIC);	break;
+		default: throw("Illigal modifier");
+		}
+	}
+
+	if (constructor->paramList != NULL)
+	{
+		for (auto param : *constructor->paramList->params)
+		{
+			DataType* paramType = CreateDataType(param);
+			newConstructor->AddParam(param->identifier, paramType);
+		}
+	}
+
+	methods[*constructorName] = newConstructor;
+}
+
 void Class::AppendParent(TypeName* parentName)
 {
 	parent = FindClass(parentName);;
@@ -374,6 +421,10 @@ void Class::CreateTables()
 		{
 			AppendMethod((Method*)classMember);
 		}
+		else if (classMember->type == ClassMember::t_CONSTRUCTOR)
+		{
+			AppendConstructor((Constructor*)classMember);
+		}
 	}
 }
 
@@ -463,6 +514,7 @@ string* DataType::ToString()
 	case DataType::t_STRING:   *str = "STRING"; break;
 	case DataType::t_BOOL:     *str = "BOOL";   break;
 	case DataType::t_CHAR:	   *str = "CHAR";   break;
+	case DataType::t_VOID:	   *str = "VOID";   break;
 	case DataType::t_TYPENAME: *str = classType->GetFullName(); break;
 	default: break;
 	}
