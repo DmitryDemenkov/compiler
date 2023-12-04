@@ -2260,9 +2260,7 @@ void main(int argc, char** argv)
 	try
 	{
 		global = Programm::main->CreateClassTable();
-		AbstractNamespaceMember* system = new Namespace(new string("<system>"), global);
-		global->Append(system);
-		system->Append(new Class(new string("Object"), system, NULL));
+		Class::CreateRTLClasses(global);
 		dotStr = "graph table{ rankdir=\"LR\"\n" + *global->ToDOT() + "}";
 		file.open("classTable.gv");
 		if (file.is_open())

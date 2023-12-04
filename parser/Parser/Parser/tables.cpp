@@ -315,13 +315,23 @@ void Class::AppdendDefaultConstructor()
 	dataType->type = DataType::t_VOID;
 
 	MethodTable* newConstructor = new MethodTable(constructorName, dataType);
-	newConstructor->SetAccessModifier(e_PRIVATE);
+	newConstructor->SetAccessModifier(e_PUBLIC);
 	methods[*constructorName] = newConstructor;
 }
 
 void Class::AppendParent(TypeName* parentName)
 {
 	parent = FindClass(parentName);;
+}
+
+void Class::AppendMethod(string* name, DataType* returnType, vector<Variable*> params)
+{
+	MethodTable* newMethod = new MethodTable(name, returnType);
+	for (auto param : params)
+	{
+		newMethod->AddParam(param->name, param->type);
+	}
+	methods[*name] = newMethod;
 }
 
 Class::Class(string* name, AbstractNamespaceMember* outer, ClassDeclaration* decl)
@@ -434,8 +444,7 @@ void Class::CreateTables()
 	}
 	else
 	{
-		TypeName* typeName = new TypeName(new string("<system>"));
-		typeName->Append(typeName, new string("Object"));
+		TypeName* typeName = new TypeName(new string("Object"));
 		AppendParent(typeName);
 	}
 
@@ -655,7 +664,7 @@ void MethodTable::SetVirtual(bool value)
 	{
 		throw("Illigal mofifier virtual");
 	}
-	isStatic = value;
+	isVirtual = value;
 }
 
 bool MethodTable::IsVirtual()
@@ -724,4 +733,43 @@ string MethodTable::ToString()
 	}
 
 	return str;
+}
+
+Class* Class::CreateObjectClass(AbstractNamespaceMember* outer)
+{
+	Class* objectClass = new Class(new string("Object"), outer,	NULL);
+	objectClass->SetAccesModifier(e_PUBLIC);
+
+	DataType* equalsReturn = new DataType(); 
+	equalsReturn->type = DataType::t_BOOL;
+	DataType* equalsParamType = new DataType(); 
+	equalsParamType->type = DataType::t_TYPENAME;
+	equalsParamType->classType = objectClass;
+	Variable* equalsParam = new Variable();
+	equalsParam->name = new string("obj");
+	equalsParam->type = equalsParamType;
+	vector<Variable*> equalsParamSet = vector<Variable*>{ equalsParam };
+
+	objectClass->AppendMethod(new string("Equals"), equalsReturn, equalsParamSet);
+	MethodTable* equalsMethod = objectClass->methods["Equals"];
+	equalsMethod->SetAccessModifier(e_PUBLIC);
+	equalsMethod->SetVirtual(true);
+
+	DataType* toStringReturn = new DataType();
+	toStringReturn->type = DataType::t_STRING;
+	vector<Variable*> toStringParamSet = vector<Variable*>();
+
+	objectClass->AppendMethod(new string("ToString"), toStringReturn, toStringParamSet);
+	MethodTable* toStringMethod = objectClass->methods["ToString"];
+	toStringMethod->SetAccessModifier(e_PUBLIC);
+	toStringMethod->SetVirtual(true);
+
+	objectClass->AppdendDefaultConstructor();
+	return objectClass;
+}
+
+void Class::CreateRTLClasses(AbstractNamespaceMember* outer)
+{
+	Class* objClass = CreateObjectClass(outer);
+	outer->Append(objClass);
 }

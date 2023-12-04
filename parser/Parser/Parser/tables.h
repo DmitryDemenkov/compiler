@@ -16,6 +16,7 @@ class DataType;
 class ClassMember;
 class TypeName;
 class VarDeclarator;
+class Variable;
 
 class Constant
 {
@@ -108,9 +109,12 @@ private:
 	Class* FindClass(TypeName* typeName);
 	void AppendField(Field* field);
 	void AppendMethod(Method* method);
+	void AppendMethod(string* name, DataType* returnType, vector<Variable*> params);
 	void AppendConstructor(Constructor* constructor);
 	void AppdendDefaultConstructor();
 	void AppendParent(TypeName* parentName);
+
+	static Class* CreateObjectClass(AbstractNamespaceMember* outer);
 
 public:
 	Class(string* name, AbstractNamespaceMember* outer, ClassDeclaration* decl);
@@ -139,6 +143,8 @@ public:
 	void Append(AbstractNamespaceMember* member) override;
 	string* ToDOT() override;
 	string ToString();
+
+	static void CreateRTLClasses(AbstractNamespaceMember* outer);
 };
 
 class DataType
