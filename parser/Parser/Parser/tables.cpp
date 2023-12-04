@@ -203,6 +203,10 @@ void Class::AppendField(Field* field)
 		default: throw("Illigal modifier");
 		}
 	}
+	if (newField->GetAccessModifier() == e_NONE)
+	{
+		newField->SetAccessModifier(e_PRIVATE);
+	}
 
 	fields[*newField->GetName()] = newField;
 }
@@ -233,6 +237,10 @@ void Class::AppendMethod(Method* method)
 		case Modifier::t_VIRTUAL:   newMethod->SetVirtual(true);  break;
 		default: throw("Illigal modifier");
 		}
+	}
+	if (newMethod->GetAccessModifier() == e_NONE)
+	{
+		newMethod->SetAccessModifier(e_PRIVATE);
 	}
 
 	if (method->paramList != NULL)
@@ -277,6 +285,10 @@ void Class::AppendConstructor(Constructor* constructor)
 		case Modifier::t_PUBLIC:	newConstructor->SetAccessModifier(e_PUBLIC);	break;
 		default: throw("Illigal modifier");
 		}
+	}
+	if (newConstructor->GetAccessModifier() == e_NONE)
+	{
+		newConstructor->SetAccessModifier(e_PRIVATE);
 	}
 
 	if (constructor->paramList != NULL)

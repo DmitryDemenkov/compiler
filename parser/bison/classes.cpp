@@ -1478,6 +1478,10 @@ AbstractNamespaceMember* ClassDeclaration::CreateClassTable(AbstractNamespaceMem
 			break;
 		}
 	}
+	if (current->GetAccessModifier() == e_NONE)
+	{
+		current->SetAccesModifier(e_PRIVATE);
+	}
 
 	if (classMemberList != NULL)
 	{
