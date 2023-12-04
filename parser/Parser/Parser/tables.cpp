@@ -303,6 +303,22 @@ void Class::AppendConstructor(Constructor* constructor)
 	methods[*constructorName] = newConstructor;
 }
 
+void Class::AppdendDefaultConstructor()
+{
+	string* constructorName = new string("<init>");
+	if (methods.count(*constructorName) > 0)
+	{
+		throw("Illigle constructor overriding");
+	}
+
+	DataType* dataType = new DataType();
+	dataType->type = DataType::t_VOID;
+
+	MethodTable* newConstructor = new MethodTable(constructorName, dataType);
+	newConstructor->SetAccessModifier(e_PRIVATE);
+	methods[*constructorName] = newConstructor;
+}
+
 void Class::AppendParent(TypeName* parentName)
 {
 	parent = FindClass(parentName);;
@@ -437,6 +453,11 @@ void Class::CreateTables()
 		{
 			AppendConstructor((Constructor*)classMember);
 		}
+	}
+
+	if (methods.count(string("<init>")) == 0)
+	{
+		AppdendDefaultConstructor();
 	}
 }
 

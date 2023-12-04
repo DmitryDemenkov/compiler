@@ -109,6 +109,7 @@ private:
 	void AppendField(Field* field);
 	void AppendMethod(Method* method);
 	void AppendConstructor(Constructor* constructor);
+	void AppdendDefaultConstructor();
 	void AppendParent(TypeName* parentName);
 
 public:
