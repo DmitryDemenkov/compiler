@@ -115,6 +115,7 @@ private:
 	void AppendParent(TypeName* parentName);
 
 	static Class* CreateObjectClass(AbstractNamespaceMember* outer);
+	static Class* CreateStringClass(AbstractNamespaceMember* outer);
 
 public:
 	Class(string* name, AbstractNamespaceMember* outer, ClassDeclaration* decl);

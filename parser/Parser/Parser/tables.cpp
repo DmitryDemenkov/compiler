@@ -768,8 +768,18 @@ Class* Class::CreateObjectClass(AbstractNamespaceMember* outer)
 	return objectClass;
 }
 
+Class* Class::CreateStringClass(AbstractNamespaceMember* outer)
+{
+	Class* stringClass = new Class(new string("String"), outer, NULL);
+	stringClass->SetAccesModifier(e_PUBLIC);
+	stringClass->parent = (Class*)outer->GetInnerMember(new string("Object"));
+
+	stringClass->AppdendDefaultConstructor();
+	return stringClass;
+}
+
 void Class::CreateRTLClasses(AbstractNamespaceMember* outer)
 {
-	Class* objClass = CreateObjectClass(outer);
-	outer->Append(objClass);
+	outer->Append(CreateObjectClass(outer));
+	outer->Append(CreateStringClass(outer));
 }
