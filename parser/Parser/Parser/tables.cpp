@@ -208,6 +208,8 @@ void Class::AppendField(Field* field)
 		newField->SetAccessModifier(e_PRIVATE);
 	}
 
+	newField->SetInitializer(field->expression);
+
 	fields[*newField->GetName()] = newField;
 }
 
@@ -566,6 +568,22 @@ string* DataType::ToString()
 	return str;
 }
 
+Expression* FieldTable::GetDefaultInitializer()
+{
+	Expression* expr = NULL;
+	switch (type->type)
+	{
+	case DataType::t_BOOL:
+		expr = new Expression(Expression::t_BOOL_LITER, false); break;
+	case DataType::t_INT:
+		expr = new Expression(Expression::t_INT_LITER, 0); break;
+	case DataType::t_CHAR:
+		expr = new Expression(Expression::t_CHAR_LITER, 0); break;
+	default: break;
+	}
+	return expr;
+}
+
 FieldTable::FieldTable(string* name, DataType* type)
 {
 	this->name = name;
@@ -594,6 +612,23 @@ void FieldTable::SetAccessModifier(AccessModifier modifier)
 AccessModifier FieldTable::GetAccessModifier()
 {
 	return accessModifier;
+}
+
+void FieldTable::SetInitializer(Expression* expr)
+{
+	if (expr == NULL)
+	{
+		initializer = GetDefaultInitializer();
+	}
+	else
+	{
+		initializer = expr;
+	}
+}
+
+Expression* FieldTable::GetInitializer()
+{
+	return initializer;
 }
 
 string* FieldTable::GetName()

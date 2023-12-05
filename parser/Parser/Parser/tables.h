@@ -17,6 +17,7 @@ class ClassMember;
 class TypeName;
 class VarDeclarator;
 class Variable;
+class Expression;
 
 class Constant
 {
@@ -176,6 +177,9 @@ private:
 	DataType* type;
 	bool isStatic = false;
 	AccessModifier accessModifier = e_NONE;
+	Expression* initializer = NULL;
+
+	Expression* GetDefaultInitializer();
 
 public:
 	FieldTable(string* name, DataType* type);
@@ -183,6 +187,9 @@ public:
 	bool IsStatic();
 	void SetAccessModifier(AccessModifier modifier);
 	AccessModifier GetAccessModifier();
+
+	void SetInitializer(Expression* expr);
+	Expression* GetInitializer();
 
 	string* GetName();
 	DataType* GetType();
