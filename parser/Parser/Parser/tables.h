@@ -18,6 +18,7 @@ class TypeName;
 class VarDeclarator;
 class Variable;
 class Expression;
+class StatementList;
 
 class Constant
 {
@@ -125,8 +126,8 @@ public:
 	string GetFullName() override;
 	Class* GetParent();
 
-	MethodTable* GetMethod(string* name);
-	FieldTable* GetField(string* name);
+	MethodTable* GetMethod(string name);
+	FieldTable* GetField(string name);
 	vector<FieldTable*> GetAllFields();
 	vector<MethodTable*> GetAllMethods();
 
@@ -138,6 +139,7 @@ public:
 	AccessModifier GetAccessModifier();
 
 	void CreateTables();
+	void CheckOverridingMethods();
 
 	AbstractNamespaceMember* GetOuterMember() override;
 	AbstractNamespaceMember* GetInnerMember(string* name) override;
@@ -210,12 +212,13 @@ private:
 	bool isStatic = false;
 	bool isAbstract = false;
 	bool isVirtual = false;
+	bool isOverride = false;
 	AccessModifier accessModifier = e_NONE;
 
 	DataType* returnValue;
 	vector<Variable*> params;
 	vector<Variable*> localVariables;
-	//StatementList* body;
+	StatementList* body = NULL;
 
 public:
 	MethodTable(string* name, DataType* dataType);
@@ -225,13 +228,19 @@ public:
 	bool IsAbstract();
 	void SetVirtual(bool value);
 	bool IsVirtual();
+	void SetOverride(bool value);
+	bool IsOverride();
 	void SetAccessModifier(AccessModifier modifier);
 	AccessModifier GetAccessModifier();
 	void AddParam(string* name, DataType* type);
 	Variable* GetParam(string* name);
 
+	void SetBody(StatementList* body);
+	StatementList* GetBody();
+
 	DataType* GetReturnValue();
 	string* GetName();
+	vector<Variable*> GetParams();
 	bool CompareParamsSet(map<DataType, int>* args);
 	int GetParamIndex(string* name);
 	string ToString();

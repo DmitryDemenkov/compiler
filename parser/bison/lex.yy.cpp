@@ -2295,8 +2295,6 @@ void main(int argc, char** argv)
 			members.push(inner);
 		}
 	}
-
-	cout << endl << "Classes" << endl;
 	for (auto cl : classes)
 	{
 		try
@@ -2308,6 +2306,23 @@ void main(int argc, char** argv)
 			cout << e << endl;
 			return;
 		}
+	}
+	for (auto cl : classes)
+	{
+		try
+		{
+			cl->CheckOverridingMethods();
+		}
+		catch (const char* e)
+		{
+			cout << e << endl;
+			return;
+		}
+	}
+
+	cout << endl << "Classes" << endl;
+	for (auto cl : classes)
+	{
 		cout << cl->ToString() << endl;
 		
 		cout << "Fields" << endl;

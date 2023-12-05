@@ -80,6 +80,11 @@ string Class::GetFullName()
 	return fullName;
 }
 
+Class* Class::GetParent()
+{
+	return parent;
+}
+
 DataType* Class::CreateDataType(ClassMember* member)
 {
 	DataType* dataType = new DataType();
@@ -237,6 +242,7 @@ void Class::AppendMethod(Method* method)
 		case Modifier::t_STATIC:	newMethod->SetStatic(true);   break;
 		case Modifier::t_ABSTRACT:  newMethod->SetAbstract(true); break;
 		case Modifier::t_VIRTUAL:   newMethod->SetVirtual(true);  break;
+		case Modifier::t_OVERRIDE:  newMethod->SetOverride(true); break;
 		default: throw("Illigal modifier");
 		}
 	}
@@ -253,6 +259,7 @@ void Class::AppendMethod(Method* method)
 			newMethod->AddParam(param->identifier, paramType);
 		}
 	}
+	newMethod->SetBody(method->statementList);
 
 	methods[*newMethod->GetName()] = newMethod;
 }
@@ -301,6 +308,7 @@ void Class::AppendConstructor(Constructor* constructor)
 			newConstructor->AddParam(param->identifier, paramType);
 		}
 	}
+	newConstructor->SetBody(constructor->statementList);
 
 	methods[*constructorName] = newConstructor;
 }
@@ -324,6 +332,55 @@ void Class::AppdendDefaultConstructor()
 void Class::AppendParent(TypeName* parentName)
 {
 	parent = FindClass(parentName);;
+}
+
+void Class::CheckOverridingMethods()
+{
+	for (auto method : methods)
+	{
+		if (method.second->IsOverride())
+		{
+			MethodTable* parentMethod = parent->GetMethod(*method.second->GetName());
+			if (parentMethod == NULL)
+			{
+				throw("No such method in parent");
+			}
+			if (!parentMethod->IsAbstract() && !parentMethod->IsVirtual() && !parentMethod->IsOverride())
+			{
+				throw("This method can not be overrided");
+			}
+			if (method.second->GetAccessModifier() != parentMethod->GetAccessModifier())
+			{
+				throw("Access modifier can not be changed");
+			}
+
+			vector<Variable*> currentParams = method.second->GetParams();
+			vector<Variable*> parentParams = parentMethod->GetParams();
+			if (currentParams.size() != parentParams.size())
+			{
+				throw("There is no method in parent with such params set");
+			}
+						
+			for (int i = 0; i < currentParams.size(); i++)
+			{
+				if (!(*currentParams[i]->type == *parentParams[i]->type))
+				{
+					throw("There is no method in parent with such params set");
+				}
+			}
+		}
+		if (method.second->IsAbstract())
+		{
+			if (!IsAbstract())
+			{
+				throw("Class could be abstract");
+			}
+			if (method.second->GetBody() != NULL)
+			{
+				throw("Abstract method could not have realisation");
+			}
+		}
+	}
 }
 
 void Class::AppendMethod(string* name, DataType* returnType, vector<Variable*> params)
@@ -361,6 +418,31 @@ int Class::GetId()
 string* Class::GetName()
 {
 	return name;
+}
+
+MethodTable* Class::GetMethod(string name)
+{
+	MethodTable* method = NULL;
+	Class* current = this;
+	while (method == NULL && current != NULL)
+	{
+		if (current->methods.count(name) > 0)
+		{
+			method = current->methods[name];
+		}
+		current = current->parent;
+	}
+	return method;
+}
+
+FieldTable* Class::GetField(string name)
+{
+	FieldTable* field = NULL;
+	if (fields.count(name) > 0)
+	{
+		field = fields[name];
+	}
+	return field;
 }
 
 vector<FieldTable*> Class::GetAllFields()
@@ -568,6 +650,16 @@ string* DataType::ToString()
 	return str;
 }
 
+bool DataType::operator==(const DataType& other) const
+{
+	bool isTypeEquals = this->type == other.type;
+	if (isTypeEquals && this->type == t_TYPENAME)
+	{
+		isTypeEquals = this->classType->GetFullName() == other.classType->GetFullName();
+	}
+	return isTypeEquals && this->isArray == other.isArray;
+}
+
 Expression* FieldTable::GetDefaultInitializer()
 {
 	Expression* expr = NULL;
@@ -667,7 +759,7 @@ MethodTable::MethodTable(string* name, DataType* dataType)
 
 void MethodTable::SetStatic(bool value)
 {
-	if (IsAbstract() || IsVirtual())
+	if (IsAbstract() || IsVirtual() || IsOverride())
 	{
 		throw("Illigle modifier static");
 	}
@@ -681,7 +773,7 @@ bool MethodTable::IsStatic()
 
 void MethodTable::SetAbstract(bool value)
 {
-	if (IsStatic() || IsVirtual())
+	if (IsStatic() || IsVirtual() || IsOverride())
 	{
 		throw("Illigal modifier abstract");
 	}
@@ -695,7 +787,7 @@ bool MethodTable::IsAbstract()
 
 void MethodTable::SetVirtual(bool value)
 {
-	if (IsStatic() || IsAbstract())
+	if (IsStatic() || IsAbstract() || IsOverride())
 	{
 		throw("Illigal mofifier virtual");
 	}
@@ -705,6 +797,20 @@ void MethodTable::SetVirtual(bool value)
 bool MethodTable::IsVirtual()
 {
 	return isVirtual;
+}
+
+void MethodTable::SetOverride(bool value)
+{
+	if (IsAbstract() || IsStatic() || IsVirtual())
+	{
+		throw("Illigal mofifier virtual");
+	}
+	isOverride = value;
+}
+
+bool MethodTable::IsOverride()
+{
+	return isOverride;
 }
 
 void MethodTable::SetAccessModifier(AccessModifier modifier)
@@ -746,6 +852,16 @@ Variable* MethodTable::GetParam(string* name)
 	return NULL;
 }
 
+void MethodTable::SetBody(StatementList* body)
+{
+	this->body = body;
+}
+
+StatementList* MethodTable::GetBody()
+{
+	return body;
+}
+
 DataType* MethodTable::GetReturnValue()
 {
 	return returnValue;
@@ -756,11 +872,16 @@ string* MethodTable::GetName()
 	return name;
 }
 
+vector<Variable*> MethodTable::GetParams()
+{
+	return params;
+}
+
 string MethodTable::ToString()
 {
 	string str = *GetName() + ";" + *GetReturnValue()->ToString() + ";"
 		+ GetAccessModifierName(accessModifier) + ";static:" + to_string(IsStatic()) + ";abstract:" + to_string(IsAbstract())
-		+ ";virtual:" + to_string(IsVirtual()) + "\nParams\n";
+		+ ";virtual:" + to_string(IsVirtual()) + ";override:" + to_string(IsOverride()) + "\nParams\n";
 
 	for (auto param : params)
 	{
