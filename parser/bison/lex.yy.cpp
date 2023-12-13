@@ -2242,19 +2242,8 @@ void main(int argc, char** argv)
 	if (Programm::main == NULL)
 		cout << "null prg" << endl;
 
-	string dotStr = "digraph tree{ rankdir=\"LR\"\n" + *Programm::main->ToDOT() + "}";
+	string dotStr = "";
 	ofstream file;
-	/*file.open("tree.gv");
-	if (file.is_open())
-	{
-		file << dotStr;
-		cout << "Success" << endl;
-	}
-	else
-	{
-		cout << "Error" << endl;
-	}
-	file.close();*/
 
 	AbstractNamespaceMember* global;
 	try
@@ -2335,6 +2324,14 @@ void main(int argc, char** argv)
 		cout << "Methods" << endl;
 		for (auto md : cl->GetAllMethods())
 		{
+			try
+			{
+				md->Semantic(cl);
+			}
+			catch (const char* e)
+			{
+				cout << e << endl;
+			}
 			cout << md->ToString() << endl;
 		}
 		cout << endl;

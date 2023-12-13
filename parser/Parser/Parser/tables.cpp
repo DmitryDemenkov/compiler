@@ -877,6 +877,40 @@ vector<Variable*> MethodTable::GetParams()
 	return params;
 }
 
+Variable* MethodTable::GetLocalVariable(string* varName)
+{
+	Variable* var = NULL;
+	for (auto param : params)
+	{
+		if (*param->name == *varName)
+		{
+			var = param;
+		}
+	}
+	if (var == NULL)
+	{
+		for (auto locVar : localVariables)
+		{
+			if (*locVar->name == *varName)
+			{
+				var = locVar;
+			}
+		}
+	}
+	return var;
+}
+
+void MethodTable::Semantic(Class* owner)
+{
+	if (body != NULL)
+	{
+		for (auto stmt : *body->statements)
+		{
+			stmt->Semantic(owner, this);
+		}
+	}
+}
+
 string MethodTable::ToString()
 {
 	string str = *GetName() + ";" + *GetReturnValue()->ToString() + ";"

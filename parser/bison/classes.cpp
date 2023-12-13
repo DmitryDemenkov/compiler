@@ -149,6 +149,11 @@ string* Argument::ToDOT()
 	return dotStr;
 }
 
+void Argument::DetermineDataType(Class* owner, MethodTable* methodInfo)
+{
+	this->expression->DetermineDataType(owner, methodInfo);
+}
+
 ArgumentList::ArgumentList(Argument* argument)
 {
 	this->id = argument->id;
@@ -239,7 +244,33 @@ string* MemberInitializer::ToDOT()
 	*dotStr += to_string(id) + "[label=\"memberInit\"];\n";
 	*dotStr += to_string(id) + "->" + memberId + "[label=\"member\"];\n";
 	*dotStr += to_string(id) + "->" + initId + "[label=\"initializer\"];\n";
+
+	if (dataType != NULL)
+	{
+		*dotStr += to_string(id) + ".01[label=\"" + *dataType->ToString() + "\"];\n";
+		*dotStr += memberId + "->" + to_string(id) + ".01[label=\"dataType\"];\n";
+	}
+
 	return dotStr;
+}
+
+void MemberInitializer::DetermineDataType(Class* owner, MethodTable* methodInfo, Class* creatingClass)
+{
+	FieldTable* fieldInfo = creatingClass->GetField(*identifier);
+	if (fieldInfo == NULL)
+	{
+		throw("Field does not exist");
+	}
+	this->dataType = fieldInfo->GetType();
+
+	if (this->expression != NULL)
+	{
+		this->expression->DetermineDataType(owner, methodInfo);
+	}
+	if (this->objectInitializer != NULL)
+	{
+		this->objectInitializer->DetermineDataType(owner, methodInfo, this->dataType->classType);
+	}
 }
 
 MemberInitializerList::MemberInitializerList(MemberInitializer* memberInitializer)
@@ -268,6 +299,14 @@ string* MemberInitializerList::ToDOT()
 		previous = *i;
 	}
 	return dotStr;
+}
+
+void MemberInitializerList::DetermineDataType(Class* owner, MethodTable* methodInfo, Class* creatingClass)
+{
+	for (auto objInit : *initializers)
+	{
+		objInit->DetermineDataType(owner, methodInfo, creatingClass);
+	}
 }
 
 Expression::Expression(Type type, string* name)
@@ -343,19 +382,6 @@ string* Expression::ToDOT()
 	string* dotStr = GetName();
 	*dotStr = to_string(id) + "[label=\"" + *dotStr + "\"];\n";
 
-	if (type == t_TYPENAME_CAST)
-	{
-		try
-		{
-			typeName = MemberAccess::ToTypeName(left);
-		}
-		catch (const char* expr)
-		{
-			cout << expr << endl;
-		}
-		left = right;
-		right = NULL;
-	}
 	if (type != Expression::t_SIMPLE_TYPE && simpleType != NULL)
 	{
 		*dotStr += *simpleType->ToDOT();
@@ -381,8 +407,107 @@ string* Expression::ToDOT()
 		*dotStr += *right->ToDOT();;
 		*dotStr += to_string(id) + "->" + to_string(right->id) + "[label=\"right\"];\n";
 	}
+	if (dataType != NULL)
+	{
+		*dotStr += to_string(id) + ".01[label=\"" + *dataType->ToString() + "\"];\n";
+		*dotStr += to_string(id) + "->" + to_string(id) + ".01[label=\"dataType\"];\n";
+	}
 
 	return dotStr;
+}
+
+void Expression::DetermineDataType(Class* owner, MethodTable* methodInfo)
+{
+	dataType = new DataType();
+	switch (type)
+	{
+	case Expression::t_INT_LITER:
+		dataType->type = DataType::t_INT;
+		break;
+	case Expression::t_CHAR_LITER:
+		dataType->type = DataType::t_CHAR;
+		break;
+	case Expression::t_BOOL_LITER:
+		dataType->type = DataType::t_BOOL;
+		break;
+	case Expression::t_STRING_LITER:
+		dataType->type = DataType::t_STRING;
+		break;
+	case Expression::t_ID:
+		dataType = GetDataTypeOfId(owner, methodInfo);
+		break;
+	case Expression::t_SIMPLE_TYPE:
+		/* TODO: RTL classes for simple data types */
+		break;
+	case Expression::t_THIS:
+		dataType->type = DataType::t_TYPENAME;
+		dataType->classType = owner;
+		break;
+	case Expression::t_BASE:
+		dataType->DataType::t_TYPENAME;
+		dataType->classType = owner->GetParent();
+		break;
+	case Expression::t_OBJ_CREATION:
+		dataType = GetDataTypeOfObjectCreation(owner, methodInfo);
+		break;
+	case Expression::t_ARR_CREATION:
+		dataType = GetDataTypeOfArrayCreation(owner, methodInfo);
+		break;
+	case Expression::t_ELEMENT_ACCESS:
+		dataType = GetDataTypeOfElementAccess(owner, methodInfo);
+		break;
+	case Expression::t_MEMBER_ACCESS:
+		dataType = GetDataTypeOfMemberAccess(owner, methodInfo);
+		break;
+	case Expression::t_INVOCATION:
+		dataType = GetDataTypeOfInvocation(owner, methodInfo);
+		break;
+	case Expression::t_UNMINUS:
+		left->DetermineDataType(owner, methodInfo);
+		dataType->type = left->dataType->type;
+		dataType->classType = left->dataType->classType;
+		break;
+	case Expression::t_NOT:
+		left->DetermineDataType(owner, methodInfo);
+		dataType->type = DataType::t_BOOL;
+		break;
+	case Expression::t_SIMPLE_TYPE_CAST:
+	case Expression::t_ARRAY_CAST:
+	case Expression::t_TYPENAME_CAST:
+	case Expression::t_AS:
+		dataType = GetDataTypeOfTypeCast(owner, methodInfo);
+		break;
+	case Expression::t_MUL:
+	case Expression::t_DIV:
+	case Expression::t_MOD:
+	case Expression::t_SUM:
+	case Expression::t_SUB:
+		dataType = GetDataTypeOfArithmetic(owner, methodInfo);
+		break;
+	case Expression::t_LESS:
+	case Expression::t_GREATER:
+	case Expression::t_LESS_EQUAL:
+	case Expression::t_GREATER_EQUAL:
+	case Expression::t_IS:
+	case Expression::t_EQUALITY:
+	case Expression::t_INEQUALITY:
+	case Expression::t_AND:
+	case Expression::t_OR:
+		left->DetermineDataType(owner, methodInfo);
+		right->DetermineDataType(owner, methodInfo);
+		dataType->type = DataType::t_BOOL;
+		break;
+	case Expression::t_ASSIGNMENT:
+		if (left != NULL) { left->DetermineDataType(owner, methodInfo); }
+		if (right != NULL) 
+		{
+			right->DetermineDataType(owner, methodInfo);
+			dataType = this->right->dataType;
+		}
+		break;
+	default:
+		break;
+	}
 }
 
 string* Expression::GetName()
@@ -394,6 +519,7 @@ string* Expression::GetName()
 	case Expression::t_BOOL_LITER: return new string(to_string(boolLiteral));
 	case Expression::t_STRING_LITER: return new string("\\\"" + *name + "\\\"");
 	case Expression::t_ID: return name;
+	case Expression::t_INVOCATION: return name;
 	case Expression::t_SIMPLE_TYPE: return simpleType->GetName();
 	case Expression::t_THIS: return new string("this");
 	case Expression::t_BASE: return new string("base");
@@ -421,6 +547,278 @@ string* Expression::GetName()
 	case Expression::t_ASSIGNMENT: return new string("=");
 	default: return NULL;
 	}
+}
+
+DataType* Expression::GetDataTypeOfId(Class* owner, MethodTable* methodInfo)
+{
+	Variable* localVar = methodInfo->GetLocalVariable(this->name);
+	if (localVar != NULL) { return localVar->type; }
+
+	FieldTable* fieldInfo = owner->GetField(*this->name);
+	if (fieldInfo != NULL) 
+	{
+		this->type = Expression::t_MEMBER_ACCESS;
+		this->right = new Expression(Expression::t_ID, this->name);
+		this->left = new Expression(t_THIS);
+		this->left->DetermineDataType(owner, methodInfo);
+		return fieldInfo->GetType(); 
+	}
+
+	TypeName* tName = new TypeName(this->name);
+	Class* classInfo = NULL;
+
+	try	{ classInfo = owner->FindClass(tName); }
+	catch (const char*) { }
+
+	if (classInfo != NULL) 
+	{
+		DataType* dType = new DataType();
+		dType->type = DataType::t_TYPENAME;
+		dType->classType = classInfo;
+		return dType;
+	}
+
+	this->typeName = tName;
+	return NULL;
+}
+
+DataType* Expression::GetDataTypeOfInvocation(Class* owner, MethodTable* methodInfo)
+{
+	DataType* dType = NULL;
+	if (this->left->type == Expression::t_ID)
+	{
+		this->name = this->left->name;
+		this->left = new Expression(t_THIS);
+		this->left->DetermineDataType(owner, methodInfo);
+
+		if (owner->GetMethod(*this->name) == NULL)
+		{
+			throw("There is no such method in class");
+		}
+		dType = owner->GetMethod(*this->name)->GetReturnValue();
+	}
+	else
+	{
+		this->name = this->left->right->name;
+		this->left = this->left->left;
+		this->left->DetermineDataType(owner, methodInfo);
+
+		if (this->left->dataType == NULL || this->left->dataType->type != DataType::t_TYPENAME)
+		{
+			throw("There is no such identifier");
+		}
+		if (this->left->dataType->classType->GetMethod(*this->name) == NULL)
+		{
+			throw("There is no such method in class");
+		}
+		dType = this->left->dataType->classType->GetMethod(*this->name)->GetReturnValue();
+	}
+
+	if (argumentList != NULL)
+	{
+		for (auto arg : *argumentList->arguments)
+		{
+			arg->DetermineDataType(owner, methodInfo);
+		}
+	}
+
+	return dType;
+}
+
+DataType* Expression::GetDataTypeOfMemberAccess(Class* owner, MethodTable* methodInfo)
+{
+	this->left->DetermineDataType(owner, methodInfo);
+	if (this->left->dataType == NULL)
+	{
+		TypeName* tName = TypeName::Append(this->left->typeName, this->right->name);
+		this->left = NULL;
+		this->right = NULL;
+		
+		Class* classInfo = NULL;
+		try { classInfo = owner->FindClass(tName); }
+		catch (const char*) {}
+		this->typeName = tName;
+
+		if (classInfo != NULL)
+		{
+			DataType* dType = new DataType();
+			dType->type = DataType::t_TYPENAME;
+			dType->classType = classInfo;
+			return dType;
+		}
+	}
+	else if (this->left->dataType->type == DataType::t_TYPENAME)
+	{
+		FieldTable* fieldInfo = this->left->dataType->classType->GetField(*this->right->name);
+		if (fieldInfo != NULL) { return fieldInfo->GetType(); }
+	}
+
+	return NULL;
+}
+
+DataType* Expression::GetDataTypeOfObjectCreation(Class* owner, MethodTable* methodInfo)
+{
+	DataType* dType = new DataType();
+	if (this->simpleType != NULL)
+	{
+		dType->type = DataType::GetType(this->simpleType);
+	}
+	else
+	{
+		dType->type = DataType::t_TYPENAME;
+		dType->classType = owner->FindClass(this->typeName);
+	}
+
+	if (this->argumentList != NULL)
+	{
+		for (auto arg : *argumentList->arguments)
+		{
+			arg->DetermineDataType(owner, methodInfo);
+		}
+	}
+
+	if (this->objInitializer != NULL)
+	{
+		objInitializer->DetermineDataType(owner, methodInfo, dType->classType);
+	}
+
+	return dType;
+}
+
+DataType* Expression::GetDataTypeOfArrayCreation(Class* owner, MethodTable* methodInfo)
+{
+	DataType* dType = new DataType();
+	dType->isArray = true;
+	if (simpleType != NULL)
+	{
+		dType->type = DataType::GetType(simpleType);
+	}
+	else if (typeName != NULL)
+	{
+		dType->type = DataType::t_TYPENAME;
+		dType->classType = owner->FindClass(typeName);
+	}
+	else
+	{
+		if (arrayType->simpleType != NULL)
+		{
+			dType->type = DataType::GetType(arrayType->simpleType);
+		}
+		else
+		{
+			dType->type = DataType::t_TYPENAME;
+			dType->classType = owner->FindClass(arrayType->typeName);
+		}
+	}
+
+	if (this->left == NULL)
+	{
+		if (arrayInitializer == NULL)
+		{
+			this->left = new Expression(t_INT_LITER, 0);
+		}
+		else
+		{
+			this->left = new Expression(t_INT_LITER, (int)arrayInitializer->expressions->size());
+		}
+	}
+	this->left->DetermineDataType(owner, methodInfo);
+
+	if (arrayInitializer != NULL)
+	{
+		for (auto init : *arrayInitializer->expressions)
+		{
+			init->DetermineDataType(owner, methodInfo);
+		}
+	}
+
+	return dType;
+}
+
+DataType* Expression::GetDataTypeOfElementAccess(Class* owner, MethodTable* methodInfo)
+{
+	DataType* dType = new DataType();
+
+	left->DetermineDataType(owner, methodInfo);
+	if (left->dataType->isArray == false)
+	{
+		throw("Invalid element access");
+	}
+	dType->type = left->dataType->type;
+	dType->classType = left->dataType->classType;
+
+	if (argumentList != NULL)
+	{
+		for (auto arg : *argumentList->arguments)
+		{
+			arg->DetermineDataType(owner, methodInfo);
+		}
+	}
+
+	return dType;
+}
+
+DataType* Expression::GetDataTypeOfTypeCast(Class* owner, MethodTable* methodInfo)
+{
+	if (type == t_TYPENAME_CAST)
+	{
+		typeName = MemberAccess::ToTypeName(left);
+		left = right;
+		right = NULL;
+	}
+
+	DataType* dType = new DataType();
+	if (simpleType != NULL)
+	{
+		dType->type = DataType::GetType(simpleType);
+	}
+	else if (arrayType != NULL)
+	{
+		if (arrayType->simpleType != NULL)
+		{
+			dType->type = DataType::GetType(arrayType->simpleType);
+		}
+		else
+		{
+			dType->type = DataType::t_TYPENAME;
+			dType->classType = owner->FindClass(arrayType->typeName);
+		}
+		dType->isArray = true;
+	}
+	else
+	{
+		dType->type = DataType::t_TYPENAME;
+		dType->classType = owner->FindClass(typeName);
+	}
+
+	left->DetermineDataType(owner, methodInfo);
+
+	return dType;
+}
+
+DataType* Expression::GetDataTypeOfArithmetic(Class* owner, MethodTable* methodInfo)
+{
+	DataType* dType = new DataType();
+	left->DetermineDataType(owner, methodInfo);
+	right->DetermineDataType(owner, methodInfo);
+
+	if (left->dataType->type == DataType::t_INT && !left->dataType->isArray
+		&& right->dataType->type == DataType::t_CHAR && !right->dataType->isArray)
+	{
+		right->dataType->type = DataType::t_INT;
+	}
+
+	if (left->dataType->type == DataType::t_CHAR && !left->dataType->isArray
+		&& right->dataType->type == DataType::t_INT && !right->dataType->isArray)
+	{
+		right->dataType->type = DataType::t_CHAR;
+	}
+
+	dType->type = left->dataType->type;
+	dType->classType = left->dataType->classType;
+	dType->isArray = left->dataType->isArray;
+
+	return dType;
 }
 
 ObjectCreation::ObjectCreation(SimpleType* simpleType, 
@@ -466,6 +864,12 @@ string* ObjectCreation::ToDOT()
 	{
 		*dotStr += *objInitializer->ToDOT();
 		*dotStr += to_string(id) + "->" + to_string(objInitializer->id) + "[label=\"init\"];\n";
+	}
+
+	if (dataType != NULL)
+	{
+		*dotStr += to_string(id) + ".01[label=\"" + *dataType->ToString() + "\"];\n";
+		*dotStr += to_string(id) + "->" + to_string(id) + ".01[label=\"dataType\"];\n";
 	}
 
 	return dotStr;
@@ -559,6 +963,12 @@ string* ArrayCreation::ToDOT()
 		*dotStr += to_string(id) + "->" + to_string(arrayInitializer->id) + "[label=\"arrInit\"];\n";
 	}
 
+	if (dataType != NULL)
+	{
+		*dotStr += to_string(id) + ".01[label=\"" + *dataType->ToString() + "\"];\n";
+		*dotStr += to_string(id) + "->" + to_string(id) + ".01[label=\"dataType\"];\n";
+	}
+
 	return dotStr;
 }
 
@@ -621,6 +1031,13 @@ string* ElementAccess::ToDOT()
 	*dotStr += to_string(id) + "[label=\"elemAccess\"];\n";
 	*dotStr += to_string(id) + "->" + to_string(left->id) + "[label=\"expr\"];\n";
 	*dotStr += to_string(id) + "->" + to_string(argumentList->id) + "[label=\"args\"];\n";
+
+	if (dataType != NULL)
+	{
+		*dotStr += to_string(id) + ".01[label=\"" + *dataType->ToString() + "\"];\n";
+		*dotStr += to_string(id) + "->" + to_string(id) + ".01[label=\"dataType\"];\n";
+	}
+
 	return dotStr;
 }
 
@@ -638,10 +1055,22 @@ string* InvocationExpression::ToDOT()
 	*dotStr += to_string(id) + "[label=\"invocation\"];\n";
 	*dotStr += to_string(id) + "->" + to_string(left->id) + "[label=\"expr\"];\n";
 
+	if (name != NULL)
+	{
+		*dotStr += to_string(id) + ".1[label=\"" + *name + "\"];\n";
+		*dotStr += to_string(id) + "->" + to_string(id) + ".1[label=\"name\"];\n";
+	}
+
 	if (argumentList != NULL)
 	{
 		*dotStr += *argumentList->ToDOT();
 		*dotStr += to_string(id) + "->" + to_string(argumentList->id) + "[label=\"args\"];\n";
+	}
+
+	if (dataType != NULL)
+	{
+		*dotStr += to_string(id) + ".01[label=\"" + *dataType->ToString() + "\"];\n";
+		*dotStr += to_string(id) + "->" + to_string(id) + ".01[label=\"dataType\"];\n";
 	}
 
 	return dotStr;
@@ -810,6 +1239,14 @@ string* Statement::ToDOT()
 	}
 
 	return dotStr;
+}
+
+void Statement::Semantic(Class* owner, MethodTable* methodInfo)
+{
+	if (type == t_EXPRESSION)
+	{
+		expressions->expressions->front()->DetermineDataType(owner, methodInfo);
+	}
 }
 
 StatementList::StatementList(Statement* statement)

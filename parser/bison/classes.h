@@ -80,6 +80,8 @@ public:
     Argument(Expression* expression, string* identifier = NULL);
 
     string* ToDOT();
+
+    void DetermineDataType(Class* owner, MethodTable* methodInfo);
 };
 
 class ArgumentList
@@ -103,12 +105,16 @@ public:
     ArgumentList* argumentList = NULL;
     MemberInitializerList* objectInitializer = NULL;
 
+    DataType* dataType = NULL;
+
     MemberInitializer(string* identifier, Expression* expression);
     MemberInitializer(string* identifier, MemberInitializerList* objectInitializer);
     MemberInitializer(ArgumentList* argumentList, Expression* expression);
     MemberInitializer(ArgumentList* argumentList, MemberInitializerList* objectInitializer);
 
     string* ToDOT();
+
+    void DetermineDataType(Class* owner, MethodTable* methodInfo, Class* creatingClass);
 };
 
 class MemberInitializerList
@@ -121,6 +127,8 @@ public:
     static MemberInitializerList* Append(MemberInitializerList* list, MemberInitializer* memberInitializer);
 
     string* ToDOT();
+
+    void DetermineDataType(Class* owner, MethodTable* methodInfo, Class* creatingClass);
 };
 
 
@@ -180,6 +188,8 @@ public:
     Expression* left = NULL;
     Expression* right = NULL;
 
+    DataType* dataType = NULL;
+
     Expression(Type type, string* name = NULL);
     Expression(Type type, int intLiteral);
     Expression(Type type, char charLiteral);
@@ -192,8 +202,19 @@ public:
 
     virtual string* ToDOT();
 
+    void DetermineDataType(Class* owner, MethodTable* methodInfo);
+
 private:
     string* GetName();
+
+    DataType* GetDataTypeOfId(Class* owner, MethodTable* methodInfo);
+    DataType* GetDataTypeOfInvocation(Class* owner, MethodTable* methodInfo);
+    DataType* GetDataTypeOfMemberAccess(Class* owner, MethodTable* methodInfo);
+    DataType* GetDataTypeOfObjectCreation(Class* owner, MethodTable* methodInfo);
+    DataType* GetDataTypeOfArrayCreation(Class* owner, MethodTable* methodInfo);
+    DataType* GetDataTypeOfElementAccess(Class* owner, MethodTable* methodInfo);
+    DataType* GetDataTypeOfTypeCast(Class* owner, MethodTable* methodInfo);
+    DataType* GetDataTypeOfArithmetic(Class* owner, MethodTable* methodInfo);
 };
 
 class ObjectCreation : public Expression
@@ -327,6 +348,8 @@ public:
     Statement(Type type, StatementList* statements);
 
     virtual string* ToDOT();
+
+    void Semantic(Class* owner, MethodTable* methodInfo);
 };
 
 class StatementList

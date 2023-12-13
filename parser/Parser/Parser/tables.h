@@ -108,7 +108,6 @@ private:
 
 	DataType* CreateDataType(ClassMember* member);
 	DataType* CreateDataType(VarDeclarator* varDecl);
-	Class* FindClass(TypeName* typeName);
 	void AppendField(Field* field);
 	void AppendMethod(Method* method);
 	void AppendMethod(string* name, DataType* returnType, vector<Variable*> params);
@@ -147,6 +146,8 @@ public:
 	void Append(AbstractNamespaceMember* member) override;
 	string* ToDOT() override;
 	string ToString();
+
+	Class* FindClass(TypeName* typeName);
 
 	static void CreateRTLClasses(AbstractNamespaceMember* outer);
 };
@@ -241,6 +242,10 @@ public:
 	DataType* GetReturnValue();
 	string* GetName();
 	vector<Variable*> GetParams();
+	Variable* GetLocalVariable(string* varName);
+
+	void Semantic(Class* owner);
+
 	bool CompareParamsSet(map<DataType, int>* args);
 	int GetParamIndex(string* name);
 	string ToString();
