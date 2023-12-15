@@ -3,6 +3,8 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <filesystem>
+#include <fstream>
 using namespace std;
 
 class FieldTable;
@@ -146,6 +148,7 @@ public:
 	void Append(AbstractNamespaceMember* member) override;
 	string* ToDOT() override;
 	string ToString();
+	void WriteTablesFile();
 
 	Class* FindClass(TypeName* typeName);
 
@@ -170,6 +173,7 @@ public:
 
 	static Type GetType(SimpleType* simpleType);
 	string* ToString();
+	string ToDescriptor();
 	bool operator== (const DataType& other) const;
 };
 

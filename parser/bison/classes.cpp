@@ -2081,7 +2081,7 @@ string* Programm::ToDOT()
 
 AbstractNamespaceMember* Programm::CreateClassTable()
 {
-	AbstractNamespaceMember* global = new Namespace(new string("<global>"), NULL);
+	AbstractNamespaceMember* global = new Namespace(new string(".global"), NULL);
 	global = members->CreateClassTable(global);
 	return global;
 }

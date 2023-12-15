@@ -2309,19 +2309,11 @@ void main(int argc, char** argv)
 		}
 	}
 
-	cout << endl << "Classes" << endl;
+	std::filesystem::remove_all(".global");
 	for (auto cl : classes)
 	{
-		cout << cl->ToString() << endl;
-		
-		cout << "Fields" << endl;
-		for (auto fl : cl->GetAllFields())
-		{
-			cout << fl->ToString() << endl;
-		}
-		cout << endl;
+		cl->WriteTablesFile();
 
-		cout << "Methods" << endl;
 		for (auto md : cl->GetAllMethods())
 		{
 			try
@@ -2332,9 +2324,7 @@ void main(int argc, char** argv)
 			{
 				cout << e << endl;
 			}
-			cout << md->ToString() << endl;
 		}
-		cout << endl;
 	}
 
 	dotStr = "digraph tree{ rankdir=\"LR\"\n" + *Programm::main->ToDOT() + "}";

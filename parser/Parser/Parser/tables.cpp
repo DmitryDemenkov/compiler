@@ -604,15 +604,41 @@ string* Class::ToDOT()
 
 string Class::ToString()
 {
-	string str = GetFullName() + ";" + GetAccessModifierName(accessModifier) + ";abstract:" +
-		to_string(IsAbstract()) + ";static:" + to_string(IsStatic());
+	string str = GetFullName() + "," + GetAccessModifierName(accessModifier) 
+		+ "," + to_string(IsStatic()) + "," + to_string(IsAbstract());
 
 	if (parent != NULL)
 	{
-		str += ";parent:" + parent->GetFullName();
+		str += "," + parent->GetFullName();
 	}
 
 	return str;
+}
+
+void Class::WriteTablesFile()
+{
+	std::filesystem::create_directories(GetFullName());
+	ofstream file;
+	file.open(GetFullName() + "/declaration.csv");
+	file << "name,access modifier,static,abstract,parent\n";
+	file << ToString() << "\n";
+	file.close();
+
+	file.open(GetFullName() + "/fields.csv");
+	file << "name,descriptor,access modifier,static\n";
+	for (auto field : GetAllFields())
+	{
+		file << field->ToString() << "\n";
+	}
+	file.close();
+
+	file.open(GetFullName() + "/methods.csv");
+	file << "name,descriptor,access modifier,static,abstract,virtual,override" << "\n";
+	for (auto method : GetAllMethods())
+	{
+		file << method->ToString() << "\n";
+	}
+	file.close();
 }
 
 Constant::Constant(Type type)
@@ -648,6 +674,20 @@ string* DataType::ToString()
 	if (isArray) { *str += "[]"; }
 
 	return str;
+}
+
+string DataType::ToDescriptor()
+{
+	switch (type)
+	{
+	case DataType::t_INT:
+	case DataType::t_BOOL:
+	case DataType::t_CHAR:     return "I";
+	case DataType::t_STRING:   return "L.global/String;";
+	case DataType::t_TYPENAME: return "L" + classType->GetFullName() + ";";
+	case DataType::t_VOID:	   return "V";
+	default: return "";
+	}
 }
 
 bool DataType::operator==(const DataType& other) const
@@ -735,8 +775,8 @@ DataType* FieldTable::GetType()
 
 string FieldTable::ToString()
 {
-	return *GetName() + ";" + *GetType()->ToString() 
-		+ ";" + GetAccessModifierName(GetAccessModifier()) + ";static:" + to_string(IsStatic());
+	return *GetName() + "," + GetType()->ToDescriptor() 
+		+ "," + GetAccessModifierName(GetAccessModifier()) + "," + to_string(IsStatic());
 }
 
 string GetAccessModifierName(AccessModifier modifier)
@@ -913,14 +953,16 @@ void MethodTable::Semantic(Class* owner)
 
 string MethodTable::ToString()
 {
-	string str = *GetName() + ";" + *GetReturnValue()->ToString() + ";"
-		+ GetAccessModifierName(accessModifier) + ";static:" + to_string(IsStatic()) + ";abstract:" + to_string(IsAbstract())
-		+ ";virtual:" + to_string(IsVirtual()) + ";override:" + to_string(IsOverride()) + "\nParams\n";
-
+	string descriptor = "(";
 	for (auto param : params)
 	{
-		str += *param->name + ";" + *param->type->ToString() + "\n";
+		descriptor += param->type->ToDescriptor();
 	}
+	descriptor += ")" + GetReturnValue()->ToDescriptor();
+
+	string str = *GetName() + "," + descriptor + ","
+		+ GetAccessModifierName(accessModifier) + "," + to_string(IsStatic()) + "," + to_string(IsAbstract())
+		+ "," + to_string(IsVirtual()) + "," + to_string(IsOverride());
 
 	return str;
 }
