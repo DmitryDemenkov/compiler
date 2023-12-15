@@ -2324,6 +2324,10 @@ void main(int argc, char** argv)
 			{
 				cout << e << endl;
 			}
+			catch (string str)
+			{
+				cout << str << endl;
+			}
 		}
 	}
 

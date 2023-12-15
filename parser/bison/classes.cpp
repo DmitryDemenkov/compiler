@@ -444,7 +444,7 @@ void Expression::DetermineDataType(Class* owner, MethodTable* methodInfo)
 		dataType->classType = owner;
 		break;
 	case Expression::t_BASE:
-		dataType->DataType::t_TYPENAME;
+		dataType->type = DataType::t_TYPENAME;
 		dataType->classType = owner->GetParent();
 		break;
 	case Expression::t_OBJ_CREATION:
@@ -593,7 +593,7 @@ DataType* Expression::GetDataTypeOfInvocation(Class* owner, MethodTable* methodI
 
 		if (owner->GetMethod(*this->name) == NULL)
 		{
-			throw("There is no such method in class");
+			throw("There is no such method " + *this->name + " in class " + owner->GetFullName());
 		}
 		dType = owner->GetMethod(*this->name)->GetReturnValue();
 	}
@@ -609,7 +609,7 @@ DataType* Expression::GetDataTypeOfInvocation(Class* owner, MethodTable* methodI
 		}
 		if (this->left->dataType->classType->GetMethod(*this->name) == NULL)
 		{
-			throw("There is no such method in class");
+			throw("There is no such method " + *this->name + " in class " + this->left->dataType->classType->GetFullName());
 		}
 		dType = this->left->dataType->classType->GetMethod(*this->name)->GetReturnValue();
 	}
@@ -1814,12 +1814,6 @@ string* Constructor::ToDOT()
 	{
 		*dotStr += to_string(id) + ".2[label=\"this\"];\n";
 		*dotStr += to_string(id) + "->" + to_string(id) + ".2[label=\"thisConstruct\"];\n";
-	}
-
-	if (argumentList != NULL)
-	{
-		*dotStr += *argumentList->ToDOT();
-		*dotStr += to_string(id) + "->" + to_string(argumentList->id) + "[label=\"args\"];\n";
 	}
 
 	return dotStr;

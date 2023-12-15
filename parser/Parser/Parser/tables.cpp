@@ -309,6 +309,8 @@ void Class::AppendConstructor(Constructor* constructor)
 		}
 	}
 	newConstructor->SetBody(constructor->statementList);
+	AppendFieldInitializers(newConstructor, constructor->argumentList);
+	constructor->statementList = newConstructor->GetBody();
 
 	methods[*constructorName] = newConstructor;
 }
@@ -326,12 +328,42 @@ void Class::AppdendDefaultConstructor()
 
 	MethodTable* newConstructor = new MethodTable(constructorName, dataType);
 	newConstructor->SetAccessModifier(e_PUBLIC);
+	AppendFieldInitializers(newConstructor, NULL);
+
+	if (decl != NULL)
+	{
+		ClassMemberList::Append(decl->classMemberList, 
+			new Constructor(NULL, GetName(), NULL, ClassMember::t_NULL, newConstructor->GetBody()));
+	}
+
 	methods[*constructorName] = newConstructor;
 }
 
 void Class::AppendParent(TypeName* parentName)
 {
 	parent = FindClass(parentName);;
+}
+
+void Class::AppendFieldInitializers(MethodTable* constructor, ArgumentList* args)
+{
+	TypeName* baseName = new TypeName(new string("<init>"));
+	Expression* baseExpr = MemberAccess::FromTypeName(baseName, new Expression(Expression::t_BASE));
+
+	Expression* baseInvoke = new InvocationExpression(baseExpr, args);
+	Statement* baseInit = new Statement(Statement::t_EXPRESSION, baseInvoke);
+
+	if (constructor->GetBody() != NULL)
+	{
+		StatementList* body = constructor->GetBody();
+		body->statements->push_front(baseInit);
+		body->id = body->statements->front()->id;
+		constructor->SetBody(body);
+	}
+	else
+	{
+		StatementList* body = new StatementList(baseInit);
+		constructor->SetBody(body);
+	}
 }
 
 void Class::CheckOverridingMethods()
@@ -997,6 +1029,7 @@ Class* Class::CreateObjectClass(AbstractNamespaceMember* outer)
 	toStringMethod->SetVirtual(true);
 
 	objectClass->AppdendDefaultConstructor();
+	objectClass->GetMethod("<init>")->SetBody(NULL);
 	return objectClass;
 }
 

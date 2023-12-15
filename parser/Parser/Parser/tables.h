@@ -21,6 +21,10 @@ class VarDeclarator;
 class Variable;
 class Expression;
 class StatementList;
+class Statement;
+class MemberAccess;
+class InvocationExpression;
+class ArgumentList;
 
 class Constant
 {
@@ -116,6 +120,7 @@ private:
 	void AppendConstructor(Constructor* constructor);
 	void AppdendDefaultConstructor();
 	void AppendParent(TypeName* parentName);
+	void AppendFieldInitializers(MethodTable* constructor, ArgumentList* args);
 
 	static Class* CreateObjectClass(AbstractNamespaceMember* outer);
 	static Class* CreateStringClass(AbstractNamespaceMember* outer);
