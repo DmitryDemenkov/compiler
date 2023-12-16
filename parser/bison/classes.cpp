@@ -404,7 +404,7 @@ string* Expression::ToDOT()
 	}
 	if (right != NULL)
 	{
-		*dotStr += *right->ToDOT();;
+		*dotStr += *right->ToDOT();
 		*dotStr += to_string(id) + "->" + to_string(right->id) + "[label=\"right\"];\n";
 	}
 	if (dataType != NULL)
@@ -523,6 +523,8 @@ string* Expression::GetName()
 	case Expression::t_SIMPLE_TYPE: return simpleType->GetName();
 	case Expression::t_THIS: return new string("this");
 	case Expression::t_BASE: return new string("base");
+	case Expression::t_CLASS: return new string("class");
+	case Expression::t_OBJECT: return new string("object");
 	case Expression::t_MEMBER_ACCESS: return new string(".");
 	case Expression::t_UNMINUS: return new string("-");
 	case Expression::t_NOT: return new string("!");
@@ -557,10 +559,21 @@ DataType* Expression::GetDataTypeOfId(Class* owner, MethodTable* methodInfo)
 	FieldTable* fieldInfo = owner->GetField(*this->name);
 	if (fieldInfo != NULL) 
 	{
-		this->type = Expression::t_MEMBER_ACCESS;
+		this->type = t_OBJECT;
 		this->right = new Expression(Expression::t_ID, this->name);
-		this->left = new Expression(t_THIS);
-		this->left->DetermineDataType(owner, methodInfo);
+		this->right->dataType = fieldInfo->GetType();
+		if (!fieldInfo->IsStatic())
+		{
+			this->left = new Expression(t_THIS);
+			this->left->DetermineDataType(owner, methodInfo);
+		}
+		else
+		{
+			this->left = new Expression(Expression::t_CLASS);
+			this->left->dataType = new DataType(); 
+			this->left->dataType->type = DataType::t_TYPENAME;
+			this->left->dataType->classType = owner;
+		}
 		return fieldInfo->GetType(); 
 	}
 
@@ -570,15 +583,17 @@ DataType* Expression::GetDataTypeOfId(Class* owner, MethodTable* methodInfo)
 	try	{ classInfo = owner->FindClass(tName); }
 	catch (const char*) { }
 
+	this->typeName = tName;
+
 	if (classInfo != NULL) 
 	{
 		DataType* dType = new DataType();
 		dType->type = DataType::t_TYPENAME;
 		dType->classType = classInfo;
+		this->type = t_CLASS;
 		return dType;
 	}
 
-	this->typeName = tName;
 	return NULL;
 }
 
@@ -644,13 +659,19 @@ DataType* Expression::GetDataTypeOfMemberAccess(Class* owner, MethodTable* metho
 			DataType* dType = new DataType();
 			dType->type = DataType::t_TYPENAME;
 			dType->classType = classInfo;
+			this->type = t_CLASS;
 			return dType;
 		}
 	}
 	else if (this->left->dataType->type == DataType::t_TYPENAME)
 	{
 		FieldTable* fieldInfo = this->left->dataType->classType->GetField(*this->right->name);
-		if (fieldInfo != NULL) { return fieldInfo->GetType(); }
+		if (fieldInfo != NULL) 
+		{
+			this->type = t_OBJECT;
+			this->right->dataType = fieldInfo->GetType();
+			return fieldInfo->GetType();
+		}
 	}
 
 	return NULL;

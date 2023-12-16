@@ -170,7 +170,10 @@ public:
         t_INEQUALITY,
         t_AND,
         t_OR,
-        t_ASSIGNMENT
+        t_ASSIGNMENT,
+
+        t_CLASS,
+        t_OBJECT
     };
 
     int id;
