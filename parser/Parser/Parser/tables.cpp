@@ -346,6 +346,29 @@ void Class::AppendParent(TypeName* parentName)
 
 void Class::AppendFieldInitializers(MethodTable* constructor, ArgumentList* args)
 {
+	for (auto field : GetAllFields())
+	{
+		if (!field->IsStatic() && field->GetInitializer() != NULL)
+		{
+			Expression* fieldName = new Expression(Expression::t_ID, field->GetName());
+			Expression* initExpr = new Expression(Expression::t_ASSIGNMENT, fieldName, field->GetInitializer());
+			Statement* fieldInit = new Statement(Statement::t_EXPRESSION, initExpr);
+
+			if (constructor->GetBody() != NULL)
+			{
+				StatementList* body = constructor->GetBody();
+				body->statements->push_front(fieldInit);
+				body->id = body->statements->front()->id;
+				constructor->SetBody(body);
+			}
+			else
+			{
+				StatementList* body = new StatementList(fieldInit);
+				constructor->SetBody(body);
+			}
+		}
+	}
+
 	TypeName* baseName = new TypeName(new string("<init>"));
 	Expression* baseExpr = MemberAccess::FromTypeName(baseName, new Expression(Expression::t_BASE));
 
@@ -710,16 +733,20 @@ string* DataType::ToString()
 
 string DataType::ToDescriptor()
 {
+	string str = "";
 	switch (type)
 	{
 	case DataType::t_INT:
 	case DataType::t_BOOL:
-	case DataType::t_CHAR:     return "I";
-	case DataType::t_STRING:   return "L.global/String;";
-	case DataType::t_TYPENAME: return "L" + classType->GetFullName() + ";";
-	case DataType::t_VOID:	   return "V";
-	default: return "";
+	case DataType::t_CHAR:     str = "I"; break;
+	case DataType::t_STRING:   str = "L.global/String;"; break;
+	case DataType::t_TYPENAME: str = "L" + classType->GetFullName() + ";"; break;
+	case DataType::t_VOID:	   str = "V"; break;
+	default: break;
 	}
+
+	if (isArray) str = "[" + str;
+	return str;
 }
 
 bool DataType::operator==(const DataType& other) const

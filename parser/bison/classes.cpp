@@ -1759,12 +1759,6 @@ string* Field::ToDOT()
 		*dotStr += to_string(id) + "->" + to_string(arrayType->id) + "[label=\"type\"];\n";
 	}
 
-	if (expression != NULL)
-	{
-		*dotStr += *expression->ToDOT();
-		*dotStr += to_string(id) + "->" + to_string(expression->id) + "[label=\"init\"];\n";
-	}
-
 	return dotStr;
 }
 
@@ -1783,9 +1777,7 @@ Constructor::Constructor(ModifielrList* modifiers, string* identifier,
 string* Constructor::ToDOT()
 {
 	string* dotStr = new string();
-	*dotStr += to_string(id) + ".1[label=\"" + *identifier + "\"];\n";
 	*dotStr += to_string(id) + "[label=\"constructor\"];\n";
-	*dotStr += to_string(id) + "->" + to_string(id) + ".1[label=\"id\"];\n";
 
 	if (modifiers != NULL)
 	{
@@ -1803,17 +1795,6 @@ string* Constructor::ToDOT()
 	{
 		*dotStr += *statementList->ToDOT();
 		*dotStr += to_string(id) + "->" + to_string(statementList->id) + "[label=\"stmt\"];\n";
-	}
-
-	if (baseConstructor == Constructor::t_BASE)
-	{
-		*dotStr += to_string(id) + ".2[label=\"base\"];\n";
-		*dotStr += to_string(id) + "->" + to_string(id) + ".2[label=\"baseConstruct\"];\n";
-	}
-	else if (baseConstructor == Constructor::t_THIS)
-	{
-		*dotStr += to_string(id) + ".2[label=\"this\"];\n";
-		*dotStr += to_string(id) + "->" + to_string(id) + ".2[label=\"thisConstruct\"];\n";
 	}
 
 	return dotStr;
