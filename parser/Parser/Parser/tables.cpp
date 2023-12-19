@@ -454,15 +454,6 @@ Class::Class(string* name, AbstractNamespaceMember* outer, ClassDeclaration* dec
 	this->decl = decl;
 	this->outerMember = outer;
 	this->name = name;
-
-	this->constantTable = vector<Constant*>();
-	Constant* code = new Constant(Constant::t_UTF8);        code->utf8 = new string("Code");
-	Constant* className = new Constant(Constant::t_UTF8);   className->utf8 = new string(GetFullName());
-	Constant* classConst = new Constant(Constant::t_CLASS); classConst->firstRef = 1;
-
-	constantTable.push_back(code);
-	constantTable.push_back(className);
-	constantTable.push_back(classConst);
 }
 
 int Class::GetId()

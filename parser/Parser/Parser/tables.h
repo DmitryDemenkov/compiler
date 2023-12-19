@@ -47,6 +47,9 @@ public:
 	int secondRef = -1;
 
 	Constant(Type type);
+	Constant(Type type, string* utf8);
+	Constant(Type type, int integer);
+	Constant(Type type, int firstRef, int secondRef = -1);
 };
 
 enum AccessModifier
