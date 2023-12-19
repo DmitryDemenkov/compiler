@@ -603,13 +603,25 @@ DataType* Expression::GetDataTypeOfInvocation(Class* owner, MethodTable* methodI
 	if (this->left->type == Expression::t_ID)
 	{
 		this->name = this->left->name;
-		this->left = new Expression(t_THIS);
-		this->left->DetermineDataType(owner, methodInfo);
 
 		if (owner->GetMethod(*this->name) == NULL)
 		{
 			throw("There is no such method " + *this->name + " in class " + owner->GetFullName());
 		}
+
+		if (owner->GetMethod(*this->name)->IsStatic())
+		{
+			this->left = new Expression(t_CLASS);
+			this->left->dataType = new DataType();
+			this->left->dataType->type = DataType::t_TYPENAME;
+			this->left->dataType->classType = owner;
+		}
+		else
+		{
+			this->left = new Expression(t_THIS);
+			this->left->DetermineDataType(owner, methodInfo);
+		}
+
 		dType = owner->GetMethod(*this->name)->GetReturnValue();
 	}
 	else
