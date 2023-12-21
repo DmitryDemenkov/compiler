@@ -636,6 +636,21 @@ void Class::Append(AbstractNamespaceMember* member)
 	}
 }
 
+bool Class::InstanceOf(Class* other)
+{
+	if (this->GetFullName() == other->GetFullName())
+	{
+		return true;
+	}
+
+	if (parent == NULL)
+	{
+		return false;
+	}
+
+	return parent->InstanceOf(other);
+}
+
 string* Class::ToDOT()
 {
 	string* dotStr = new string();
@@ -742,10 +757,10 @@ string DataType::ToDescriptor()
 
 bool DataType::operator==(const DataType& other) const
 {
-	bool isTypeEquals = this->type == other.type;
+	bool isTypeEquals = this->type == other.type || this->type == t_INT && other.type == t_CHAR;
 	if (isTypeEquals && this->type == t_TYPENAME)
 	{
-		isTypeEquals = this->classType->GetFullName() == other.classType->GetFullName();
+		isTypeEquals = other.classType->InstanceOf(this->classType);
 	}
 	return isTypeEquals && this->isArray == other.isArray;
 }

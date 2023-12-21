@@ -154,6 +154,9 @@ public:
 	AbstractNamespaceMember* GetInnerMember(string* name) override;
 	vector<AbstractNamespaceMember*> GetAllMembers() override;
 	void Append(AbstractNamespaceMember* member) override;
+	
+	bool InstanceOf(Class* other);
+
 	string* ToDOT() override;
 	string ToString();
 	void WriteTablesFile();
