@@ -563,7 +563,7 @@ AccessModifier Class::GetAccessModifier()
 
 void Class::CreateTables()
 {
-	if (decl == NULL || decl->classMemberList == NULL)
+	if (decl == NULL)
 	{
 		return;
 	}
@@ -576,6 +576,11 @@ void Class::CreateTables()
 	{
 		TypeName* typeName = new TypeName(new string("Object"));
 		AppendParent(typeName);
+	}
+
+	if (decl->classMemberList == NULL)
+	{
+		return;
 	}
 
 	for (auto classMember : *decl->classMemberList->members)
