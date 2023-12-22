@@ -261,7 +261,7 @@ public:
 
 	void Semantic(Class* owner);
 
-	bool CompareParamsSet(map<DataType, int>* args);
+	bool CompareArgsTypes(ArgumentList* args);
 	int GetParamIndex(string* name);
 	string ToString();
 };

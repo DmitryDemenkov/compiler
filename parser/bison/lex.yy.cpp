@@ -2295,6 +2295,11 @@ void main(int argc, char** argv)
 			cout << e << endl;
 			return;
 		}
+		catch (string str)
+		{
+			cout << str << endl;
+			return;
+		}
 	}
 	for (auto cl : classes)
 	{

@@ -177,7 +177,7 @@ Class* Class::FindClass(TypeName* typeName)
 
 	if (dynamic_cast<Class*>(neededMember) == NULL)
 	{
-		throw("Not such identifier");
+		throw("Not such identifier " + *typeName->identifiers->back());
 	}
 
 	return (Class*)neededMember;
@@ -1019,6 +1019,70 @@ void MethodTable::Semantic(Class* owner)
 			stmt->Semantic(owner, this);
 		}
 	}
+}
+
+bool MethodTable::CompareArgsTypes(ArgumentList* args)
+{
+	if (args == NULL)
+	{
+		return params.size() == 0;
+	}
+
+	vector<Expression*> sortedArgs = vector<Expression*>(params.size(), NULL);
+	int lastArgIndex = 0;
+	for (auto arg : *args->arguments)
+	{
+		if (arg->identifier == NULL)
+		{
+			if (lastArgIndex >= sortedArgs.size())
+			{
+				throw("Too many arguments");
+			}
+			if (sortedArgs[lastArgIndex] != NULL)
+			{
+				throw("Argument just exists");
+			}
+			sortedArgs[lastArgIndex] = arg->expression;
+		}
+		else
+		{
+			int argIndex = GetParamIndex(arg->identifier);
+			if (argIndex < 0)
+			{
+				throw("No param with such name");
+			}
+			if (sortedArgs[argIndex] != NULL)
+			{
+				throw("Argument just exists");
+			}
+			sortedArgs[argIndex] = arg->expression;
+		}
+		lastArgIndex++;
+	}
+
+	for (int i = 0; i < params.size(); i++)
+	{
+		if (sortedArgs[i] == NULL)
+		{
+			throw("Argument not exists");
+		}
+		if (!(*params[i]->type == *sortedArgs[i]->dataType))
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+int MethodTable::GetParamIndex(string* name)
+{
+	for (int i = 0; i < params.size(); i++)
+	{
+		if (*params[i]->name == *name)
+			return i;
+	}
+	return -1;
 }
 
 string MethodTable::ToString()

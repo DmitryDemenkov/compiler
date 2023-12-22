@@ -218,6 +218,8 @@ private:
     DataType* GetDataTypeOfElementAccess(Class* owner, MethodTable* methodInfo);
     DataType* GetDataTypeOfTypeCast(Class* owner, MethodTable* methodInfo);
     DataType* GetDataTypeOfArithmetic(Class* owner, MethodTable* methodInfo);
+
+    void CheckErrorsOfInvokation(Class* owner, MethodTable* methodInfo);
 };
 
 class ObjectCreation : public Expression

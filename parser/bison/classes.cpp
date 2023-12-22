@@ -649,6 +649,8 @@ DataType* Expression::GetDataTypeOfInvocation(Class* owner, MethodTable* methodI
 		}
 	}
 
+	CheckErrorsOfInvokation(owner, methodInfo);
+
 	return dType;
 }
 
@@ -852,6 +854,49 @@ DataType* Expression::GetDataTypeOfArithmetic(Class* owner, MethodTable* methodI
 	dType->isArray = left->dataType->isArray;
 
 	return dType;
+}
+
+void Expression::CheckErrorsOfInvokation(Class* owner, MethodTable* methodInfo)
+{
+	MethodTable* invoketedMethod = this->left->dataType->classType->GetMethod(*this->name);
+	if (invoketedMethod->CompareArgsTypes(this->argumentList) == false)
+	{
+		throw("Incorrect arguments data types");
+	}
+
+	if (invoketedMethod->IsStatic() && this->left->type != Expression::t_CLASS)
+	{
+		throw("Static methods should be invoked on class");
+	}
+
+	if (!invoketedMethod->IsStatic() && this->left->type == Expression::t_CLASS)
+	{
+		throw("Dynamic methods should be invoked on object");
+	}
+
+	if (!invoketedMethod->IsStatic() && methodInfo->IsStatic() &&
+		(this->left->type == Expression::t_THIS || this->left->type == Expression::t_BASE))
+	{
+		throw("Static methods can invoke only static methods");
+	}
+
+	switch (invoketedMethod->GetAccessModifier())
+	{
+	case AccessModifier::e_PRIVATE:
+		if (left->dataType->classType->GetFullName() != owner->GetFullName())
+		{
+			throw("Invoketed method are not allown");
+		}
+		break;
+	case AccessModifier::e_PROTECTED:
+		if (!owner->InstanceOf(left->dataType->classType))
+		{
+			throw("Invoketed method are not allown");
+		}
+		break;
+	default:
+		break;
+	}
 }
 
 ObjectCreation::ObjectCreation(SimpleType* simpleType, 
