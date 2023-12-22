@@ -115,8 +115,6 @@ private:
 	AbstractNamespaceMember* outerMember = NULL;
 	vector<Class*> innerMembers;
 
-	DataType* CreateDataType(ClassMember* member);
-	DataType* CreateDataType(VarDeclarator* varDecl);
 	void AppendField(Field* field);
 	void AppendMethod(Method* method);
 	void AppendMethod(string* name, DataType* returnType, vector<Variable*> params);
@@ -149,6 +147,9 @@ public:
 
 	void CreateTables();
 	void CheckOverridingMethods();
+
+	DataType* CreateDataType(ClassMember* member);
+	DataType* CreateDataType(VarDeclarator* varDecl);
 
 	AbstractNamespaceMember* GetOuterMember() override;
 	AbstractNamespaceMember* GetInnerMember(string* name) override;
@@ -257,6 +258,7 @@ public:
 	DataType* GetReturnValue();
 	string* GetName();
 	vector<Variable*> GetParams();
+	void AddLocalVariable(string* name, DataType* type);
 	Variable* GetLocalVariable(string* varName);
 
 	void Semantic(Class* owner);

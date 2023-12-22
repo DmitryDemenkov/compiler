@@ -301,9 +301,13 @@ public:
     string* identifier = NULL;
     Expression* initializer = NULL;
 
+    DataType* dataType = NULL;
+
     VarDeclarator(SimpleType* simpletype, string* identifier, Expression* expression = NULL);
     VarDeclarator(TypeName* typeName, string* identifier, Expression* expression = NULL);
     VarDeclarator(ArrayType* arraytype, string* identifier, Expression* expression = NULL);
+
+    void Semantic(Class* owner, MethodTable* methodInfo);
 
     string* ToDOT();
 };

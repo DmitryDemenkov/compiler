@@ -987,6 +987,19 @@ vector<Variable*> MethodTable::GetParams()
 	return params;
 }
 
+void MethodTable::AddLocalVariable(string* name, DataType* type)
+{
+	if (GetLocalVariable(name) != NULL)
+	{
+		throw("Duplicated local variable name");
+	}
+
+	Variable* newParam = new Variable();
+	newParam->name = name;
+	newParam->type = type;
+	localVariables.push_back(newParam);
+}
+
 Variable* MethodTable::GetLocalVariable(string* varName)
 {
 	Variable* var = NULL;

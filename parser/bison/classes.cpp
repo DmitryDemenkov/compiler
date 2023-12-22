@@ -1181,6 +1181,19 @@ VarDeclarator::VarDeclarator(ArrayType* arraytype, string* identifier, Expressio
 	this->initializer = expression;
 }
 
+void VarDeclarator::Semantic(Class* owner, MethodTable* methodInfo)
+{
+	DataType* dType = owner->CreateDataType(this);
+	methodInfo->AddLocalVariable(this->identifier, dType);
+
+	dataType = dType;
+
+	if (initializer != NULL)
+	{
+		initializer->DetermineDataType(owner, methodInfo);
+	}
+}
+
 string* VarDeclarator::ToDOT()
 {
 	string typeId;
@@ -1209,6 +1222,12 @@ string* VarDeclarator::ToDOT()
 	{
 		*dotStr += *initializer->ToDOT();
 		*dotStr += to_string(id) + "->" + to_string(initializer->id) + "[label=\"init\"];\n";
+	}
+
+	if (dataType != NULL)
+	{
+		*dotStr += to_string(id) + ".01[label=\"" + *dataType->ToString() + "\"];\n";
+		*dotStr += to_string(id) + "->" + to_string(id) + ".01[label=\"dataType\"];\n";
 	}
 
 	return dotStr;
@@ -1324,6 +1343,13 @@ void Statement::Semantic(Class* owner, MethodTable* methodInfo)
 	if (type == t_EXPRESSION)
 	{
 		expressions->expressions->front()->DetermineDataType(owner, methodInfo);
+	}
+	else if (type == t_DECLARATOR)
+	{
+		for (auto decl : *declarators->declarators)
+		{
+			decl->Semantic(owner, methodInfo);
+		}
 	}
 }
 
