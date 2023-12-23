@@ -259,7 +259,8 @@ void MemberInitializer::DetermineDataType(Class* owner, MethodTable* methodInfo,
 	FieldTable* fieldInfo = creatingClass->GetField(*identifier);
 	if (fieldInfo == NULL)
 	{
-		throw("Field does not exist");
+		string err = "Field \"" + *identifier + "\" does not exist in class \"" + creatingClass->GetFullName() + "\"";
+		throw std::exception(err.c_str());
 	}
 	this->dataType = fieldInfo->GetType();
 
@@ -581,7 +582,7 @@ DataType* Expression::GetDataTypeOfId(Class* owner, MethodTable* methodInfo)
 	Class* classInfo = NULL;
 
 	try	{ classInfo = owner->FindClass(tName); }
-	catch (const char*) { }
+	catch (std::exception) { }
 
 	this->typeName = tName;
 
@@ -606,7 +607,8 @@ DataType* Expression::GetDataTypeOfInvocation(Class* owner, MethodTable* methodI
 
 		if (owner->GetMethod(*this->name) == NULL)
 		{
-			throw("There is no such method " + *this->name + " in class " + owner->GetFullName());
+			string err = "There is no such method " + *this->name + " in class " + owner->GetFullName();
+			throw std::exception(err.c_str());
 		}
 
 		if (owner->GetMethod(*this->name)->IsStatic())
@@ -632,11 +634,13 @@ DataType* Expression::GetDataTypeOfInvocation(Class* owner, MethodTable* methodI
 
 		if (this->left->dataType == NULL || this->left->dataType->type != DataType::t_TYPENAME)
 		{
-			throw("There is no such identifier");
+			string err = "There is no such identifier";
+			throw std::exception(err.c_str());
 		}
 		if (this->left->dataType->classType->GetMethod(*this->name) == NULL)
 		{
-			throw("There is no such method " + *this->name + " in class " + this->left->dataType->classType->GetFullName());
+			string err = "There is no such method " + *this->name + " in class " + this->left->dataType->classType->GetFullName();
+			throw std::exception(err.c_str());
 		}
 		dType = this->left->dataType->classType->GetMethod(*this->name)->GetReturnValue();
 	}
@@ -665,7 +669,7 @@ DataType* Expression::GetDataTypeOfMemberAccess(Class* owner, MethodTable* metho
 		
 		Class* classInfo = NULL;
 		try { classInfo = owner->FindClass(tName); }
-		catch (const char*) {}
+		catch (std::exception) {}
 		this->typeName = tName;
 
 		if (classInfo != NULL)
@@ -777,7 +781,8 @@ DataType* Expression::GetDataTypeOfElementAccess(Class* owner, MethodTable* meth
 	left->DetermineDataType(owner, methodInfo);
 	if (left->dataType->isArray == false)
 	{
-		throw("Invalid element access");
+		string err = "Invalid element access";
+		throw std::exception(err.c_str());
 	}
 	dType->type = left->dataType->type;
 	dType->classType = left->dataType->classType;
@@ -861,23 +866,27 @@ void Expression::CheckErrorsOfInvokation(Class* owner, MethodTable* methodInfo)
 	MethodTable* invoketedMethod = this->left->dataType->classType->GetMethod(*this->name);
 	if (invoketedMethod->CompareArgsTypes(this->argumentList) == false)
 	{
-		throw("Incorrect arguments data types");
+		string err = "Incorrect arguments data types in invokation of method \"" + *invoketedMethod->GetName() + "\"";
+		throw std::exception(err.c_str());
 	}
 
 	if (invoketedMethod->IsStatic() && this->left->type != Expression::t_CLASS)
 	{
-		throw("Static methods should be invoked on class");
+		string err = "Static methods should be invoked on class";
+		throw std::exception(err.c_str());
 	}
 
 	if (!invoketedMethod->IsStatic() && this->left->type == Expression::t_CLASS)
 	{
-		throw("Dynamic methods should be invoked on object");
+		string err = "Dynamic methods should be invoked on object";
+		throw std::exception(err.c_str());
 	}
 
 	if (!invoketedMethod->IsStatic() && methodInfo->IsStatic() &&
 		(this->left->type == Expression::t_THIS || this->left->type == Expression::t_BASE))
 	{
-		throw("Static methods can invoke only static methods");
+		string err = "Static methods can invoke only static methods";
+		throw std::exception(err.c_str());
 	}
 
 	switch (invoketedMethod->GetAccessModifier())
@@ -885,13 +894,15 @@ void Expression::CheckErrorsOfInvokation(Class* owner, MethodTable* methodInfo)
 	case AccessModifier::e_PRIVATE:
 		if (left->dataType->classType->GetFullName() != owner->GetFullName())
 		{
-			throw("Invoketed method are not allown");
+			string err = "Invoketed method are not allown";
+			throw std::exception(err.c_str());
 		}
 		break;
 	case AccessModifier::e_PROTECTED:
 		if (!owner->InstanceOf(left->dataType->classType))
 		{
-			throw("Invoketed method are not allown");
+			string err = "Invoketed method are not allown";
+			throw std::exception(err.c_str());
 		}
 		break;
 	default:
@@ -1087,7 +1098,8 @@ TypeName* MemberAccess::ToTypeName(Expression* memberAccess)
 		}
 		else
 		{
-			throw "incorrect exprression type";
+			string err = "Incorrect exprression type";
+			throw std::exception(err.c_str());
 		}
 		memberAccess = memberAccess->left;
 	} while (memberAccess != NULL);
@@ -1603,37 +1615,42 @@ Modifier::Modifier(Type type)
 	this->type = type;
 }
 
-string* Modifier::ToDOT()
+string Modifier::GetName()
 {
 	string name;
 	switch (type)
 	{
-	case Modifier::t_PRIVATE:   
+	case Modifier::t_PRIVATE:
 		name = "private";
 		break;
-	case Modifier::t_PROTECTED: 
+	case Modifier::t_PROTECTED:
 		name = "protected";
 		break;
-	case Modifier::t_PUBLIC:    
+	case Modifier::t_PUBLIC:
 		name = "public";
 		break;
-	case Modifier::t_INTERNAL:  
+	case Modifier::t_INTERNAL:
 		name = "internal";
 		break;
-	case Modifier::t_ABSTRACT:  
+	case Modifier::t_ABSTRACT:
 		name = "abstract";
 		break;
-	case Modifier::t_STATIC:   
+	case Modifier::t_STATIC:
 		name = "static";
 		break;
-	case Modifier::t_OVERRIDE:  
+	case Modifier::t_OVERRIDE:
 		name = "override";
 		break;
-	case Modifier::t_VIRTUAL:   
+	case Modifier::t_VIRTUAL:
 		name = "virtual";
 		break;
 	}
-	
+	return name;
+}
+
+string* Modifier::ToDOT()
+{
+	string name = GetName();	
 	string* dotStr = new string();
 	*dotStr = to_string(id) + "[label=\"" + name + "\"];\n";
 	return dotStr;
@@ -1955,7 +1972,8 @@ AbstractNamespaceMember* ClassDeclaration::CreateClassTable(AbstractNamespaceMem
 {
 	if (outer->GetInnerMember(identifier) != NULL)
 	{
-		throw("Identifier already exists");
+		string err = "Identifier \"" + *identifier + "\" already exists in \"" + outer->GetFullName() + "\"";
+		throw std::exception(err.c_str());
 	}
 	
 	Class* current =  new Class(identifier, outer, this);
@@ -1990,8 +2008,8 @@ AbstractNamespaceMember* ClassDeclaration::CreateClassTable(AbstractNamespaceMem
 			current->SetStatic(true);
 			break;
 		default:
-			throw("Illigal class modifier");
-			break;
+			string err = "Illegal class modifier \"" + modifier->GetName() + "\" of class \"" + current->GetFullName() + "\"";
+			throw std::exception(err.c_str());
 		}
 	}
 	if (current->GetAccessModifier() == e_NONE)
@@ -2118,7 +2136,8 @@ AbstractNamespaceMember* NamespaceDeclaration::CreateClassTable(AbstractNamespac
 	AbstractNamespaceMember* current = outer->GetInnerMember(typeName->identifiers->front());
 	if (current != NULL && dynamic_cast<Class*>(current))
 	{
-		throw("Identifier already exists");
+		string err = "Identifier \"" + *typeName->identifiers->front() + "\" already exists in \"" + outer->GetFullName() + "\"";
+		throw std::exception(err.c_str());
 	}
 
 	if (current == NULL)

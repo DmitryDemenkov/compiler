@@ -177,7 +177,8 @@ Class* Class::FindClass(TypeName* typeName)
 
 	if (dynamic_cast<Class*>(neededMember) == NULL)
 	{
-		throw("Not such identifier " + *typeName->identifiers->back());
+		string err = "Not such identifier \"" + *typeName->identifiers->back() + "\"";
+		throw std::exception(err.c_str());
 	}
 
 	return (Class*)neededMember;
@@ -188,7 +189,8 @@ void Class::AppendField(Field* field)
 	DataType* dataType = CreateDataType(field);
 	if (fields.count(*field->identifier) > 0 || GetInnerMember(field->identifier) != NULL)
 	{
-		throw("Identifier already exists");
+		string err = "Identifier \"" + *field->identifier + "\" already exists in class \"" + GetFullName() + "\"";
+		throw std::exception(err.c_str());
 	}
 
 	FieldTable* newField = new FieldTable(field->identifier, dataType);
@@ -205,7 +207,9 @@ void Class::AppendField(Field* field)
 		case Modifier::t_PROTECTED: newField->SetAccessModifier(e_PROTECTED); break;
 		case Modifier::t_PUBLIC:	newField->SetAccessModifier(e_PUBLIC);	  break;
 		case Modifier::t_STATIC:	newField->SetStatic(true); break;
-		default: throw("Illigal modifier");
+		default: 
+			string err = "Illigal modifier \"" + modifier->GetName() + "\" of class \"" + GetFullName() + "\"";
+			throw std::exception(err.c_str());
 		}
 	}
 	if (newField->GetAccessModifier() == e_NONE)
@@ -223,7 +227,8 @@ void Class::AppendMethod(Method* method)
 	DataType* dataType = CreateDataType(method);
 	if (methods.count(*method->identifier) > 0)
 	{
-		throw("Method already exists");
+		string err = "Method \"" + *method->identifier + "\" already exists in class \"" + GetFullName() + "\"";
+		throw std::exception(err.c_str());
 	}
 
 	MethodTable* newMethod = new MethodTable(method->identifier, dataType);
@@ -243,7 +248,10 @@ void Class::AppendMethod(Method* method)
 		case Modifier::t_ABSTRACT:  newMethod->SetAbstract(true); break;
 		case Modifier::t_VIRTUAL:   newMethod->SetVirtual(true);  break;
 		case Modifier::t_OVERRIDE:  newMethod->SetOverride(true); break;
-		default: throw("Illigal modifier");
+		default: 
+			string err = "Illigal modifier \"" + modifier->GetName() + "\" of method \"" +
+							*method->identifier + "\" in class \"" + GetFullName() + "\"";
+			throw std::exception(err.c_str());
 		}
 	}
 	if (newMethod->GetAccessModifier() == e_NONE)
@@ -269,11 +277,13 @@ void Class::AppendConstructor(Constructor* constructor)
 	string* constructorName = new string("<init>");
 	if (methods.count(*constructorName) > 0)
 	{
-		throw("Illigle constructor overriding");
+		string err = "Unsupported constructor overriding in class \"" + GetFullName() + "\"";
+		throw std::exception(err.c_str());
 	}
 	if (*this->name != *constructor->identifier)
 	{
-		throw("Illigle constructor name");
+		string err = "Constructor name doesn't match with name of class \"" + GetFullName() + "\"";
+		throw std::exception(err.c_str());
 	}
 
 	DataType* dataType = new DataType();
@@ -292,7 +302,9 @@ void Class::AppendConstructor(Constructor* constructor)
 		case Modifier::t_PRIVATE:   newConstructor->SetAccessModifier(e_PRIVATE);   break;
 		case Modifier::t_PROTECTED: newConstructor->SetAccessModifier(e_PROTECTED); break;
 		case Modifier::t_PUBLIC:	newConstructor->SetAccessModifier(e_PUBLIC);	break;
-		default: throw("Illigal modifier");
+		default: 
+			string err = "Illigal constructor modifier \"" + modifier->GetName() + "\" of class \"" + GetFullName() + "\"";
+			throw std::exception(err.c_str());
 		}
 	}
 	if (newConstructor->GetAccessModifier() == e_NONE)
@@ -320,7 +332,8 @@ void Class::AppdendDefaultConstructor()
 	string* constructorName = new string("<init>");
 	if (methods.count(*constructorName) > 0)
 	{
-		throw("Illigle constructor overriding");
+		string err = "Unsupported constructor overriding in class \"" + GetFullName() + "\"";
+		throw std::exception(err.c_str());
 	}
 
 	DataType* dataType = new DataType();
@@ -398,29 +411,39 @@ void Class::CheckOverridingMethods()
 			MethodTable* parentMethod = parent->GetMethod(*method.second->GetName());
 			if (parentMethod == NULL)
 			{
-				throw("No such method in parent");
+				string err = "No overriding method \"" + *method.second->GetName() 
+							 + "\" in class \"" + GetFullName() + "\"";
+				throw std::exception(err.c_str());
 			}
 			if (!parentMethod->IsAbstract() && !parentMethod->IsVirtual() && !parentMethod->IsOverride())
 			{
-				throw("This method can not be overrided");
+				string err = "Method \"" + *method.second->GetName()
+							 + "\" in class \"" + GetFullName() + "\" couldn't be overrided";
+				throw std::exception(err.c_str());
 			}
 			if (method.second->GetAccessModifier() != parentMethod->GetAccessModifier())
 			{
-				throw("Access modifier can not be changed");
+				string err = "Access modifier of method \"" + *method.second->GetName()
+							 + "\" in class \"" + GetFullName() + "\" couldn't be changed";
+				throw std::exception(err.c_str());
 			}
 
 			vector<Variable*> currentParams = method.second->GetParams();
 			vector<Variable*> parentParams = parentMethod->GetParams();
 			if (currentParams.size() != parentParams.size())
 			{
-				throw("There is no method in parent with such params set");
+				string err = "There is no method  \"" + *method.second->GetName()
+					+ "\" with such params set in parents of class \"" + GetFullName() + "\"";
+				throw std::exception(err.c_str());
 			}
 						
 			for (int i = 0; i < currentParams.size(); i++)
 			{
 				if (!(*currentParams[i]->type == *parentParams[i]->type))
 				{
-					throw("There is no method in parent with such params set");
+					string err = "There is no method \"" + *method.second->GetName()
+						+ "\" with such params set in parents of class \"" + GetFullName() + "\"";
+					throw std::exception(err.c_str());
 				}
 			}
 		}
@@ -428,11 +451,15 @@ void Class::CheckOverridingMethods()
 		{
 			if (!IsAbstract())
 			{
-				throw("Class could be abstract");
+				string err = "Class \"" + GetFullName()
+					+ "\" contains abstract method \"" + *method.second->GetName() + "\" should be abstract";
+				throw std::exception(err.c_str());
 			}
 			if (method.second->GetBody() != NULL)
 			{
-				throw("Abstract method could not have realisation");
+				string err = "Abstract method \"" + *method.second->GetName()
+					+ "\" in class \"" + GetFullName() + "\" could not have realisation";
+				throw std::exception(err.c_str());
 			}
 		}
 	}
@@ -515,7 +542,8 @@ void Class::SetStatic(bool value)
 {
 	if (value && isAbstract)
 	{
-		throw("Abstract class can not be static");
+		string err = "Abstract class \"" + GetFullName() + "\" can not be static";
+		throw std::exception(err.c_str());
 	}
 	isStatic = value;
 }
@@ -529,7 +557,8 @@ void Class::SetAbstract(bool value)
 {
 	if (value && isStatic)
 	{
-		throw("Static class can not be abstract");
+		string err = "Static class \"" + GetFullName() + "\" can not be abstract";
+		throw std::exception(err.c_str());
 	}
 	isAbstract = value;
 }
@@ -543,15 +572,18 @@ void Class::SetAccesModifier(AccessModifier modifier)
 {
 	if (accessModifier != e_NONE)
 	{
-		throw("Class can not have nore than 1 acces modifier");
+		string err = "Class \"" + GetFullName() + "\" can not have more than one acces modifier";
+		throw std::exception(err.c_str());
 	}
 	if ((modifier == e_PRIVATE || modifier == e_PROTECTED) && dynamic_cast<Namespace*>(outerMember))
 	{
-		throw("Class in namespace can be internal or public");
+		string err = "Class \"" + GetFullName() + "\" can be internal or public";
+		throw std::exception(err.c_str());
 	}
 	if (modifier == e_INTERNAL && dynamic_cast<Class*>(outerMember))
 	{
-		throw("Class in class can not be internal");
+		string err = "Class \"" + GetFullName() + "\" can not be internal";
+		throw std::exception(err.c_str());
 	}
 	accessModifier = modifier;
 }
@@ -806,7 +838,8 @@ void FieldTable::SetAccessModifier(AccessModifier modifier)
 {
 	if (this->accessModifier != e_NONE)
 	{
-		throw("Filed can not have nore than 1 acces modifier");
+		string err = "Filed \"" + *GetName() + "\" can not have more than one acces modifier";
+		throw std::exception(err.c_str());
 	}
 	this->accessModifier = modifier;
 }
@@ -871,7 +904,8 @@ void MethodTable::SetStatic(bool value)
 {
 	if (IsAbstract() || IsVirtual() || IsOverride())
 	{
-		throw("Illigle modifier static");
+		string err = "Illegal modifier \"static\" of method \"" + *GetName() + "\"";
+		throw std::exception(err.c_str());
 	}
 	isStatic = value;
 }
@@ -885,7 +919,8 @@ void MethodTable::SetAbstract(bool value)
 {
 	if (IsStatic() || IsVirtual() || IsOverride())
 	{
-		throw("Illigal modifier abstract");
+		string err = "Illegal modifier \"abstract\" of method \"" + *GetName() + "\"";
+		throw std::exception(err.c_str());
 	}
 	isAbstract = value;
 }
@@ -899,7 +934,8 @@ void MethodTable::SetVirtual(bool value)
 {
 	if (IsStatic() || IsAbstract() || IsOverride())
 	{
-		throw("Illigal mofifier virtual");
+		string err = "Illegal modifier \"virtual\" of method \"" + *GetName() + "\"";
+		throw std::exception(err.c_str());
 	}
 	isVirtual = value;
 }
@@ -913,7 +949,8 @@ void MethodTable::SetOverride(bool value)
 {
 	if (IsAbstract() || IsStatic() || IsVirtual())
 	{
-		throw("Illigal mofifier virtual");
+		string err = "Illegal modifier \"override\" of method \"" + *GetName() + "\"";
+		throw std::exception(err.c_str());
 	}
 	isOverride = value;
 }
@@ -927,7 +964,8 @@ void MethodTable::SetAccessModifier(AccessModifier modifier)
 {
 	if (accessModifier != e_NONE)
 	{
-		throw("Method can not have more than 1 access modifier");
+		string err = "Method \"" + *GetName() + "\" can not have more than one access modifier";
+		throw std::exception(err.c_str());
 	}
 	accessModifier = modifier;
 }
@@ -941,7 +979,8 @@ void MethodTable::AddParam(string* name, DataType* type)
 {
 	if (GetParam(name) != NULL)
 	{
-		throw("Duplicated param name");
+		string err = "Duplicated param name \"" + *name + "\" in method \"" + *GetName() + "\"";
+		throw std::exception(err.c_str());
 	}
 
 	Variable* newParam = new Variable();
@@ -991,7 +1030,8 @@ void MethodTable::AddLocalVariable(string* name, DataType* type)
 {
 	if (GetLocalVariable(name) != NULL)
 	{
-		throw("Duplicated local variable name");
+		string err = "Duplicated local variable name \"" + *name + "\" in method \"" + *GetName() + "\"";
+		throw std::exception(err.c_str());
 	}
 
 	Variable* newParam = new Variable();
@@ -1049,11 +1089,13 @@ bool MethodTable::CompareArgsTypes(ArgumentList* args)
 		{
 			if (lastArgIndex >= sortedArgs.size())
 			{
-				throw("Too many arguments");
+				string err = "Too many arguments in method \"" + *GetName() + "\"";
+				throw std::exception(err.c_str());
 			}
 			if (sortedArgs[lastArgIndex] != NULL)
 			{
-				throw("Argument just exists");
+				string err = "Argument \"" + *params[lastArgIndex]->name + "\" just exists in method \"" + *GetName() + "\"";
+				throw std::exception(err.c_str());
 			}
 			sortedArgs[lastArgIndex] = arg->expression;
 		}
@@ -1062,11 +1104,13 @@ bool MethodTable::CompareArgsTypes(ArgumentList* args)
 			int argIndex = GetParamIndex(arg->identifier);
 			if (argIndex < 0)
 			{
-				throw("No param with such name");
+				string err = "No param with such name \"" + *arg->identifier + "\" just exists in method \"" + *GetName() + "\"";
+				throw std::exception(err.c_str());
 			}
 			if (sortedArgs[argIndex] != NULL)
 			{
-				throw("Argument just exists");
+				string err = "Argument \"" + *params[argIndex]->name + "\" just exists in method \"" + *GetName() + "\"";
+				throw std::exception(err.c_str());
 			}
 			sortedArgs[argIndex] = arg->expression;
 		}
@@ -1077,7 +1121,8 @@ bool MethodTable::CompareArgsTypes(ArgumentList* args)
 	{
 		if (sortedArgs[i] == NULL)
 		{
-			throw("Argument not exists");
+			string err = "Argument \"" + *params[i]->name + "\" not exists in method \"" + *GetName() + "\"";
+			throw std::exception(err.c_str());
 		}
 		if (!(*params[i]->type == *sortedArgs[i]->dataType))
 		{

@@ -454,6 +454,7 @@ public:
 
     Modifier(Type type);
 
+    string GetName();
     string* ToDOT();
 };
 

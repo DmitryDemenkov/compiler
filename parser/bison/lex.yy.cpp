@@ -2263,9 +2263,9 @@ void main(int argc, char** argv)
 		}
 		file.close();
 	}
-	catch (const char* e)
+	catch (std::exception err)
 	{
-		cout << e << endl;
+		cout << err.what() << endl;
 		return;
 	}
 
@@ -2290,14 +2290,9 @@ void main(int argc, char** argv)
 		{
 			cl->CreateTables();
 		}
-		catch (const char* e)
+		catch (std::exception err)
 		{
-			cout << e << endl;
-			return;
-		}
-		catch (string str)
-		{
-			cout << str << endl;
+			cout << err.what() << endl;
 			return;
 		}
 	}
@@ -2307,9 +2302,9 @@ void main(int argc, char** argv)
 		{
 			cl->CheckOverridingMethods();
 		}
-		catch (const char* e)
+		catch (std::exception err)
 		{
-			cout << e << endl;
+			cout << err.what() << endl;
 			return;
 		}
 	}
@@ -2325,13 +2320,9 @@ void main(int argc, char** argv)
 			{
 				md->Semantic(cl);
 			}
-			catch (const char* e)
+			catch (std::exception err)
 			{
-				cout << e << endl;
-			}
-			catch (string str)
-			{
-				cout << str << endl;
+				cout << err.what() << endl;
 			}
 		}
 	}
