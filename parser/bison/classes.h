@@ -46,6 +46,7 @@ public:
     static TypeName* Append(TypeName* typeName, string* identifier);
 
     string* ToDOT();
+    string ToString();
 };
 
 class ArrayType

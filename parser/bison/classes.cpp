@@ -83,6 +83,17 @@ string* TypeName::ToDOT()
 	return dotStr;
 }
 
+string TypeName::ToString()
+{
+	string str = "";
+	for (auto identifier : *identifiers)
+	{
+		str += *identifier + ".";
+	}
+	str.pop_back();
+	return str;
+}
+
 ArrayType::ArrayType(SimpleType* simpleType)
 {
 	this->id = ++maxId;
@@ -267,6 +278,11 @@ void MemberInitializer::DetermineDataType(Class* owner, MethodTable* methodInfo,
 	if (this->expression != NULL)
 	{
 		this->expression->DetermineDataType(owner, methodInfo);
+		if (this->expression->dataType == NULL)
+		{
+			string err = "There is no such identifier \"" + this->expression->typeName->ToString() + "\"";
+			throw std::exception(err.c_str());
+		}
 	}
 	if (this->objectInitializer != NULL)
 	{
@@ -465,11 +481,21 @@ void Expression::DetermineDataType(Class* owner, MethodTable* methodInfo)
 		break;
 	case Expression::t_UNMINUS:
 		left->DetermineDataType(owner, methodInfo);
+		if (left->dataType == NULL)
+		{
+			string err = "There is no such identifier \"" + left->typeName->ToString() + "\"";
+			throw std::exception(err.c_str());
+		}
 		dataType->type = left->dataType->type;
 		dataType->classType = left->dataType->classType;
 		break;
 	case Expression::t_NOT:
 		left->DetermineDataType(owner, methodInfo);
+		if (left->dataType == NULL)
+		{
+			string err = "There is no such identifier \"" + left->typeName->ToString() + "\"";
+			throw std::exception(err.c_str());
+		}
 		dataType->type = DataType::t_BOOL;
 		break;
 	case Expression::t_SIMPLE_TYPE_CAST:
@@ -495,14 +521,37 @@ void Expression::DetermineDataType(Class* owner, MethodTable* methodInfo)
 	case Expression::t_AND:
 	case Expression::t_OR:
 		left->DetermineDataType(owner, methodInfo);
+		if (left->dataType == NULL)
+		{
+			string err = "There is no such identifier \"" + left->typeName->ToString() + "\"";
+			throw std::exception(err.c_str());
+		}
 		right->DetermineDataType(owner, methodInfo);
+		if (right->dataType == NULL)
+		{
+			string err = "There is no such identifier \"" + right->typeName->ToString() + "\"";
+			throw std::exception(err.c_str());
+		}
 		dataType->type = DataType::t_BOOL;
 		break;
 	case Expression::t_ASSIGNMENT:
-		if (left != NULL) { left->DetermineDataType(owner, methodInfo); }
+		if (left != NULL) 
+		{
+			left->DetermineDataType(owner, methodInfo);
+			if (left->dataType == NULL)
+			{
+				string err = "There is no such identifier \"" + left->typeName->ToString() + "\"";
+				throw std::exception(err.c_str());
+			}
+		}
 		if (right != NULL) 
 		{
 			right->DetermineDataType(owner, methodInfo);
+			if (right->dataType == NULL)
+			{
+				string err = "There is no such identifier \"" + right->typeName->ToString() + "\"";
+				throw std::exception(err.c_str());
+			}
 			dataType = this->right->dataType;
 		}
 		break;
@@ -638,9 +687,9 @@ DataType* Expression::GetDataTypeOfInvocation(Class* owner, MethodTable* methodI
 		this->left = this->left->left;
 		this->left->DetermineDataType(owner, methodInfo);
 
-		if (this->left->dataType == NULL || this->left->dataType->type != DataType::t_TYPENAME)
+		if (this->left->dataType == NULL)
 		{
-			string err = "There is no such identifier";
+			string err = "There is no such identifier \"" + this->left->typeName->ToString() + "\"";
 			throw std::exception(err.c_str());
 		}
 		if (this->left->dataType->classType->GetMethod(*this->name) == NULL)
@@ -715,6 +764,10 @@ DataType* Expression::GetDataTypeOfMemberAccess(Class* owner, MethodTable* metho
 
 			return dType;
 		}
+
+		string str = "There is no such identifier \"" + *this->right->name + "\"" +
+			" in \"" + this->left->dataType->classType->GetFullName() + "\"";
+		throw std::exception(str.c_str());
 	}
 
 	return NULL;
@@ -738,6 +791,11 @@ DataType* Expression::GetDataTypeOfObjectCreation(Class* owner, MethodTable* met
 		for (auto arg : *argumentList->arguments)
 		{
 			arg->DetermineDataType(owner, methodInfo);
+			if (arg->expression->dataType == NULL)
+			{
+				string err = "There is no such identifier \"" + arg->expression->typeName->ToString() + "\"";
+				throw std::exception(err.c_str());
+			}
 		}
 	}
 
@@ -786,13 +844,24 @@ DataType* Expression::GetDataTypeOfArrayCreation(Class* owner, MethodTable* meth
 			this->left = new Expression(t_INT_LITER, (int)arrayInitializer->expressions->size());
 		}
 	}
+
 	this->left->DetermineDataType(owner, methodInfo);
+	if (this->left->dataType == NULL)
+	{
+		string err = "There is no such identifier \"" + this->left->typeName->ToString() + "\"";
+		throw std::exception(err.c_str());
+	}
 
 	if (arrayInitializer != NULL)
 	{
 		for (auto init : *arrayInitializer->expressions)
 		{
 			init->DetermineDataType(owner, methodInfo);
+			if (init->dataType == NULL)
+			{
+				string err = "There is no such identifier \"" + init->typeName->ToString() + "\"";
+				throw std::exception(err.c_str());
+			}
 		}
 	}
 
@@ -804,6 +873,11 @@ DataType* Expression::GetDataTypeOfElementAccess(Class* owner, MethodTable* meth
 	DataType* dType = new DataType();
 
 	left->DetermineDataType(owner, methodInfo);
+	if (left->dataType == NULL)
+	{
+		string err = "There is no such identifier \"" + left->typeName->ToString() + "\"";
+		throw std::exception(err.c_str());
+	}
 	if (left->dataType->isArray == false)
 	{
 		string err = "Invalid element access";
@@ -817,6 +891,11 @@ DataType* Expression::GetDataTypeOfElementAccess(Class* owner, MethodTable* meth
 		for (auto arg : *argumentList->arguments)
 		{
 			arg->DetermineDataType(owner, methodInfo);
+			if (arg->expression->dataType == NULL)
+			{
+				string err = "There is no such identifier \"" + arg->expression->typeName->ToString() + "\"";
+				throw std::exception(err.c_str());
+			}
 		}
 	}
 
@@ -857,6 +936,11 @@ DataType* Expression::GetDataTypeOfTypeCast(Class* owner, MethodTable* methodInf
 	}
 
 	left->DetermineDataType(owner, methodInfo);
+	if (left->dataType == NULL)
+	{
+		string err = "There is no such identifier \"" + left->typeName->ToString() + "\"";
+		throw std::exception(err.c_str());
+	}
 
 	return dType;
 }
@@ -865,7 +949,18 @@ DataType* Expression::GetDataTypeOfArithmetic(Class* owner, MethodTable* methodI
 {
 	DataType* dType = new DataType();
 	left->DetermineDataType(owner, methodInfo);
+	if (left->dataType == NULL)
+	{
+		string err = "There is no such identifier \"" + left->typeName->ToString() + "\"";
+		throw std::exception(err.c_str());
+	}
+
 	right->DetermineDataType(owner, methodInfo);
+	if (right->dataType == NULL)
+	{
+		string err = "There is no such identifier \"" + right->typeName->ToString() + "\"";
+		throw std::exception(err.c_str());
+	}
 
 	if (left->dataType->type == DataType::t_INT && !left->dataType->isArray
 		&& right->dataType->type == DataType::t_CHAR && !right->dataType->isArray)
@@ -1446,6 +1541,11 @@ void Statement::Semantic(Class* owner, MethodTable* methodInfo)
 	if (type == t_EXPRESSION)
 	{
 		expressions->expressions->front()->DetermineDataType(owner, methodInfo);
+		if (expressions->expressions->front()->dataType == NULL)
+		{
+			string err = "There is no such identifier \"" + expressions->expressions->front()->typeName->ToString() + "\"";
+			throw std::exception(err.c_str());
+		}
 	}
 	else if (type == t_DECLARATOR)
 	{
