@@ -595,6 +595,9 @@ DataType* Expression::GetDataTypeOfId(Class* owner, MethodTable* methodInfo)
 		dType->type = DataType::t_TYPENAME;
 		dType->classType = classInfo;
 		this->type = t_CLASS;
+
+		CheckErrorsOfClassesAccess(owner, classInfo);
+
 		return dType;
 	}
 
@@ -681,6 +684,9 @@ DataType* Expression::GetDataTypeOfMemberAccess(Class* owner, MethodTable* metho
 			dType->type = DataType::t_TYPENAME;
 			dType->classType = classInfo;
 			this->type = t_CLASS;
+
+			CheckErrorsOfClassesAccess(owner, classInfo);
+
 			return dType;
 		}
 	}
@@ -695,6 +701,19 @@ DataType* Expression::GetDataTypeOfMemberAccess(Class* owner, MethodTable* metho
 			CheckErrorsOfFieldAccess(owner, methodInfo);
 
 			return fieldInfo->GetType();
+		}
+		
+		AbstractNamespaceMember* innerMember = this->left->dataType->classType->GetInnerMember(this->right->name);
+		if (dynamic_cast<Class*>(innerMember) != NULL)
+		{
+			DataType* dType = new DataType();
+			dType->type = DataType::t_TYPENAME;
+			dType->classType = (Class*)innerMember;
+			this->type = t_CLASS;
+
+			CheckErrorsOfClassesAccess(owner, dType->classType);
+
+			return dType;
 		}
 	}
 
@@ -951,6 +970,29 @@ void Expression::CheckErrorsOfFieldAccess(Class* owner, MethodTable* methodInfo)
 		if (!owner->InstanceOf(left->dataType->classType))
 		{
 			string err = "Field access are not allown";
+			throw std::exception(err.c_str());
+		}
+		break;
+	default:
+		break;
+	}
+}
+
+void Expression::CheckErrorsOfClassesAccess(Class* owner, Class* classInfo)
+{
+	switch (classInfo->GetAccessModifier())
+	{
+	case AccessModifier::e_PRIVATE:
+		if (classInfo->GetOuterMember()->GetFullName() != owner->GetFullName())
+		{
+			string err = "Class access are not allown";
+			throw std::exception(err.c_str());
+		}
+		break;
+	case AccessModifier::e_PROTECTED:
+		if (!owner->InstanceOf((Class*)classInfo->GetOuterMember()))
+		{
+			string err = "Class access are not allown";
 			throw std::exception(err.c_str());
 		}
 		break;
