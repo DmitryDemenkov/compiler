@@ -5,7 +5,7 @@ int maxId = 0;
 SimpleType::SimpleType(Type type)
 {
 	this->id = ++maxId;
-	this->type = type; 
+	this->type = type;
 }
 
 SimpleType::SimpleType(SimpleType* other)
@@ -28,7 +28,7 @@ string* SimpleType::GetName()
 	case SimpleType::t_BOOL:   return new string("bool");
 	case SimpleType::t_INT:    return new string("int");
 	case SimpleType::t_CHAR:   return new string("char");
-	case SimpleType::t_STRING: return new string("string"); 
+	case SimpleType::t_STRING: return new string("string");
 	}
 	return NULL;
 }
@@ -112,7 +112,7 @@ ArrayType::ArrayType(ArrayType* other)
 {
 	this->id = ++maxId;
 	this->type = other->type;
-	
+
 	if (this->type == t_SIMPLE_TYPE)
 		this->simpleType = new SimpleType(other->simpleType);
 	else
@@ -197,7 +197,7 @@ MemberInitializer::MemberInitializer(string* identifier, Expression* expression)
 {
 	this->id = ++maxId;
 	this->identifier = identifier;
-	this->expression = expression;	
+	this->expression = expression;
 }
 
 MemberInitializer::MemberInitializer(string* identifier, MemberInitializerList* objectInitializer)
@@ -535,7 +535,7 @@ void Expression::DetermineDataType(Class* owner, MethodTable* methodInfo)
 		dataType->type = DataType::t_BOOL;
 		break;
 	case Expression::t_ASSIGNMENT:
-		if (left != NULL) 
+		if (left != NULL)
 		{
 			left->DetermineDataType(owner, methodInfo);
 			if (left->dataType == NULL)
@@ -544,7 +544,7 @@ void Expression::DetermineDataType(Class* owner, MethodTable* methodInfo)
 				throw std::exception(err.c_str());
 			}
 		}
-		if (right != NULL) 
+		if (right != NULL)
 		{
 			right->DetermineDataType(owner, methodInfo);
 			if (right->dataType == NULL)
@@ -607,7 +607,7 @@ DataType* Expression::GetDataTypeOfId(Class* owner, MethodTable* methodInfo)
 	if (localVar != NULL) { return localVar->type; }
 
 	FieldTable* fieldInfo = owner->GetField(*this->name);
-	if (fieldInfo != NULL) 
+	if (fieldInfo != NULL)
 	{
 		this->type = t_OBJECT;
 		this->right = new Expression(Expression::t_ID, this->name);
@@ -620,25 +620,25 @@ DataType* Expression::GetDataTypeOfId(Class* owner, MethodTable* methodInfo)
 		else
 		{
 			this->left = new Expression(Expression::t_CLASS);
-			this->left->dataType = new DataType(); 
+			this->left->dataType = new DataType();
 			this->left->dataType->type = DataType::t_TYPENAME;
 			this->left->dataType->classType = owner;
 		}
 
 		CheckErrorsOfFieldAccess(owner, methodInfo);
 
-		return fieldInfo->GetType(); 
+		return fieldInfo->GetType();
 	}
 
 	TypeName* tName = new TypeName(this->name);
 	Class* classInfo = NULL;
 
-	try	{ classInfo = owner->FindClass(tName); }
-	catch (std::exception) { }
+	try { classInfo = owner->FindClass(tName); }
+	catch (std::exception) {}
 
 	this->typeName = tName;
 
-	if (classInfo != NULL) 
+	if (classInfo != NULL)
 	{
 		DataType* dType = new DataType();
 		dType->type = DataType::t_TYPENAME;
@@ -721,7 +721,7 @@ DataType* Expression::GetDataTypeOfMemberAccess(Class* owner, MethodTable* metho
 		TypeName* tName = TypeName::Append(this->left->typeName, this->right->name);
 		this->left = NULL;
 		this->right = NULL;
-		
+
 		Class* classInfo = NULL;
 		try { classInfo = owner->FindClass(tName); }
 		catch (std::exception) {}
@@ -742,7 +742,7 @@ DataType* Expression::GetDataTypeOfMemberAccess(Class* owner, MethodTable* metho
 	else if (this->left->dataType->type == DataType::t_TYPENAME)
 	{
 		FieldTable* fieldInfo = this->left->dataType->classType->GetField(*this->right->name);
-		if (fieldInfo != NULL) 
+		if (fieldInfo != NULL)
 		{
 			this->type = t_OBJECT;
 			this->right->dataType = fieldInfo->GetType();
@@ -751,7 +751,7 @@ DataType* Expression::GetDataTypeOfMemberAccess(Class* owner, MethodTable* metho
 
 			return fieldInfo->GetType();
 		}
-		
+
 		AbstractNamespaceMember* innerMember = this->left->dataType->classType->GetInnerMember(this->right->name);
 		if (dynamic_cast<Class*>(innerMember) != NULL)
 		{
@@ -803,6 +803,8 @@ DataType* Expression::GetDataTypeOfObjectCreation(Class* owner, MethodTable* met
 	{
 		objInitializer->DetermineDataType(owner, methodInfo, dType->classType);
 	}
+
+	CheckErrorsOfObjectCreation(owner, dType->classType);
 
 	return dType;
 }
@@ -864,6 +866,8 @@ DataType* Expression::GetDataTypeOfArrayCreation(Class* owner, MethodTable* meth
 			}
 		}
 	}
+
+	CheckErrorsOfArrayCreation(owner, dType);
 
 	return dType;
 }
@@ -1096,7 +1100,54 @@ void Expression::CheckErrorsOfClassesAccess(Class* owner, Class* classInfo)
 	}
 }
 
-ObjectCreation::ObjectCreation(SimpleType* simpleType, 
+void Expression::CheckErrorsOfObjectCreation(Class* owner, Class* classInfo)
+{
+	if (classInfo != NULL)
+	{
+		CheckErrorsOfClassesAccess(owner, classInfo);
+		MethodTable* constructor = classInfo->GetMethod("<init>");
+		if (constructor->CompareArgsTypes(this->argumentList) == false)
+		{
+			string err = "Incorrect arguments data types in consturtor of \"" + classInfo->GetFullName() + "\"";
+			throw std::exception(err.c_str());
+		}
+	}
+	else if (this->argumentList != NULL)
+	{
+		string err = "Incorrect arguments data types in consturtor of simple type";
+		throw std::exception(err.c_str());
+	}
+}
+
+void Expression::CheckErrorsOfArrayCreation(Class* owner, DataType* arrayType)
+{
+	if (arrayType->classType != NULL)
+	{
+		CheckErrorsOfClassesAccess(owner, arrayType->classType);
+	}
+	if (this->left->dataType->type != DataType::t_INT)
+	{
+		string err = "Invalid data type of array size expression";
+		throw std::exception(err.c_str());
+	}
+
+	DataType elemType = DataType();
+	elemType.type = arrayType->type;
+	elemType.classType = arrayType->classType;
+	if (this->arrayInitializer != NULL)
+	{
+		for (auto init : *arrayInitializer->expressions)
+		{
+			if (!(elemType == *init->dataType))
+			{
+				string err = "Invalid data type of array initializer element";
+				throw std::exception(err.c_str());
+			}
+		}
+	}
+}
+
+ObjectCreation::ObjectCreation(SimpleType* simpleType,
 	ArgumentList* argumentList, MemberInitializerList* objInit) : Expression(Expression::t_OBJ_CREATION)
 {
 	this->simpleType = simpleType;
@@ -1104,7 +1155,7 @@ ObjectCreation::ObjectCreation(SimpleType* simpleType,
 	this->objInitializer = objInit;
 }
 
-ObjectCreation::ObjectCreation(TypeName* typeName, 
+ObjectCreation::ObjectCreation(TypeName* typeName,
 	ArgumentList* argumentList, MemberInitializerList* objInit) : Expression(Expression::t_OBJ_CREATION)
 {
 	this->typeName = typeName;
@@ -1178,7 +1229,7 @@ string* ExpressionList::ToDOT()
 	return dotStr;
 }
 
-ArrayCreation::ArrayCreation(ArrayType* arrType, 
+ArrayCreation::ArrayCreation(ArrayType* arrType,
 	ExpressionList* arrInit) : Expression(Expression::t_ARR_CREATION)
 {
 	this->id = ++maxId;
@@ -1186,7 +1237,7 @@ ArrayCreation::ArrayCreation(ArrayType* arrType,
 	this->arrayInitializer = arrInit;
 }
 
-ArrayCreation::ArrayCreation(SimpleType* simpleType, 
+ArrayCreation::ArrayCreation(SimpleType* simpleType,
 	Expression* expr, ExpressionList* arrInit) : Expression(Expression::t_ARR_CREATION)
 {
 	this->id = ++maxId;
@@ -1195,7 +1246,7 @@ ArrayCreation::ArrayCreation(SimpleType* simpleType,
 	this->arrayInitializer = arrInit;
 }
 
-ArrayCreation::ArrayCreation(TypeName* typeName, 
+ArrayCreation::ArrayCreation(TypeName* typeName,
 	Expression* expr, ExpressionList* arrInit) : Expression(Expression::t_ARR_CREATION)
 {
 	this->id = ++maxId;
@@ -1266,7 +1317,7 @@ Expression* MemberAccess::FromTypeName(TypeName* typeName, Expression* left)
 TypeName* MemberAccess::ToTypeName(Expression* memberAccess)
 {
 	TypeName* typeName = NULL;
-	do 
+	do
 	{
 		if (memberAccess->type == t_ID)
 		{
@@ -1292,7 +1343,7 @@ TypeName* MemberAccess::ToTypeName(Expression* memberAccess)
 	return typeName;
 }
 
-ElementAccess::ElementAccess(Expression* expr, 
+ElementAccess::ElementAccess(Expression* expr,
 	ArgumentList* arguments) : Expression(Expression::t_ELEMENT_ACCESS)
 {
 	this->id = ++maxId;
@@ -1317,7 +1368,7 @@ string* ElementAccess::ToDOT()
 	return dotStr;
 }
 
-InvocationExpression::InvocationExpression(Expression* expr, 
+InvocationExpression::InvocationExpression(Expression* expr,
 	ArgumentList* arguments) : Expression(Expression::t_INVOCATION)
 {
 	this->id = ++maxId;
@@ -1562,7 +1613,7 @@ StatementList::StatementList(Statement* statement)
 	this->statements = new list <Statement*>{ statement };
 }
 
-StatementList* StatementList::Append(StatementList * statements, Statement* statement)
+StatementList* StatementList::Append(StatementList* statements, Statement* statement)
 {
 	statements->statements->push_back(statement);
 	return statements;
@@ -1584,7 +1635,7 @@ string* StatementList::ToDOT()
 	return dotStr;
 }
 
-IfStatement::IfStatement(Expression* expression, 
+IfStatement::IfStatement(Expression* expression,
 	Statement* main, Statement* alternative) : Statement(Statement::t_IF)
 {
 	this->id = ++maxId;
@@ -1622,7 +1673,7 @@ string* IfStatement::ToDOT()
 	return dotStr;
 }
 
-WhileStatement::WhileStatement(Expression* expression, 
+WhileStatement::WhileStatement(Expression* expression,
 	Statement* statement) : Statement(Statement::t_WHILE)
 {
 	this->id = ++maxId;
@@ -1644,7 +1695,7 @@ string* WhileStatement::ToDOT()
 	return dotStr;
 }
 
-DoStatement::DoStatement(Statement* statement, 
+DoStatement::DoStatement(Statement* statement,
 	Expression* expression) : Statement(Statement::t_DO)
 {
 	this->id = ++maxId;
@@ -1666,7 +1717,7 @@ string* DoStatement::ToDOT()
 	return dotStr;
 }
 
-ForeachStatement::ForeachStatement(VarDeclarator* declarator, 
+ForeachStatement::ForeachStatement(VarDeclarator* declarator,
 	Expression* expression, Statement* statement) : Statement(Statement::t_FOREACH)
 {
 	this->id = ++maxId;
@@ -1692,7 +1743,7 @@ string* ForeachStatement::ToDOT()
 	return dotStr;
 }
 
-ForStatement::ForStatement(ExpressionList* init, 
+ForStatement::ForStatement(ExpressionList* init,
 	Expression* cond, ExpressionList* increment, Statement* statement) : Statement(Statement::t_FOR)
 {
 	this->id = ++maxId;
@@ -1705,7 +1756,7 @@ ForStatement::ForStatement(ExpressionList* init,
 	this->statements = new StatementList(statement);
 }
 
-ForStatement::ForStatement(VarDeclaratorList* declarations, 
+ForStatement::ForStatement(VarDeclaratorList* declarations,
 	Expression* cond, ExpressionList* increment, Statement* statement) : Statement(Statement::t_FOR)
 {
 	this->id = ++maxId;
@@ -1722,7 +1773,7 @@ string* ForStatement::ToDOT()
 {
 	string* dotStr = new string();
 	*dotStr += to_string(id) + "[label=\"for_stmt\"];\n";
-	
+
 	if (declarators != NULL)
 	{
 		*dotStr += *declarators->ToDOT();
@@ -1841,7 +1892,7 @@ string Modifier::GetName()
 
 string* Modifier::ToDOT()
 {
-	string name = GetName();	
+	string name = GetName();
 	string* dotStr = new string();
 	*dotStr = to_string(id) + "[label=\"" + name + "\"];\n";
 	return dotStr;
@@ -1883,7 +1934,7 @@ ClassMember::ClassMember(Type type, ReturnValueType returnValue, BaseConstructor
 	this->baseConstructor = baseConstructor;
 }
 
-string* ClassMember::ToDOT() 
+string* ClassMember::ToDOT()
 {
 	return NULL;
 }
@@ -1894,7 +1945,7 @@ ClassMemberList::ClassMemberList(ClassMember* member)
 	this->members = new list < ClassMember*>{ member };
 }
 
-ClassMemberList* ClassMemberList::Append(ClassMemberList *members, ClassMember* member)
+ClassMemberList* ClassMemberList::Append(ClassMemberList* members, ClassMember* member)
 {
 	members->members->push_back(member);
 	return members;
@@ -1912,7 +1963,7 @@ string* ClassMemberList::ToDOT()
 	return dotStr;
 }
 
-Method::Method(ModifielrList* modifiers, ReturnValueType returnValue, 
+Method::Method(ModifielrList* modifiers, ReturnValueType returnValue,
 	string* identifiers, ParamList* params, StatementList* statements)
 	: ClassMember(ClassMember::t_METHOD, returnValue, ClassMember::t_NULL)
 {
@@ -1924,7 +1975,7 @@ Method::Method(ModifielrList* modifiers, ReturnValueType returnValue,
 
 }
 
-Method::Method(ModifielrList* modifiers, ReturnValueType returnValue, 
+Method::Method(ModifielrList* modifiers, ReturnValueType returnValue,
 	SimpleType* simpleType, string* identifiers, ParamList* params, StatementList* statements)
 	: ClassMember(ClassMember::t_METHOD, returnValue, ClassMember::t_NULL)
 {
@@ -1936,7 +1987,7 @@ Method::Method(ModifielrList* modifiers, ReturnValueType returnValue,
 	this->statementList = statements;
 }
 
-Method::Method(ModifielrList* modifiers, ReturnValueType returnValue, 
+Method::Method(ModifielrList* modifiers, ReturnValueType returnValue,
 	TypeName* typeName, string* identifiers, ParamList* params, StatementList* statements)
 	: ClassMember(ClassMember::t_METHOD, returnValue, ClassMember::t_NULL)
 {
@@ -1948,7 +1999,7 @@ Method::Method(ModifielrList* modifiers, ReturnValueType returnValue,
 	this->statementList = statements;
 }
 
-Method::Method(ModifielrList* modifiers, ReturnValueType returnValue, 
+Method::Method(ModifielrList* modifiers, ReturnValueType returnValue,
 	ArrayType* arrayType, string* identifiers, ParamList* params, StatementList* statements)
 	: ClassMember(ClassMember::t_METHOD, returnValue, ClassMember::t_NULL)
 {
@@ -1967,7 +2018,7 @@ string* Method::ToDOT()
 	*dotStr += to_string(id) + "[label=\"method\"];\n";
 	*dotStr += to_string(id) + "->" + to_string(id) + ".1[label=\"id\"];\n";
 
-	if (modifiers != NULL) 
+	if (modifiers != NULL)
 	{
 		*dotStr += *modifiers->ToDOT();
 		*dotStr += to_string(id) + "->" + to_string(modifiers->id) + "[label=\"modifs\"];\n";
@@ -2009,7 +2060,7 @@ string* Method::ToDOT()
 	return dotStr;
 }
 
-Field::Field(ModifielrList* modifiers, ReturnValueType returnValue, 
+Field::Field(ModifielrList* modifiers, ReturnValueType returnValue,
 	SimpleType* simpleType, string* identifier, Expression* expression)
 	: ClassMember(ClassMember::t_FIELD, returnValue, ClassMember::t_NULL)
 {
@@ -2020,7 +2071,7 @@ Field::Field(ModifielrList* modifiers, ReturnValueType returnValue,
 	this->expression = expression;
 }
 
-Field::Field(ModifielrList* modifiers, ReturnValueType returnValue, 
+Field::Field(ModifielrList* modifiers, ReturnValueType returnValue,
 	TypeName* typeName, string* identifier, Expression* expression)
 	: ClassMember(ClassMember::t_FIELD, returnValue, ClassMember::t_NULL)
 {
@@ -2031,7 +2082,7 @@ Field::Field(ModifielrList* modifiers, ReturnValueType returnValue,
 	this->expression = expression;
 }
 
-Field::Field(ModifielrList* modifiers, ReturnValueType returnValue, 
+Field::Field(ModifielrList* modifiers, ReturnValueType returnValue,
 	ArrayType* arraType, string* identifier, Expression* expression)
 	: ClassMember(ClassMember::t_FIELD, returnValue, ClassMember::t_NULL)
 {
@@ -2074,7 +2125,7 @@ string* Field::ToDOT()
 	return dotStr;
 }
 
-Constructor::Constructor(ModifielrList* modifiers, string* identifier, 
+Constructor::Constructor(ModifielrList* modifiers, string* identifier,
 	ParamList* params, BaseConstructorType baseConstructor, StatementList* statements, ArgumentList* args)
 	: ClassMember(ClassMember::t_CONSTRUCTOR, ClassMember::t_EMPTY, baseConstructor)
 {
@@ -2112,7 +2163,7 @@ string* Constructor::ToDOT()
 	return dotStr;
 }
 
-ClassDeclaration::ClassDeclaration(ModifielrList* modifiers, 
+ClassDeclaration::ClassDeclaration(ModifielrList* modifiers,
 	string* identifier, ClassMemberList* members, TypeName* baseClass)
 	: ClassMember(ClassMember::t_CLASS, ClassMember::t_EMPTY, ClassMember::t_NULL)
 {
@@ -2166,8 +2217,8 @@ AbstractNamespaceMember* ClassDeclaration::CreateClassTable(AbstractNamespaceMem
 		string err = "Identifier \"" + *identifier + "\" already exists in \"" + outer->GetFullName() + "\"";
 		throw std::exception(err.c_str());
 	}
-	
-	Class* current =  new Class(identifier, outer, this);
+
+	Class* current = new Class(identifier, outer, this);
 	if (modifiers == NULL)
 	{
 		if (dynamic_cast<Class*>(outer))
@@ -2335,7 +2386,7 @@ AbstractNamespaceMember* NamespaceDeclaration::CreateClassTable(AbstractNamespac
 	{
 		current = new Namespace(typeName->identifiers->front(), outer);
 	}
-	
+
 	if (typeName->identifiers->size() > 1)
 	{
 		TypeName* childName = typeName;

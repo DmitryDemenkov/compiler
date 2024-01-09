@@ -223,6 +223,8 @@ private:
     void CheckErrorsOfInvokation(Class* owner, MethodTable* methodInfo);
     void CheckErrorsOfFieldAccess(Class* owner, MethodTable* methodInfo);
     void CheckErrorsOfClassesAccess(Class* owner, Class* classInfo);
+    void CheckErrorsOfObjectCreation(Class* owner, Class* classInfo);
+    void CheckErrorsOfArrayCreation(Class* owner, DataType* arrayType);
 };
 
 class ObjectCreation : public Expression
