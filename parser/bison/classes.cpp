@@ -890,16 +890,30 @@ DataType* Expression::GetDataTypeOfElementAccess(Class* owner, MethodTable* meth
 	dType->type = left->dataType->type;
 	dType->classType = left->dataType->classType;
 
-	if (argumentList != NULL)
+	if (argumentList == NULL)
 	{
-		for (auto arg : *argumentList->arguments)
+		string err = "The index of the array element is required";
+		throw std::exception(err.c_str());
+	}
+
+	if (argumentList->arguments->size() > 1)
+	{
+		string err = "Unsupported access to a multidimensional array";
+		throw std::exception(err.c_str());
+	}
+
+	for (auto arg : *argumentList->arguments)
+	{
+		arg->DetermineDataType(owner, methodInfo);
+		if (arg->expression->dataType == NULL)
 		{
-			arg->DetermineDataType(owner, methodInfo);
-			if (arg->expression->dataType == NULL)
-			{
-				string err = "There is no such identifier \"" + arg->expression->typeName->ToString() + "\"";
-				throw std::exception(err.c_str());
-			}
+			string err = "There is no such identifier \"" + arg->expression->typeName->ToString() + "\"";
+			throw std::exception(err.c_str());
+		}
+		if (arg->expression->dataType->type != DataType::t_INT)
+		{
+			string err = "Invalid data type of array element index";
+			throw std::exception(err.c_str());
 		}
 	}
 
