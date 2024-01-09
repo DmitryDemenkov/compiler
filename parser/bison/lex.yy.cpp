@@ -2301,6 +2301,7 @@ void main(int argc, char** argv)
 		try
 		{
 			cl->CheckOverridingMethods();
+			cl->CheckOverridingFields();
 		}
 		catch (std::exception err)
 		{

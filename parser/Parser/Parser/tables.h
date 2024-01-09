@@ -147,6 +147,7 @@ public:
 
 	void CreateTables();
 	void CheckOverridingMethods();
+	void CheckOverridingFields();
 
 	DataType* CreateDataType(ClassMember* member);
 	DataType* CreateDataType(VarDeclarator* varDecl);

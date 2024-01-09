@@ -575,6 +575,9 @@ DataType* Expression::GetDataTypeOfId(Class* owner, MethodTable* methodInfo)
 			this->left->dataType->type = DataType::t_TYPENAME;
 			this->left->dataType->classType = owner;
 		}
+
+		CheckErrorsOfFieldAccess(owner, methodInfo);
+
 		return fieldInfo->GetType(); 
 	}
 
@@ -688,6 +691,9 @@ DataType* Expression::GetDataTypeOfMemberAccess(Class* owner, MethodTable* metho
 		{
 			this->type = t_OBJECT;
 			this->right->dataType = fieldInfo->GetType();
+
+			CheckErrorsOfFieldAccess(owner, methodInfo);
+
 			return fieldInfo->GetType();
 		}
 	}
@@ -902,6 +908,49 @@ void Expression::CheckErrorsOfInvokation(Class* owner, MethodTable* methodInfo)
 		if (!owner->InstanceOf(left->dataType->classType))
 		{
 			string err = "Invoketed method are not allown";
+			throw std::exception(err.c_str());
+		}
+		break;
+	default:
+		break;
+	}
+}
+
+void Expression::CheckErrorsOfFieldAccess(Class* owner, MethodTable* methodInfo)
+{
+	FieldTable* fieldInfo = this->left->dataType->classType->GetField(*this->right->name);
+	if (fieldInfo->IsStatic() && this->left->type != Expression::t_CLASS)
+	{
+		string err = "Static fields should be invoked on class";
+		throw std::exception(err.c_str());
+	}
+
+	if (!fieldInfo->IsStatic() && this->left->type == Expression::t_CLASS)
+	{
+		string err = "Dynamic fields should be invoked on object";
+		throw std::exception(err.c_str());
+	}
+
+	if (!fieldInfo->IsStatic() && methodInfo->IsStatic() &&
+		(this->left->type == Expression::t_THIS || this->left->type == Expression::t_BASE))
+	{
+		string err = "Static methods can invoke only static fields";
+		throw std::exception(err.c_str());
+	}
+
+	switch (fieldInfo->GetAccessModifier())
+	{
+	case AccessModifier::e_PRIVATE:
+		if (left->dataType->classType->GetFullName() != owner->GetFullName())
+		{
+			string err = "Field access are not allown";
+			throw std::exception(err.c_str());
+		}
+		break;
+	case AccessModifier::e_PROTECTED:
+		if (!owner->InstanceOf(left->dataType->classType))
+		{
+			string err = "Field access are not allown";
 			throw std::exception(err.c_str());
 		}
 		break;

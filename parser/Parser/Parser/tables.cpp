@@ -465,6 +465,20 @@ void Class::CheckOverridingMethods()
 	}
 }
 
+void Class::CheckOverridingFields()
+{
+	for (auto field : fields)
+	{
+		FieldTable* parentField = parent->GetField(*field.second->GetName());
+		if (parentField != NULL && parentField->GetAccessModifier() != e_PRIVATE)
+		{
+			string err = "Field \"" + *field.second->GetName()
+				+ "\" in class \"" + GetFullName() + "\" hides the field of the parent class";
+			throw std::exception(err.c_str());
+		}
+	}
+}
+
 void Class::AppendMethod(string* name, DataType* returnType, vector<Variable*> params)
 {
 	MethodTable* newMethod = new MethodTable(name, returnType);
@@ -511,9 +525,14 @@ MethodTable* Class::GetMethod(string name)
 FieldTable* Class::GetField(string name)
 {
 	FieldTable* field = NULL;
-	if (fields.count(name) > 0)
+	Class* current = this;
+	while (field == NULL && current != NULL)
 	{
-		field = fields[name];
+		if (current->fields.count(name) > 0)
+		{
+			field = current->fields[name];
+		}
+		current = current->parent;
 	}
 	return field;
 }

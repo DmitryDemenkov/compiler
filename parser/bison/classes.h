@@ -220,6 +220,7 @@ private:
     DataType* GetDataTypeOfArithmetic(Class* owner, MethodTable* methodInfo);
 
     void CheckErrorsOfInvokation(Class* owner, MethodTable* methodInfo);
+    void CheckErrorsOfFieldAccess(Class* owner, MethodTable* methodInfo);
 };
 
 class ObjectCreation : public Expression
