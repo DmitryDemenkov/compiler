@@ -503,6 +503,12 @@ void Expression::DetermineDataType(Class* owner, MethodTable* methodInfo)
 			throw std::exception(err.c_str());
 		}
 		dataType->type = DataType::t_BOOL;
+
+		if (left->dataType->type != DataType::t_BOOL)
+		{
+			string err = "Unsupported logical operator for " + *left->dataType->ToString();
+			throw std::exception(err.c_str());
+		}
 		break;
 	case Expression::t_SIMPLE_TYPE_CAST:
 	case Expression::t_ARRAY_CAST:
@@ -521,9 +527,11 @@ void Expression::DetermineDataType(Class* owner, MethodTable* methodInfo)
 	case Expression::t_GREATER:
 	case Expression::t_LESS_EQUAL:
 	case Expression::t_GREATER_EQUAL:
-	case Expression::t_IS:
 	case Expression::t_EQUALITY:
 	case Expression::t_INEQUALITY:
+		dataType = GetDataTypeOfComprasion(owner, methodInfo);
+		break;
+	case Expression::t_IS:
 	case Expression::t_AND:
 	case Expression::t_OR:
 		left->DetermineDataType(owner, methodInfo);
@@ -1006,6 +1014,48 @@ DataType* Expression::GetDataTypeOfArithmetic(Class* owner, MethodTable* methodI
 		left->dataType->type != DataType::t_CHAR) || left->dataType->isArray)
 	{
 		string str = "Unsupported arithmetic operator for " + *left->dataType->ToString() +
+			" and " + *right->dataType->ToString();
+		throw std::exception(str.c_str());
+	}
+
+	return dType;
+}
+
+DataType* Expression::GetDataTypeOfComprasion(Class* owner, MethodTable* methodInfo)
+{
+	DataType* dType = new DataType();
+	left->DetermineDataType(owner, methodInfo);
+	if (left->dataType == NULL)
+	{
+		string err = "There is no such identifier \"" + left->typeName->ToString() + "\"";
+		throw std::exception(err.c_str());
+	}
+
+	right->DetermineDataType(owner, methodInfo);
+	if (right->dataType == NULL)
+	{
+		string err = "There is no such identifier \"" + right->typeName->ToString() + "\"";
+		throw std::exception(err.c_str());
+	}
+
+	if (left->dataType->type == DataType::t_INT && !left->dataType->isArray
+		&& right->dataType->type == DataType::t_CHAR && !right->dataType->isArray)
+	{
+		right->dataType->type = DataType::t_INT;
+	}
+
+	if (left->dataType->type == DataType::t_CHAR && !left->dataType->isArray
+		&& right->dataType->type == DataType::t_INT && !right->dataType->isArray)
+	{
+		left->dataType->type = DataType::t_INT;
+	}
+
+	dType->type = DataType::t_BOOL;
+
+	if (!(*left->dataType == *right->dataType) || (left->dataType->type != DataType::t_INT &&
+		left->dataType->type != DataType::t_CHAR) || left->dataType->isArray)
+	{
+		string str = "Unsupported comprasion operator for " + *left->dataType->ToString() +
 			" and " + *right->dataType->ToString();
 		throw std::exception(str.c_str());
 	}
