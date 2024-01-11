@@ -1797,6 +1797,42 @@ void Statement::CheckForStmtError(Class* owner, MethodTable* methodInfo)
 	}
 }
 
+void Statement::CheckForeachStmtError(Class* owner, MethodTable* methodInfo)
+{
+	VarDeclarator* decl = declarators->declarators->front();
+	decl->Semantic(owner, methodInfo);
+
+	Expression* iter = expressions->expressions->front();
+	iter->DetermineDataType(owner, methodInfo);
+	if (iter->dataType == NULL)
+	{
+		string err = "There is no such identifier \"" + iter->typeName->ToString() + "\"";
+		throw std::exception(err.c_str());
+	}
+	if (!iter->dataType->isArray)
+	{
+		string err = "iterator in foreach statement must be array";
+		throw std::exception(err.c_str());
+	}
+
+	DataType dTypeIterElem = DataType();
+	dTypeIterElem.type = iter->dataType->type;
+	dTypeIterElem.classType = iter->dataType->classType;
+	if (!(*decl->dataType == dTypeIterElem))
+	{
+		string err = "it is not possible to convert " + *dTypeIterElem.ToString() + " to " + *decl->dataType->ToString();
+		throw std::exception(err.c_str());
+	}
+
+	if (statements != NULL)
+	{
+		for (auto stmt : *statements->statements)
+		{
+			stmt->Semantic(owner, methodInfo);
+		}
+	}
+}
+
 Statement::Statement(Type type, Expression* expression)
 {
 	this->id = ++maxId;
@@ -1892,6 +1928,10 @@ void Statement::Semantic(Class* owner, MethodTable* methodInfo)
 	else if (type == t_FOR)
 	{
 		CheckForStmtError(owner, methodInfo);
+	}
+	else if (type == t_FOREACH)
+	{
+		CheckForeachStmtError(owner, methodInfo);
 	}
 }
 
