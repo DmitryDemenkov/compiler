@@ -1965,6 +1965,16 @@ void Statement::Semantic(Class* owner, MethodTable* methodInfo)
 	{
 		CheckReturnStmtError(owner, methodInfo);
 	}
+	else if (type == t_BLOCK)
+	{
+		if (statements != NULL)
+		{
+			for (auto stmt : *statements->statements)
+			{
+				stmt->Semantic(owner, methodInfo);
+			}
+		}
+	}
 }
 
 StatementList::StatementList(Statement* statement)
