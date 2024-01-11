@@ -532,6 +532,27 @@ void Expression::DetermineDataType(Class* owner, MethodTable* methodInfo)
 		dataType = GetDataTypeOfComprasion(owner, methodInfo);
 		break;
 	case Expression::t_IS:
+		left->DetermineDataType(owner, methodInfo);
+		if (left->dataType == NULL)
+		{
+			string err = "There is no such identifier \"" + left->typeName->ToString() + "\"";
+			throw std::exception(err.c_str());
+		}
+
+		if (this->typeName == NULL)
+		{
+			string err = "Unsupported \"is\" operator for simple types and arrays";
+			throw std::exception(err.c_str());
+		}
+		owner->FindClass(this->typeName);
+		dataType->type = DataType::t_BOOL;
+
+		if (left->dataType->type != DataType::t_TYPENAME || left->dataType->isArray)
+		{
+			string err = "Unsupported \"is\" operator for " + *left->dataType->ToString();
+			throw std::exception(err.c_str());
+		}
+		break;
 	case Expression::t_AND:
 	case Expression::t_OR:
 		left->DetermineDataType(owner, methodInfo);
