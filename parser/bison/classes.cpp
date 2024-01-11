@@ -576,24 +576,24 @@ void Expression::DetermineDataType(Class* owner, MethodTable* methodInfo)
 		}
 		break;
 	case Expression::t_ASSIGNMENT:
-		if (left != NULL)
+		left->DetermineDataType(owner, methodInfo);
+		if (left->dataType == NULL)
 		{
-			left->DetermineDataType(owner, methodInfo);
-			if (left->dataType == NULL)
-			{
-				string err = "There is no such identifier \"" + left->typeName->ToString() + "\"";
-				throw std::exception(err.c_str());
-			}
+			string err = "There is no such identifier \"" + left->typeName->ToString() + "\"";
+			throw std::exception(err.c_str());
 		}
-		if (right != NULL)
+		right->DetermineDataType(owner, methodInfo);
+		if (right->dataType == NULL)
 		{
-			right->DetermineDataType(owner, methodInfo);
-			if (right->dataType == NULL)
-			{
-				string err = "There is no such identifier \"" + right->typeName->ToString() + "\"";
-				throw std::exception(err.c_str());
-			}
-			dataType = this->right->dataType;
+			string err = "There is no such identifier \"" + right->typeName->ToString() + "\"";
+			throw std::exception(err.c_str());
+		}
+		dataType = this->right->dataType;
+
+		if (!(*left->dataType == *right->dataType))
+		{
+			string err = "it is not possible to convert " + *right->dataType->ToString() + " to " + *left->dataType->ToString();
+			throw std::exception(err.c_str());
 		}
 		break;
 	default:
