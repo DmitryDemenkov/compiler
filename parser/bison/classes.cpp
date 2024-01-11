@@ -1724,6 +1724,79 @@ void Statement::CheckDoStmtError(Class* owner, MethodTable* methodInfo)
 	}
 }
 
+void Statement::CheckForStmtError(Class* owner, MethodTable* methodInfo)
+{
+	if (declarators != NULL)
+	{
+		for (auto decl : *declarators->declarators)
+		{
+			decl->Semantic(owner, methodInfo);
+		}
+	}
+
+	if (inits != NULL)
+	{
+		for (auto init : *inits->expressions)
+		{
+			if (init->type != Expression::t_ASSIGNMENT)
+			{
+				string err = "Invalid initial expression of for statement";
+				throw std::exception(err.c_str());
+			}
+
+			init->DetermineDataType(owner, methodInfo);
+			if (init->dataType == NULL)
+			{
+				string err = "There is no such identifier \"" + init->typeName->ToString() + "\"";
+				throw std::exception(err.c_str());
+			}
+		}
+	}
+
+	if (expressions != NULL)
+	{
+		Expression* cond = expressions->expressions->front();
+		cond->DetermineDataType(owner, methodInfo);
+		if (cond->dataType == NULL)
+		{
+			string err = "There is no such identifier \"" + cond->typeName->ToString() + "\"";
+			throw std::exception(err.c_str());
+		}
+		if (cond->dataType->type != DataType::t_BOOL || cond->dataType->isArray)
+		{
+			string err = "Data type of for statement condition must be boolean";
+			throw std::exception(err.c_str());
+		}
+	}
+
+	if (incrs != NULL)
+	{
+		for (auto incr : *incrs->expressions)
+		{
+			if (incr->type != Expression::t_ASSIGNMENT)
+			{
+				string err = "Invalid increment expression of for statement";
+				throw std::exception(err.c_str());
+			}
+
+			incr->DetermineDataType(owner, methodInfo);
+			if (incr->dataType == NULL)
+			{
+				string err = "There is no such identifier \"" + incr->typeName->ToString() + "\"";
+				throw std::exception(err.c_str());
+			}
+		}
+	}
+
+	if (statements != NULL)
+	{
+		for (auto stmt : *statements->statements)
+		{
+			stmt->Semantic(owner, methodInfo);
+		}
+	}
+}
+
 Statement::Statement(Type type, Expression* expression)
 {
 	this->id = ++maxId;
@@ -1815,6 +1888,10 @@ void Statement::Semantic(Class* owner, MethodTable* methodInfo)
 	else if (type == t_DO)
 	{
 		CheckDoStmtError(owner, methodInfo);
+	}
+	else if (type == t_FOR)
+	{
+		CheckForStmtError(owner, methodInfo);
 	}
 }
 
