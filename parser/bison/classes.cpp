@@ -488,6 +488,12 @@ void Expression::DetermineDataType(Class* owner, MethodTable* methodInfo)
 		}
 		dataType->type = left->dataType->type;
 		dataType->classType = left->dataType->classType;
+
+		if (left->dataType->type != DataType::t_INT && left->dataType->type != DataType::t_CHAR || left->dataType->isArray)
+		{
+			string err = "Unsupported operator for " + *left->dataType->ToString();
+			throw std::exception(err.c_str());
+		}
 		break;
 	case Expression::t_NOT:
 		left->DetermineDataType(owner, methodInfo);
@@ -989,12 +995,20 @@ DataType* Expression::GetDataTypeOfArithmetic(Class* owner, MethodTable* methodI
 	if (left->dataType->type == DataType::t_CHAR && !left->dataType->isArray
 		&& right->dataType->type == DataType::t_INT && !right->dataType->isArray)
 	{
-		right->dataType->type = DataType::t_CHAR;
+		left->dataType->type = DataType::t_INT;
 	}
 
 	dType->type = left->dataType->type;
 	dType->classType = left->dataType->classType;
 	dType->isArray = left->dataType->isArray;
+
+	if (!(*left->dataType == *right->dataType) || (left->dataType->type != DataType::t_INT &&
+		left->dataType->type != DataType::t_CHAR) || left->dataType->isArray)
+	{
+		string str = "Unsupported arithmetic operator for " + *left->dataType->ToString() +
+			" and " + *right->dataType->ToString();
+		throw std::exception(str.c_str());
+	}
 
 	return dType;
 }
