@@ -504,7 +504,7 @@ void Expression::DetermineDataType(Class* owner, MethodTable* methodInfo)
 		}
 		dataType->type = DataType::t_BOOL;
 
-		if (left->dataType->type != DataType::t_BOOL)
+		if (left->dataType->type != DataType::t_BOOL || left->dataType->isArray)
 		{
 			string err = "Unsupported logical operator for " + *left->dataType->ToString();
 			throw std::exception(err.c_str());
@@ -547,6 +547,12 @@ void Expression::DetermineDataType(Class* owner, MethodTable* methodInfo)
 			throw std::exception(err.c_str());
 		}
 		dataType->type = DataType::t_BOOL;
+
+		if (!(*left->dataType == *right->dataType) || left->dataType->type != DataType::t_BOOL || left->dataType->isArray)
+		{
+			string err = "Unsupported logical operators for " + *left->dataType->ToString() + " and " + *right->dataType->ToString();
+			throw std::exception(err.c_str());
+		}
 		break;
 	case Expression::t_ASSIGNMENT:
 		if (left != NULL)
