@@ -339,6 +339,7 @@ private:
     void CheckDoStmtError(Class* owner, MethodTable* methodInfo);
     void CheckForStmtError(Class* owner, MethodTable* methodInfo);
     void CheckForeachStmtError(Class* owner, MethodTable* methodInfo);
+    void CheckReturnStmtError(Class* owner, MethodTable* methodInfo);
 
 public:
     enum Type

@@ -1833,6 +1833,34 @@ void Statement::CheckForeachStmtError(Class* owner, MethodTable* methodInfo)
 	}
 }
 
+void Statement::CheckReturnStmtError(Class* owner, MethodTable* methodInfo)
+{
+	if (expressions != NULL)
+	{
+		Expression* expr = expressions->expressions->front();
+		expr->DetermineDataType(owner, methodInfo);
+		if (expr->dataType == NULL)
+		{
+			string err = "There is no such identifier \"" + expr->typeName->ToString() + "\"";
+			throw std::exception(err.c_str());
+		}
+
+		if (!(*methodInfo->GetReturnValue() == *expr->dataType))
+		{
+			string err = "it is not possible to convert " + *expr->dataType->ToString() + " to " + *methodInfo->GetReturnValue()->ToString();
+			throw std::exception(err.c_str());
+		}
+	}
+	else
+	{
+		if (methodInfo->GetReturnValue()->type != DataType::t_VOID)
+		{
+			string err = "it is not possible to convert VOID to " + *methodInfo->GetReturnValue()->ToString();
+			throw std::exception(err.c_str());
+		}
+	}
+}
+
 Statement::Statement(Type type, Expression* expression)
 {
 	this->id = ++maxId;
@@ -1932,6 +1960,10 @@ void Statement::Semantic(Class* owner, MethodTable* methodInfo)
 	else if (type == t_FOREACH)
 	{
 		CheckForeachStmtError(owner, methodInfo);
+	}
+	else if (type == t_RETURN)
+	{
+		CheckReturnStmtError(owner, methodInfo);
 	}
 }
 
