@@ -1542,9 +1542,28 @@ void VarDeclarator::Semantic(Class* owner, MethodTable* methodInfo)
 
 	dataType = dType;
 
+	if (initializer == NULL)
+	{
+		switch (dType->type)
+		{
+		case DataType::t_BOOL:
+			initializer = new Expression(Expression::t_BOOL_LITER, false); break;
+		case DataType::t_INT:
+			initializer = new Expression(Expression::t_INT_LITER, 0); break;
+		case DataType::t_CHAR:
+			initializer = new Expression(Expression::t_CHAR_LITER, 0); break;
+		default: break;
+		}
+	}
+
 	if (initializer != NULL)
 	{
 		initializer->DetermineDataType(owner, methodInfo);
+		if (!(*dType == *initializer->dataType))
+		{
+			string err = "it is not possible to convert " + *initializer->dataType->ToString() + " to " + *dType->ToString();
+			throw std::exception(err.c_str());
+		}
 	}
 }
 
