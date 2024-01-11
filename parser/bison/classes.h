@@ -333,6 +333,9 @@ public:
 
 class Statement
 {
+private:
+    void CheckIfStmtError(Class* owner, MethodTable* methodInfo);
+
 public:
     enum Type
     {

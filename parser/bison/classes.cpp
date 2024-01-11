@@ -1649,6 +1649,31 @@ string* VarDeclaratorList::ToDOT()
 	return dotStr;
 }
 
+void Statement::CheckIfStmtError(Class* owner, MethodTable* methodInfo)
+{
+	Expression* cond = expressions->expressions->front();
+	cond->DetermineDataType(owner, methodInfo);
+	if (cond->dataType == NULL)
+	{
+		string err = "There is no such identifier \"" + cond->typeName->ToString() + "\"";
+		throw std::exception(err.c_str());
+	}
+
+	if (cond->dataType->type != DataType::t_BOOL || cond->dataType->isArray)
+	{
+		string err = "Data type of if statement condition must be boolean";
+		throw std::exception(err.c_str());
+	}
+
+	if (statements != NULL)
+	{
+		for (auto stmt : *statements->statements)
+		{
+			stmt->Semantic(owner, methodInfo);
+		}
+	}
+}
+
 Statement::Statement(Type type, Expression* expression)
 {
 	this->id = ++maxId;
@@ -1728,6 +1753,10 @@ void Statement::Semantic(Class* owner, MethodTable* methodInfo)
 		{
 			decl->Semantic(owner, methodInfo);
 		}
+	}
+	else if (type == t_IF)
+	{
+		CheckIfStmtError(owner, methodInfo);
 	}
 }
 
