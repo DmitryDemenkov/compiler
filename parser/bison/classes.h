@@ -335,6 +335,8 @@ class Statement
 {
 private:
     void CheckIfStmtError(Class* owner, MethodTable* methodInfo);
+    void CheckWhileStmtError(Class* owner, MethodTable* methodInfo);
+    void CheckDoStmtError(Class* owner, MethodTable* methodInfo);
 
 public:
     enum Type
