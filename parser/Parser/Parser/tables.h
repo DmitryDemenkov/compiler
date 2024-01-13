@@ -184,6 +184,7 @@ public:
 	Class* classType = NULL;
 	bool isArray = false;
 
+	DataType(Type type, Class* classType, bool isArray, Class* namespaceMember);
 	static Type GetType(SimpleType* simpleType);
 	string* ToString();
 	string ToDescriptor();

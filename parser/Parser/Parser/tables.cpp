@@ -87,29 +87,32 @@ Class* Class::GetParent()
 
 DataType* Class::CreateDataType(ClassMember* member)
 {
-	DataType* dataType = new DataType();
+	DataType::Type type = DataType::t_INT;
+	Class* classType = NULL;
+	bool isArray = false;
+
 	TypeName* typeName = NULL;
 	switch (member->returnValue)
 	{
 	case ClassMember::t_SIMPLE_TYPE:
-		dataType->type = DataType::GetType(member->simpleType);
+		type = DataType::GetType(member->simpleType);
 		break;
 	case ClassMember::t_TYPENAME:
-		dataType->type = DataType::t_TYPENAME;
+		type = DataType::t_TYPENAME;
 		typeName = member->typeName;
 		break;
 	case ClassMember::t_VOID:
-		dataType->type = DataType::t_VOID;
+		type = DataType::t_VOID;
 		break;
 	case ClassMember::t_ARRAY:
 		if (member->arrayType->type == ArrayType::t_SIMPLE_TYPE) {
-			dataType->type = DataType::GetType(member->arrayType->simpleType);
+			type = DataType::GetType(member->arrayType->simpleType);
 		}
 		else {
-			dataType->type = DataType::t_TYPENAME;
+			type = DataType::t_TYPENAME;
 		}
 		typeName = member->arrayType->typeName;
-		dataType->isArray = true;
+		isArray = true;
 		break;
 	default:
 		break;
@@ -117,34 +120,37 @@ DataType* Class::CreateDataType(ClassMember* member)
 
 	if (typeName != NULL)
 	{
-		dataType->classType = FindClass(typeName);
+		classType = FindClass(typeName);
 	}
 
-	return dataType;
+	return new DataType(type, classType, isArray, this);
 }
 
 DataType* Class::CreateDataType(VarDeclarator* varDecl)
 {
-	DataType* dataType = new DataType();
+	DataType::Type type = DataType::t_INT;
+	Class* classType = NULL;
+	bool isArray = false;
+
 	TypeName* typeName = NULL;
 	switch (varDecl->type)
 	{
 	case VarDeclarator::t_SIMPLE_TYPE:
-		dataType->type = DataType::GetType(varDecl->simpleType);
+		type = DataType::GetType(varDecl->simpleType);
 		break;
 	case VarDeclarator::t_TYPE_NAME:
-		dataType->type = DataType::t_TYPENAME;
+		type = DataType::t_TYPENAME;
 		typeName = varDecl->typeName;
 		break;
 	case VarDeclarator::t_ARRAY_TYPE:
 		if (varDecl->arrayType->type == ArrayType::t_SIMPLE_TYPE) {
-			dataType->type = DataType::GetType(varDecl->arrayType->simpleType);
+			type = DataType::GetType(varDecl->arrayType->simpleType);
 		}
 		else {
-			dataType->type = DataType::t_TYPENAME;
+			type = DataType::t_TYPENAME;
 		}
 		typeName = varDecl->arrayType->typeName;
-		dataType->isArray = true;
+		isArray = true;
 		break;
 	default:
 		break;
@@ -152,10 +158,10 @@ DataType* Class::CreateDataType(VarDeclarator* varDecl)
 
 	if (typeName != NULL)
 	{
-		dataType->classType = FindClass(typeName);
+		classType = FindClass(typeName);
 	}
 
-	return dataType;
+	return new DataType(type, classType, isArray, this);
 }
 
 Class* Class::FindClass(TypeName* typeName)
@@ -286,8 +292,7 @@ void Class::AppendConstructor(Constructor* constructor)
 		throw std::exception(err.c_str());
 	}
 
-	DataType* dataType = new DataType();
-	dataType->type = DataType::t_VOID;
+	DataType* dataType = new DataType(DataType::t_VOID, NULL, false, this);
 
 	MethodTable* newConstructor = new MethodTable(constructorName, dataType);
 	if (constructor->modifiers == NULL)
@@ -336,8 +341,7 @@ void Class::AppdendDefaultConstructor()
 		throw std::exception(err.c_str());
 	}
 
-	DataType* dataType = new DataType();
-	dataType->type = DataType::t_VOID;
+	DataType* dataType = new DataType(DataType::t_VOID, NULL, false, this);
 
 	MethodTable* newConstructor = new MethodTable(constructorName, dataType);
 	newConstructor->SetAccessModifier(e_PUBLIC);
@@ -763,6 +767,13 @@ Constant::Constant(Type type)
 	this->type = type;
 }
 
+DataType::DataType(Type type, Class* classType, bool isArray, Class* namespaceMember)
+{
+	this->type = type;
+	this->classType = classType;
+	this->isArray = isArray;
+}
+
 DataType::Type DataType::GetType(SimpleType* simpleType)
 {
 	switch (simpleType->type)
@@ -1183,11 +1194,8 @@ Class* Class::CreateObjectClass(AbstractNamespaceMember* outer)
 	Class* objectClass = new Class(new string("Object"), outer,	NULL);
 	objectClass->SetAccesModifier(e_PUBLIC);
 
-	DataType* equalsReturn = new DataType(); 
-	equalsReturn->type = DataType::t_BOOL;
-	DataType* equalsParamType = new DataType(); 
-	equalsParamType->type = DataType::t_TYPENAME;
-	equalsParamType->classType = objectClass;
+	DataType* equalsReturn = new DataType(DataType::t_BOOL, NULL, false, objectClass); 
+	DataType* equalsParamType = new DataType(DataType::t_TYPENAME, objectClass, false, objectClass); 
 	Variable* equalsParam = new Variable();
 	equalsParam->name = new string("obj");
 	equalsParam->type = equalsParamType;
@@ -1198,8 +1206,7 @@ Class* Class::CreateObjectClass(AbstractNamespaceMember* outer)
 	equalsMethod->SetAccessModifier(e_PUBLIC);
 	equalsMethod->SetVirtual(true);
 
-	DataType* toStringReturn = new DataType();
-	toStringReturn->type = DataType::t_STRING;
+	DataType* toStringReturn = new DataType(DataType::t_STRING, NULL, false, objectClass);
 	vector<Variable*> toStringParamSet = vector<Variable*>();
 
 	objectClass->AppendMethod(new string("ToString"), toStringReturn, toStringParamSet);

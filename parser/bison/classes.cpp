@@ -435,20 +435,19 @@ string* Expression::ToDOT()
 
 void Expression::DetermineDataType(Class* owner, MethodTable* methodInfo)
 {
-	dataType = new DataType();
 	switch (type)
 	{
 	case Expression::t_INT_LITER:
-		dataType->type = DataType::t_INT;
+		dataType = new DataType(DataType::t_INT, NULL, false, owner);
 		break;
 	case Expression::t_CHAR_LITER:
-		dataType->type = DataType::t_CHAR;
+		dataType = new DataType(DataType::t_CHAR, NULL, false, owner);
 		break;
 	case Expression::t_BOOL_LITER:
-		dataType->type = DataType::t_BOOL;
+		dataType = new DataType(DataType::t_BOOL, NULL, false, owner);
 		break;
 	case Expression::t_STRING_LITER:
-		dataType->type = DataType::t_STRING;
+		dataType = new DataType(DataType::t_STRING, NULL, false, owner);
 		break;
 	case Expression::t_ID:
 		dataType = GetDataTypeOfId(owner, methodInfo);
@@ -457,12 +456,10 @@ void Expression::DetermineDataType(Class* owner, MethodTable* methodInfo)
 		/* TODO: RTL classes for simple data types */
 		break;
 	case Expression::t_THIS:
-		dataType->type = DataType::t_TYPENAME;
-		dataType->classType = owner;
+		dataType = new DataType(DataType::t_TYPENAME, owner, false, owner);
 		break;
 	case Expression::t_BASE:
-		dataType->type = DataType::t_TYPENAME;
-		dataType->classType = owner->GetParent();
+		dataType = new DataType(DataType::t_TYPENAME, owner->GetParent(), false, owner);
 		break;
 	case Expression::t_OBJ_CREATION:
 		dataType = GetDataTypeOfObjectCreation(owner, methodInfo);
@@ -486,8 +483,7 @@ void Expression::DetermineDataType(Class* owner, MethodTable* methodInfo)
 			string err = "There is no such identifier \"" + left->typeName->ToString() + "\"";
 			throw std::exception(err.c_str());
 		}
-		dataType->type = left->dataType->type;
-		dataType->classType = left->dataType->classType;
+		dataType = new DataType(left->dataType->type, left->dataType->classType, false, owner);
 
 		if (left->dataType->type != DataType::t_INT && left->dataType->type != DataType::t_CHAR || left->dataType->isArray)
 		{
@@ -502,7 +498,7 @@ void Expression::DetermineDataType(Class* owner, MethodTable* methodInfo)
 			string err = "There is no such identifier \"" + left->typeName->ToString() + "\"";
 			throw std::exception(err.c_str());
 		}
-		dataType->type = DataType::t_BOOL;
+		dataType = new DataType(DataType::t_BOOL, NULL, false, owner);
 
 		if (left->dataType->type != DataType::t_BOOL || left->dataType->isArray)
 		{
@@ -545,7 +541,7 @@ void Expression::DetermineDataType(Class* owner, MethodTable* methodInfo)
 			throw std::exception(err.c_str());
 		}
 		owner->FindClass(this->typeName);
-		dataType->type = DataType::t_BOOL;
+		dataType = new DataType(DataType::t_BOOL, NULL, false, owner);
 
 		if (left->dataType->type != DataType::t_TYPENAME || left->dataType->isArray)
 		{
@@ -567,7 +563,7 @@ void Expression::DetermineDataType(Class* owner, MethodTable* methodInfo)
 			string err = "There is no such identifier \"" + right->typeName->ToString() + "\"";
 			throw std::exception(err.c_str());
 		}
-		dataType->type = DataType::t_BOOL;
+		dataType = new DataType(DataType::t_BOOL, NULL, false, owner);
 
 		if (!(*left->dataType == *right->dataType) || left->dataType->type != DataType::t_BOOL || left->dataType->isArray)
 		{
@@ -661,9 +657,7 @@ DataType* Expression::GetDataTypeOfId(Class* owner, MethodTable* methodInfo)
 		else
 		{
 			this->left = new Expression(Expression::t_CLASS);
-			this->left->dataType = new DataType();
-			this->left->dataType->type = DataType::t_TYPENAME;
-			this->left->dataType->classType = owner;
+			this->left->dataType = new DataType(DataType::t_TYPENAME, owner, false, owner);
 		}
 
 		CheckErrorsOfFieldAccess(owner, methodInfo);
@@ -681,9 +675,7 @@ DataType* Expression::GetDataTypeOfId(Class* owner, MethodTable* methodInfo)
 
 	if (classInfo != NULL)
 	{
-		DataType* dType = new DataType();
-		dType->type = DataType::t_TYPENAME;
-		dType->classType = classInfo;
+		DataType* dType = new DataType(DataType::t_TYPENAME, classInfo, false, owner);
 		this->type = t_CLASS;
 
 		CheckErrorsOfClassesAccess(owner, classInfo);
@@ -710,9 +702,7 @@ DataType* Expression::GetDataTypeOfInvocation(Class* owner, MethodTable* methodI
 		if (owner->GetMethod(*this->name)->IsStatic())
 		{
 			this->left = new Expression(t_CLASS);
-			this->left->dataType = new DataType();
-			this->left->dataType->type = DataType::t_TYPENAME;
-			this->left->dataType->classType = owner;
+			this->left->dataType = new DataType(DataType::t_TYPENAME, owner, false, owner);
 		}
 		else
 		{
@@ -770,9 +760,7 @@ DataType* Expression::GetDataTypeOfMemberAccess(Class* owner, MethodTable* metho
 
 		if (classInfo != NULL)
 		{
-			DataType* dType = new DataType();
-			dType->type = DataType::t_TYPENAME;
-			dType->classType = classInfo;
+			DataType* dType = new DataType(DataType::t_TYPENAME, classInfo, false, owner);
 			this->type = t_CLASS;
 
 			CheckErrorsOfClassesAccess(owner, classInfo);
@@ -796,9 +784,7 @@ DataType* Expression::GetDataTypeOfMemberAccess(Class* owner, MethodTable* metho
 		AbstractNamespaceMember* innerMember = this->left->dataType->classType->GetInnerMember(this->right->name);
 		if (dynamic_cast<Class*>(innerMember) != NULL)
 		{
-			DataType* dType = new DataType();
-			dType->type = DataType::t_TYPENAME;
-			dType->classType = (Class*)innerMember;
+			DataType* dType = new DataType(DataType::t_TYPENAME, (Class*)innerMember, false, owner);
 			this->type = t_CLASS;
 
 			CheckErrorsOfClassesAccess(owner, dType->classType);
@@ -816,16 +802,18 @@ DataType* Expression::GetDataTypeOfMemberAccess(Class* owner, MethodTable* metho
 
 DataType* Expression::GetDataTypeOfObjectCreation(Class* owner, MethodTable* methodInfo)
 {
-	DataType* dType = new DataType();
+	DataType::Type type = DataType::t_INT;
+	Class* classType = NULL;
 	if (this->simpleType != NULL)
 	{
-		dType->type = DataType::GetType(this->simpleType);
+		type = DataType::GetType(this->simpleType);
 	}
 	else
 	{
-		dType->type = DataType::t_TYPENAME;
-		dType->classType = owner->FindClass(this->typeName);
+		type = DataType::t_TYPENAME;
+		classType = owner->FindClass(this->typeName);
 	}
+	DataType* dType = new DataType(type, classType, false, owner);
 
 	if (this->argumentList != NULL)
 	{
@@ -852,29 +840,33 @@ DataType* Expression::GetDataTypeOfObjectCreation(Class* owner, MethodTable* met
 
 DataType* Expression::GetDataTypeOfArrayCreation(Class* owner, MethodTable* methodInfo)
 {
-	DataType* dType = new DataType();
-	dType->isArray = true;
+	DataType::Type type = DataType::t_INT;
+	Class* classType = NULL;
+	bool isArray = true;
+
 	if (simpleType != NULL)
 	{
-		dType->type = DataType::GetType(simpleType);
+		type = DataType::GetType(simpleType);
 	}
 	else if (typeName != NULL)
 	{
-		dType->type = DataType::t_TYPENAME;
-		dType->classType = owner->FindClass(typeName);
+		type = DataType::t_TYPENAME;
+		classType = owner->FindClass(typeName);
 	}
 	else
 	{
 		if (arrayType->simpleType != NULL)
 		{
-			dType->type = DataType::GetType(arrayType->simpleType);
+			type = DataType::GetType(arrayType->simpleType);
 		}
 		else
 		{
-			dType->type = DataType::t_TYPENAME;
-			dType->classType = owner->FindClass(arrayType->typeName);
+			type = DataType::t_TYPENAME;
+			classType = owner->FindClass(arrayType->typeName);
 		}
 	}
+
+	DataType* dType = new DataType(type, classType, isArray, owner);
 
 	if (this->left == NULL)
 	{
@@ -915,8 +907,6 @@ DataType* Expression::GetDataTypeOfArrayCreation(Class* owner, MethodTable* meth
 
 DataType* Expression::GetDataTypeOfElementAccess(Class* owner, MethodTable* methodInfo)
 {
-	DataType* dType = new DataType();
-
 	left->DetermineDataType(owner, methodInfo);
 	if (left->dataType == NULL)
 	{
@@ -928,8 +918,8 @@ DataType* Expression::GetDataTypeOfElementAccess(Class* owner, MethodTable* meth
 		string err = "Invalid element access";
 		throw std::exception(err.c_str());
 	}
-	dType->type = left->dataType->type;
-	dType->classType = left->dataType->classType;
+
+	DataType* dType = new DataType(left->dataType->type, left->dataType->classType, false, owner);
 
 	if (argumentList == NULL)
 	{
@@ -970,29 +960,32 @@ DataType* Expression::GetDataTypeOfTypeCast(Class* owner, MethodTable* methodInf
 		right = NULL;
 	}
 
-	DataType* dType = new DataType();
+	DataType::Type type = DataType::t_INT;
+	Class* classType = NULL;
+	bool isArray = false;
 	if (simpleType != NULL)
 	{
-		dType->type = DataType::GetType(simpleType);
+		type = DataType::GetType(simpleType);
 	}
 	else if (arrayType != NULL)
 	{
 		if (arrayType->simpleType != NULL)
 		{
-			dType->type = DataType::GetType(arrayType->simpleType);
+			type = DataType::GetType(arrayType->simpleType);
 		}
 		else
 		{
-			dType->type = DataType::t_TYPENAME;
-			dType->classType = owner->FindClass(arrayType->typeName);
+			type = DataType::t_TYPENAME;
+			classType = owner->FindClass(arrayType->typeName);
 		}
-		dType->isArray = true;
+		isArray = true;
 	}
 	else
 	{
-		dType->type = DataType::t_TYPENAME;
-		dType->classType = owner->FindClass(typeName);
+		type = DataType::t_TYPENAME;
+		classType = owner->FindClass(typeName);
 	}
+	DataType* dType = new DataType(type, classType, isArray, owner);
 
 	left->DetermineDataType(owner, methodInfo);
 	if (left->dataType == NULL)
@@ -1006,7 +999,6 @@ DataType* Expression::GetDataTypeOfTypeCast(Class* owner, MethodTable* methodInf
 
 DataType* Expression::GetDataTypeOfArithmetic(Class* owner, MethodTable* methodInfo)
 {
-	DataType* dType = new DataType();
 	left->DetermineDataType(owner, methodInfo);
 	if (left->dataType == NULL)
 	{
@@ -1033,9 +1025,7 @@ DataType* Expression::GetDataTypeOfArithmetic(Class* owner, MethodTable* methodI
 		left->dataType->type = DataType::t_INT;
 	}
 
-	dType->type = left->dataType->type;
-	dType->classType = left->dataType->classType;
-	dType->isArray = left->dataType->isArray;
+	DataType* dType = new DataType(left->dataType->type, left->dataType->classType, left->dataType->isArray, owner);
 
 	if (!(*left->dataType == *right->dataType) || (left->dataType->type != DataType::t_INT &&
 		left->dataType->type != DataType::t_CHAR) || left->dataType->isArray)
@@ -1050,7 +1040,6 @@ DataType* Expression::GetDataTypeOfArithmetic(Class* owner, MethodTable* methodI
 
 DataType* Expression::GetDataTypeOfComprasion(Class* owner, MethodTable* methodInfo)
 {
-	DataType* dType = new DataType();
 	left->DetermineDataType(owner, methodInfo);
 	if (left->dataType == NULL)
 	{
@@ -1077,7 +1066,7 @@ DataType* Expression::GetDataTypeOfComprasion(Class* owner, MethodTable* methodI
 		left->dataType->type = DataType::t_INT;
 	}
 
-	dType->type = DataType::t_BOOL;
+	DataType* dType = new DataType(DataType::t_BOOL, NULL, false , owner);
 
 	if (!(*left->dataType == *right->dataType) || (left->dataType->type != DataType::t_INT &&
 		left->dataType->type != DataType::t_CHAR) || left->dataType->isArray)
@@ -1236,9 +1225,7 @@ void Expression::CheckErrorsOfArrayCreation(Class* owner, DataType* arrayType)
 		throw std::exception(err.c_str());
 	}
 
-	DataType elemType = DataType();
-	elemType.type = arrayType->type;
-	elemType.classType = arrayType->classType;
+	DataType elemType = DataType(arrayType->type, arrayType->classType, false, owner);
 	if (this->arrayInitializer != NULL)
 	{
 		for (auto init : *arrayInitializer->expressions)
@@ -1815,9 +1802,7 @@ void Statement::CheckForeachStmtError(Class* owner, MethodTable* methodInfo)
 		throw std::exception(err.c_str());
 	}
 
-	DataType dTypeIterElem = DataType();
-	dTypeIterElem.type = iter->dataType->type;
-	dTypeIterElem.classType = iter->dataType->classType;
+	DataType dTypeIterElem = DataType(iter->dataType->type, iter->dataType->classType, false, owner);
 	if (!(*decl->dataType == dTypeIterElem))
 	{
 		string err = "it is not possible to convert " + *dTypeIterElem.ToString() + " to " + *decl->dataType->ToString();
