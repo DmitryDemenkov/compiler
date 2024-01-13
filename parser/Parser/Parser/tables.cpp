@@ -629,7 +629,8 @@ void Class::CreateTables()
 	}
 	else
 	{
-		TypeName* typeName = new TypeName(new string("Object"));
+		TypeName* typeName = new TypeName(new string("System"));
+		typeName = TypeName::Append(typeName, new string("Object"));
 		AppendParent(typeName);
 	}
 
@@ -1231,6 +1232,9 @@ Class* Class::CreateStringClass(AbstractNamespaceMember* outer)
 
 void Class::CreateRTLClasses(AbstractNamespaceMember* outer)
 {
-	outer->Append(CreateObjectClass(outer));
-	outer->Append(CreateStringClass(outer));
+	AbstractNamespaceMember* system = new Namespace(new string("System"), outer);
+	outer->Append(system);
+
+	system->Append(CreateObjectClass(system));
+	system->Append(CreateStringClass(system));
 }
