@@ -773,6 +773,11 @@ DataType::DataType(Type type, Class* classType, bool isArray, Class* namespaceMe
 	this->type = type;
 	this->classType = classType;
 	this->isArray = isArray;
+
+	if (classType == NULL)
+	{
+		this->classType = GetClassOfType(type, namespaceMember);
+	}
 }
 
 DataType::Type DataType::GetType(SimpleType* simpleType)
@@ -831,6 +836,36 @@ bool DataType::operator==(const DataType& other) const
 		isTypeEquals = other.classType->InstanceOf(this->classType);
 	}
 	return isTypeEquals && this->isArray == other.isArray;
+}
+
+Class* DataType::GetClassOfType(Type type, Class* namespaceMember)
+{
+	Class* classType = NULL;
+	TypeName* tName = new TypeName(new string("System"));
+	switch (type)
+	{
+	case DataType::t_INT:
+		tName = TypeName::Append(tName, new string("Int"));
+		classType = namespaceMember->FindClass(tName);
+		break;
+	case DataType::t_STRING:
+		tName = TypeName::Append(tName, new string("String"));
+		classType = namespaceMember->FindClass(tName);
+		break;
+	case DataType::t_BOOL:
+		tName = TypeName::Append(tName, new string("Bool"));
+		classType = namespaceMember->FindClass(tName);
+		break;
+	case DataType::t_CHAR:
+		tName = TypeName::Append(tName, new string("Char"));
+		classType = namespaceMember->FindClass(tName);
+		break;
+	case DataType::t_TYPENAME:
+	case DataType::t_VOID:
+	default:
+		break;
+	}
+	return classType;
 }
 
 Expression* FieldTable::GetDefaultInitializer()
@@ -1195,8 +1230,51 @@ Class* Class::CreateObjectClass(AbstractNamespaceMember* outer)
 	Class* objectClass = new Class(new string("Object"), outer,	NULL);
 	objectClass->SetAccesModifier(e_PUBLIC);
 
-	DataType* equalsReturn = new DataType(DataType::t_BOOL, NULL, false, objectClass); 
-	DataType* equalsParamType = new DataType(DataType::t_TYPENAME, objectClass, false, objectClass); 
+	return objectClass;
+}
+
+Class* Class::CreateStringClass(AbstractNamespaceMember* outer)
+{
+	Class* stringClass = new Class(new string("String"), outer, NULL);
+	stringClass->SetAccesModifier(e_PUBLIC);
+	stringClass->parent = (Class*)outer->GetInnerMember(new string("Object"));
+
+	return stringClass;
+}
+
+Class* Class::CreateIntClass(AbstractNamespaceMember* outer)
+{
+	Class* intClass = new Class(new string("Int"), outer, NULL);
+	intClass->SetAccesModifier(e_PUBLIC);
+	intClass->parent = (Class*)outer->GetInnerMember(new string("Object"));
+
+	return intClass;
+}
+
+Class* Class::CreateCharClass(AbstractNamespaceMember* outer)
+{
+	Class* charClass = new Class(new string("Char"), outer, NULL);
+	charClass->SetAccesModifier(e_PUBLIC);
+	charClass->parent = (Class*)outer->GetInnerMember(new string("Object"));
+
+	return charClass;
+}
+
+Class* Class::CreateBoolClass(AbstractNamespaceMember* outer)
+{
+	Class* boolClass = new Class(new string("Bool"), outer, NULL);
+	boolClass->SetAccesModifier(e_PUBLIC);
+	boolClass->parent = (Class*)outer->GetInnerMember(new string("Object"));
+
+	return boolClass;
+}
+
+void Class::FillObjectClass(AbstractNamespaceMember* outer)
+{
+	Class* objectClass = (Class*)outer->GetInnerMember(new string("Object"));
+
+	DataType* equalsReturn = new DataType(DataType::t_BOOL, NULL, false, objectClass);
+	DataType* equalsParamType = new DataType(DataType::t_TYPENAME, objectClass, false, objectClass);
 	Variable* equalsParam = new Variable();
 	equalsParam->name = new string("obj");
 	equalsParam->type = equalsParamType;
@@ -1217,17 +1295,42 @@ Class* Class::CreateObjectClass(AbstractNamespaceMember* outer)
 
 	objectClass->AppdendDefaultConstructor();
 	objectClass->GetMethod("<init>")->SetBody(NULL);
-	return objectClass;
 }
 
-Class* Class::CreateStringClass(AbstractNamespaceMember* outer)
+void Class::FillStringClass(AbstractNamespaceMember* outer)
 {
-	Class* stringClass = new Class(new string("String"), outer, NULL);
-	stringClass->SetAccesModifier(e_PUBLIC);
-	stringClass->parent = (Class*)outer->GetInnerMember(new string("Object"));
-
+	Class* stringClass = (Class*)outer->GetInnerMember(new string("String"));
 	stringClass->AppdendDefaultConstructor();
-	return stringClass;
+}
+
+void Class::FillIntClass(AbstractNamespaceMember* outer)
+{
+	Class* intClass = (Class*)outer->GetInnerMember(new string("Int"));
+	intClass->AppdendDefaultConstructor();
+
+	DataType* parseReturn = new DataType(DataType::t_INT, NULL, false, intClass);
+	DataType* parseParamType = new DataType(DataType::t_STRING, NULL, false, intClass);
+	Variable* parseParam = new Variable();
+	parseParam->name = new string("str");
+	parseParam->type = parseParamType;
+	vector<Variable*> parseParamSet = vector<Variable*>{ parseParam };
+
+	intClass->AppendMethod(new string("Parse"), parseReturn, parseParamSet);
+	MethodTable* equalsMethod = intClass->methods["Parse"];
+	equalsMethod->SetAccessModifier(e_PUBLIC);
+	equalsMethod->SetStatic(true);
+}
+
+void Class::FillCharClass(AbstractNamespaceMember* outer)
+{
+	Class* charClass = (Class*)outer->GetInnerMember(new string("Char"));
+	charClass->AppdendDefaultConstructor();
+}
+
+void Class::FillBoolClass(AbstractNamespaceMember* outer)
+{
+	Class* boolClass = (Class*)outer->GetInnerMember(new string("Bool"));
+	boolClass->AppdendDefaultConstructor();
 }
 
 void Class::CreateRTLClasses(AbstractNamespaceMember* outer)
@@ -1237,4 +1340,13 @@ void Class::CreateRTLClasses(AbstractNamespaceMember* outer)
 
 	system->Append(CreateObjectClass(system));
 	system->Append(CreateStringClass(system));
+	system->Append(CreateIntClass(system));
+	system->Append(CreateCharClass(system));
+	system->Append(CreateBoolClass(system));
+
+	FillObjectClass(system);
+	FillIntClass(system);
+	FillCharClass(system);
+	FillStringClass(system);
+	FillBoolClass(system);
 }

@@ -125,6 +125,15 @@ private:
 
 	static Class* CreateObjectClass(AbstractNamespaceMember* outer);
 	static Class* CreateStringClass(AbstractNamespaceMember* outer);
+	static Class* CreateIntClass(AbstractNamespaceMember* outer);
+	static Class* CreateCharClass(AbstractNamespaceMember* outer);
+	static Class* CreateBoolClass(AbstractNamespaceMember* outer);
+
+	static void FillObjectClass(AbstractNamespaceMember* outer);
+	static void FillStringClass(AbstractNamespaceMember* outer);
+	static void FillIntClass(AbstractNamespaceMember* outer);
+	static void FillCharClass(AbstractNamespaceMember* outer);
+	static void FillBoolClass(AbstractNamespaceMember* outer);
 
 public:
 	Class(string* name, AbstractNamespaceMember* outer, ClassDeclaration* decl);
@@ -189,6 +198,8 @@ public:
 	string* ToString();
 	string ToDescriptor();
 	bool operator== (const DataType& other) const;
+
+	static Class* GetClassOfType(Type type, Class* namespaceMember);
 };
 
 class FieldTable

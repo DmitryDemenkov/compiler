@@ -453,7 +453,7 @@ void Expression::DetermineDataType(Class* owner, MethodTable* methodInfo)
 		dataType = GetDataTypeOfId(owner, methodInfo);
 		break;
 	case Expression::t_SIMPLE_TYPE:
-		/* TODO: RTL classes for simple data types */
+		dataType = GetDataTypeOfSympleType(owner, methodInfo);
 		break;
 	case Expression::t_THIS:
 		dataType = new DataType(DataType::t_TYPENAME, owner, false, owner);
@@ -1077,6 +1077,13 @@ DataType* Expression::GetDataTypeOfComprasion(Class* owner, MethodTable* methodI
 	}
 
 	return dType;
+}
+
+DataType* Expression::GetDataTypeOfSympleType(Class* owner, MethodTable* methodInfo)
+{
+	this->type = t_CLASS;
+	DataType::Type type = DataType::GetType(this->simpleType);
+	return new DataType(type, NULL, false, owner);
 }
 
 void Expression::CheckErrorsOfInvokation(Class* owner, MethodTable* methodInfo)
