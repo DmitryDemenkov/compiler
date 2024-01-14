@@ -723,6 +723,11 @@ DataType* Expression::GetDataTypeOfInvocation(Class* owner, MethodTable* methodI
 			string err = "There is no such identifier \"" + this->left->typeName->ToString() + "\"";
 			throw std::exception(err.c_str());
 		}
+		if (this->left->dataType->isArray)
+		{
+			string err = "Unsupported method invocation on array object";
+			throw std::exception(err.c_str());
+		}
 		if (this->left->dataType->classType->GetMethod(*this->name) == NULL)
 		{
 			string err = "There is no such method " + *this->name + " in class " + this->left->dataType->classType->GetFullName();
@@ -768,7 +773,12 @@ DataType* Expression::GetDataTypeOfMemberAccess(Class* owner, MethodTable* metho
 			return dType;
 		}
 	}
-	else if (this->left->dataType->type == DataType::t_TYPENAME)
+	else if (this->left->dataType->isArray)
+	{
+		string err = "Unsupported method access on array object";
+		throw std::exception(err.c_str());
+	}
+	else
 	{
 		FieldTable* fieldInfo = this->left->dataType->classType->GetField(*this->right->name);
 		if (fieldInfo != NULL)
@@ -1536,7 +1546,7 @@ void VarDeclarator::Semantic(Class* owner, MethodTable* methodInfo)
 
 	dataType = dType;
 
-	if (initializer == NULL)
+	if (initializer == NULL && !dType->isArray)
 	{
 		switch (dType->type)
 		{
@@ -1546,6 +1556,8 @@ void VarDeclarator::Semantic(Class* owner, MethodTable* methodInfo)
 			initializer = new Expression(Expression::t_INT_LITER, 0); break;
 		case DataType::t_CHAR:
 			initializer = new Expression(Expression::t_CHAR_LITER, 0); break;
+		case DataType::t_STRING:
+			initializer = new Expression(Expression::t_STRING_LITER, ""); break;
 		default: break;
 		}
 	}

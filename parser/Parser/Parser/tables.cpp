@@ -871,15 +871,20 @@ Class* DataType::GetClassOfType(Type type, Class* namespaceMember)
 Expression* FieldTable::GetDefaultInitializer()
 {
 	Expression* expr = NULL;
-	switch (type->type)
+	if (!type->isArray)
 	{
-	case DataType::t_BOOL:
-		expr = new Expression(Expression::t_BOOL_LITER, false); break;
-	case DataType::t_INT:
-		expr = new Expression(Expression::t_INT_LITER, 0); break;
-	case DataType::t_CHAR:
-		expr = new Expression(Expression::t_CHAR_LITER, 0); break;
-	default: break;
+		switch (type->type)
+		{
+		case DataType::t_BOOL:
+			expr = new Expression(Expression::t_BOOL_LITER, false); break;
+		case DataType::t_INT:
+			expr = new Expression(Expression::t_INT_LITER, 0); break;
+		case DataType::t_CHAR:
+			expr = new Expression(Expression::t_CHAR_LITER, 0); break;
+		case DataType::t_STRING:
+			expr = new Expression(Expression::t_STRING_LITER, ""); break;
+		default: break;
+		}
 	}
 	return expr;
 }
