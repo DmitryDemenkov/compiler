@@ -49,7 +49,9 @@ public:
 	Constant(Type type);
 	Constant(Type type, string* utf8);
 	Constant(Type type, int integer);
-	Constant(Type type, int firstRef, int secondRef = -1);
+	Constant(Type type, int firstRef, int secondRef);
+
+	bool operator== (const Constant& other) const;
 };
 
 enum AccessModifier
@@ -137,6 +139,8 @@ private:
 	static void FillBoolClass(AbstractNamespaceMember* outer);
 	static void FillConsoleClass(AbstractNamespaceMember* outer);
 
+	int IndexOfConstant(Constant* constant);
+
 public:
 	Class(string* name, AbstractNamespaceMember* outer, ClassDeclaration* decl);
 	int GetId() override;
@@ -177,6 +181,14 @@ public:
 	Class* FindClass(TypeName* typeName);
 
 	static void CreateRTLClasses(AbstractNamespaceMember* outer);
+
+	Constant* AppendUtf8Constant(string* utf8);
+	Constant* AppendIntegerConstant(int integer);
+	Constant* AppendStringConstant(string* utf8);
+	Constant* AppendClassConstant(Class* classInfo);
+	Constant* AppendNameAndTypeConstant(string* name, string* descriptor);
+	Constant* AppendFieldRefConstant(Class* owner, FieldTable* fieldInfo);
+	Constant* AppendMethofRefConstant(Class* owner, MethodTable* methodTable);
 };
 
 class DataType
@@ -281,4 +293,5 @@ public:
 	bool CompareArgsTypes(ArgumentList* args);
 	int GetParamIndex(string* name);
 	string ToString();
+	string* GetDescriptor();
 };

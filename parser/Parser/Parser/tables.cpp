@@ -768,6 +768,53 @@ Constant::Constant(Type type)
 	this->type = type;
 }
 
+Constant::Constant(Type type, string* utf8)
+{
+	this->type = type;
+	this->utf8 = utf8;
+}
+
+Constant::Constant(Type type, int integer)
+{
+	this->type = type;
+	this->integer = integer;
+}
+
+Constant::Constant(Type type, int firstRef, int secondRef)
+{
+	this->type = type;
+	this->firstRef = firstRef;
+	this->secondRef = secondRef;
+}
+
+bool Constant::operator==(const Constant& other) const
+{
+	bool isEqual = this->type == other.type;
+
+	switch (type)
+	{
+	case Constant::t_UTF8:
+		isEqual = isEqual && *this->utf8 == *other.utf8;
+		break;
+	case Constant::t_INTEGER:
+		isEqual = isEqual && this->integer == other.integer;
+		break;
+	case Constant::t_STRING:
+	case Constant::t_CLASS:
+		isEqual = isEqual && this->firstRef == other.firstRef;
+		break;
+	case Constant::t_NAME_AND_TYPE:
+	case Constant::t_FIELD_REF:
+	case Constant::t_METHOD_REF:
+		isEqual = isEqual && this->firstRef == other.firstRef && this->secondRef == other.secondRef;
+		break;
+	default:
+		break;
+	}
+
+	return isEqual;
+}
+
 DataType::DataType(Type type, Class* classType, bool isArray, Class* namespaceMember)
 {
 	this->type = type;
@@ -1216,18 +1263,22 @@ int MethodTable::GetParamIndex(string* name)
 
 string MethodTable::ToString()
 {
-	string descriptor = "(";
-	for (auto param : params)
-	{
-		descriptor += param->type->ToDescriptor();
-	}
-	descriptor += ")" + GetReturnValue()->ToDescriptor();
-
-	string str = *GetName() + "," + descriptor + ","
+	string str = *GetName() + "," + *GetDescriptor() + ","
 		+ GetAccessModifierName(accessModifier) + "," + to_string(IsStatic()) + "," + to_string(IsAbstract())
 		+ "," + to_string(IsVirtual()) + "," + to_string(IsOverride());
 
 	return str;
+}
+
+string* MethodTable::GetDescriptor()
+{
+	string* descriptor = new string("(");
+	for (auto param : params)
+	{
+		*descriptor += param->type->ToDescriptor();
+	}
+	*descriptor += ")" + GetReturnValue()->ToDescriptor();
+	return descriptor;
 }
 
 Class* Class::CreateObjectClass(AbstractNamespaceMember* outer)
@@ -1373,6 +1424,22 @@ void Class::FillConsoleClass(AbstractNamespaceMember* outer)
 	readMethod->SetStatic(true);
 }
 
+int Class::IndexOfConstant(Constant* constant)
+{
+	int index = 0;
+	for (auto c : constantTable)
+	{
+		if (*c == *constant)
+		{
+			return index;
+		}
+		index++;
+	}
+
+	constantTable.push_back(constant);
+	return constantTable.size() - 1;
+}
+
 void Class::CreateRTLClasses(AbstractNamespaceMember* outer)
 {
 	AbstractNamespaceMember* system = new Namespace(new string("System"), outer);
@@ -1391,4 +1458,61 @@ void Class::CreateRTLClasses(AbstractNamespaceMember* outer)
 	FillStringClass(system);
 	FillBoolClass(system);
 	FillConsoleClass(system);
+}
+
+Constant* Class::AppendUtf8Constant(string* utf8)
+{
+	Constant* constant = new Constant(Constant::t_UTF8, utf8);
+	int index = IndexOfConstant(constant);
+	return constantTable[index];
+}
+
+Constant* Class::AppendIntegerConstant(int integer)
+{
+	Constant* constant = new Constant(Constant::t_INTEGER, integer);
+	int index = IndexOfConstant(constant);
+	return constantTable[index];
+}
+
+Constant* Class::AppendStringConstant(string* utf8)
+{
+	Constant* utf8Const = AppendUtf8Constant(utf8);
+	Constant* constant = new Constant(Constant::t_STRING, IndexOfConstant(utf8Const), -1);
+	int index = IndexOfConstant(constant);
+	return constantTable[index];
+}
+
+Constant* Class::AppendClassConstant(Class* classInfo)
+{
+	Constant* utf8Const = AppendUtf8Constant(new string(classInfo->GetFullName()));
+	Constant* constant = new Constant(Constant::t_CLASS, IndexOfConstant(utf8Const), -1);
+	int index = IndexOfConstant(constant);
+	return constantTable[index];
+}
+
+Constant* Class::AppendNameAndTypeConstant(string* name, string* descriptor)
+{
+	Constant* utf8Name = AppendUtf8Constant(name);
+	Constant* utf8Type = AppendUtf8Constant(descriptor);
+	Constant* constant = new Constant(Constant::t_NAME_AND_TYPE, IndexOfConstant(utf8Name), IndexOfConstant(utf8Type));
+	int index = IndexOfConstant(constant);
+	return constantTable[index];
+}
+
+Constant* Class::AppendFieldRefConstant(Class* owner, FieldTable* fieldInfo)
+{
+	Constant* classConst = AppendClassConstant(owner);
+	Constant* nameAndTypeConst = AppendNameAndTypeConstant(fieldInfo->GetName(), new string(fieldInfo->GetType()->ToDescriptor()));
+	Constant* constant = new Constant(Constant::t_FIELD_REF, IndexOfConstant(classConst), IndexOfConstant(nameAndTypeConst));
+	int index = IndexOfConstant(constant);
+	return constantTable[index];
+}
+
+Constant* Class::AppendMethofRefConstant(Class* owner, MethodTable* methodTable)
+{
+	Constant* classConst = AppendClassConstant(owner);
+	Constant* nameAndTypeConst = AppendNameAndTypeConstant(methodTable->GetName(), methodTable->GetDescriptor());
+	Constant* constant = new Constant(Constant::t_FIELD_REF, IndexOfConstant(classConst), IndexOfConstant(nameAndTypeConst));
+	int index = IndexOfConstant(constant);
+	return constantTable[index];
 }
