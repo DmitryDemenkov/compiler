@@ -128,12 +128,14 @@ private:
 	static Class* CreateIntClass(AbstractNamespaceMember* outer);
 	static Class* CreateCharClass(AbstractNamespaceMember* outer);
 	static Class* CreateBoolClass(AbstractNamespaceMember* outer);
+	static Class* CreateConsoleClass(AbstractNamespaceMember* outer);
 
 	static void FillObjectClass(AbstractNamespaceMember* outer);
 	static void FillStringClass(AbstractNamespaceMember* outer);
 	static void FillIntClass(AbstractNamespaceMember* outer);
 	static void FillCharClass(AbstractNamespaceMember* outer);
 	static void FillBoolClass(AbstractNamespaceMember* outer);
+	static void FillConsoleClass(AbstractNamespaceMember* outer);
 
 public:
 	Class(string* name, AbstractNamespaceMember* outer, ClassDeclaration* decl);

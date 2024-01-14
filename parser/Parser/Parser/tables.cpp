@@ -1274,6 +1274,15 @@ Class* Class::CreateBoolClass(AbstractNamespaceMember* outer)
 	return boolClass;
 }
 
+Class* Class::CreateConsoleClass(AbstractNamespaceMember* outer)
+{
+	Class* consoleClass = new Class(new string("Console"), outer, NULL);
+	consoleClass->SetAccesModifier(e_PUBLIC);
+	consoleClass->parent = (Class*)outer->GetInnerMember(new string("Object"));
+
+	return consoleClass;
+}
+
 void Class::FillObjectClass(AbstractNamespaceMember* outer)
 {
 	Class* objectClass = (Class*)outer->GetInnerMember(new string("Object"));
@@ -1338,6 +1347,32 @@ void Class::FillBoolClass(AbstractNamespaceMember* outer)
 	boolClass->AppdendDefaultConstructor();
 }
 
+void Class::FillConsoleClass(AbstractNamespaceMember* outer)
+{
+	Class* consoleClass = (Class*)outer->GetInnerMember(new string("Console"));
+	consoleClass->AppdendDefaultConstructor();
+
+	DataType* writeReturn = new DataType(DataType::t_VOID, NULL, false, consoleClass);
+	DataType* writeParamType = new DataType(DataType::t_STRING, NULL, false, consoleClass);
+	Variable* writeParam = new Variable();
+	writeParam->name = new string("str");
+	writeParam->type = writeParamType;
+	vector<Variable*> writeParamSet = vector<Variable*>{ writeParam };
+
+	consoleClass->AppendMethod(new string("WriteLine"), writeReturn, writeParamSet);
+	MethodTable* writeMethod = consoleClass->methods["WriteLine"];
+	writeMethod->SetAccessModifier(e_PUBLIC);
+	writeMethod->SetStatic(true);
+
+	DataType* readReturn = new DataType(DataType::t_STRING, NULL, false, consoleClass);
+	vector<Variable*> readParamSet = vector<Variable*>{ };
+
+	consoleClass->AppendMethod(new string("ReadLine"), readReturn, readParamSet);
+	MethodTable* readMethod = consoleClass->methods["ReadLine"];
+	readMethod->SetAccessModifier(e_PUBLIC);
+	readMethod->SetStatic(true);
+}
+
 void Class::CreateRTLClasses(AbstractNamespaceMember* outer)
 {
 	AbstractNamespaceMember* system = new Namespace(new string("System"), outer);
@@ -1348,10 +1383,12 @@ void Class::CreateRTLClasses(AbstractNamespaceMember* outer)
 	system->Append(CreateIntClass(system));
 	system->Append(CreateCharClass(system));
 	system->Append(CreateBoolClass(system));
+	system->Append(CreateConsoleClass(system));
 
 	FillObjectClass(system);
 	FillIntClass(system);
 	FillCharClass(system);
 	FillStringClass(system);
 	FillBoolClass(system);
+	FillConsoleClass(system);
 }
