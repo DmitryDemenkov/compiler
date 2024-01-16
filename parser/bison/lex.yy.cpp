@@ -2313,8 +2313,6 @@ void main(int argc, char** argv)
 	std::filesystem::remove_all(".global");
 	for (auto cl : classes)
 	{
-		cl->WriteTablesFile();
-
 		for (auto md : cl->GetAllMethods())
 		{
 			try
@@ -2326,6 +2324,7 @@ void main(int argc, char** argv)
 				cout << err.what() << endl;
 			}
 		}
+		cl->WriteTablesFile();
 	}
 
 	dotStr = "digraph tree{ rankdir=\"LR\"\n" + *Programm::main->ToDOT() + "}";

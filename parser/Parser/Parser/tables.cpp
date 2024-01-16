@@ -225,6 +225,9 @@ void Class::AppendField(Field* field)
 
 	newField->SetInitializer(field->expression);
 
+	AppendUtf8Constant(newField->GetName());
+	AppendUtf8Constant(new string(newField->GetType()->ToDescriptor()));
+
 	fields[*newField->GetName()] = newField;
 }
 
@@ -274,6 +277,9 @@ void Class::AppendMethod(Method* method)
 		}
 	}
 	newMethod->SetBody(method->statementList);
+
+	AppendUtf8Constant(newMethod->GetName());
+	AppendUtf8Constant(newMethod->GetDescriptor());
 
 	methods[*newMethod->GetName()] = newMethod;
 }
@@ -329,6 +335,9 @@ void Class::AppendConstructor(Constructor* constructor)
 	AppendFieldInitializers(newConstructor, constructor->argumentList);
 	constructor->statementList = newConstructor->GetBody();
 
+	AppendUtf8Constant(newConstructor->GetName());
+	AppendUtf8Constant(newConstructor->GetDescriptor());
+
 	methods[*constructorName] = newConstructor;
 }
 
@@ -353,12 +362,16 @@ void Class::AppdendDefaultConstructor()
 			new Constructor(NULL, GetName(), NULL, ClassMember::t_NULL, newConstructor->GetBody()));
 	}
 
+	AppendUtf8Constant(newConstructor->GetName());
+	AppendUtf8Constant(newConstructor->GetDescriptor());
+
 	methods[*constructorName] = newConstructor;
 }
 
 void Class::AppendParent(TypeName* parentName)
 {
-	parent = FindClass(parentName);;
+	parent = FindClass(parentName);
+	AppendClassConstant(parent);
 }
 
 void Class::AppendFieldInitializers(MethodTable* constructor, ArgumentList* args)
@@ -490,6 +503,8 @@ void Class::AppendMethod(string* name, DataType* returnType, vector<Variable*> p
 	{
 		newMethod->AddParam(param->name, param->type);
 	}
+	AppendUtf8Constant(newMethod->GetName());
+	AppendUtf8Constant(newMethod->GetDescriptor());
 	methods[*name] = newMethod;
 }
 
@@ -499,6 +514,9 @@ Class::Class(string* name, AbstractNamespaceMember* outer, ClassDeclaration* dec
 	this->decl = decl;
 	this->outerMember = outer;
 	this->name = name;
+
+	AppendUtf8Constant(new string("Code"));
+	AppendClassConstant(this);
 }
 
 int Class::GetId()
@@ -761,6 +779,14 @@ void Class::WriteTablesFile()
 		file << method->ToString() << "\n";
 	}
 	file.close();
+
+	file.open(GetFullName() + "/constants.csv");
+	file << "num,type,value\n";
+	for (int i = 1; i < constantTable.size(); i++)
+	{
+		file << "#" + to_string(i) + "," + constantTable[i]->ToCSV() << "\n";
+	}
+	file.close();
 }
 
 Constant::Constant(Type type)
@@ -813,6 +839,23 @@ bool Constant::operator==(const Constant& other) const
 	}
 
 	return isEqual;
+}
+
+string Constant::ToCSV()
+{
+	switch (type)
+	{
+	case Constant::t_UTF8:    return "UTF8," + *utf8;
+	case Constant::t_INTEGER: return "INT," + to_string(integer);
+	case Constant::t_STRING:  return "STRING,#" + to_string(firstRef);
+	case Constant::t_CLASS:   return "CLASS,#" + to_string(firstRef);
+	case Constant::t_NAME_AND_TYPE: return "N&T,#" + to_string(firstRef) + ",#" + to_string(secondRef);
+	case Constant::t_FIELD_REF: return "FIELDREF,#" + to_string(firstRef) + ",#" + to_string(secondRef);
+	case Constant::t_METHOD_REF: return "METHODREF,#" + to_string(firstRef) + ",#" + to_string(secondRef);
+	default:
+		break;
+	}
+	return "";
 }
 
 DataType::DataType(Type type, Class* classType, bool isArray, Class* namespaceMember)
@@ -929,7 +972,7 @@ Expression* FieldTable::GetDefaultInitializer()
 		case DataType::t_CHAR:
 			expr = new Expression(Expression::t_CHAR_LITER, 0); break;
 		case DataType::t_STRING:
-			expr = new Expression(Expression::t_STRING_LITER, ""); break;
+			expr = new Expression(Expression::t_STRING_LITER, new string("")); break;
 		default: break;
 		}
 	}
@@ -1293,7 +1336,7 @@ Class* Class::CreateStringClass(AbstractNamespaceMember* outer)
 {
 	Class* stringClass = new Class(new string("String"), outer, NULL);
 	stringClass->SetAccesModifier(e_PUBLIC);
-	stringClass->parent = (Class*)outer->GetInnerMember(new string("Object"));
+	stringClass->AppendParent(new TypeName(new string("Object")));
 
 	return stringClass;
 }
@@ -1302,7 +1345,7 @@ Class* Class::CreateIntClass(AbstractNamespaceMember* outer)
 {
 	Class* intClass = new Class(new string("Int"), outer, NULL);
 	intClass->SetAccesModifier(e_PUBLIC);
-	intClass->parent = (Class*)outer->GetInnerMember(new string("Object"));
+	intClass->AppendParent(new TypeName(new string("Object")));
 
 	return intClass;
 }
@@ -1311,7 +1354,7 @@ Class* Class::CreateCharClass(AbstractNamespaceMember* outer)
 {
 	Class* charClass = new Class(new string("Char"), outer, NULL);
 	charClass->SetAccesModifier(e_PUBLIC);
-	charClass->parent = (Class*)outer->GetInnerMember(new string("Object"));
+	charClass->AppendParent(new TypeName(new string("Object")));
 
 	return charClass;
 }
@@ -1320,7 +1363,7 @@ Class* Class::CreateBoolClass(AbstractNamespaceMember* outer)
 {
 	Class* boolClass = new Class(new string("Bool"), outer, NULL);
 	boolClass->SetAccesModifier(e_PUBLIC);
-	boolClass->parent = (Class*)outer->GetInnerMember(new string("Object"));
+	boolClass->AppendParent(new TypeName(new string("Object")));
 
 	return boolClass;
 }
@@ -1329,7 +1372,7 @@ Class* Class::CreateConsoleClass(AbstractNamespaceMember* outer)
 {
 	Class* consoleClass = new Class(new string("Console"), outer, NULL);
 	consoleClass->SetAccesModifier(e_PUBLIC);
-	consoleClass->parent = (Class*)outer->GetInnerMember(new string("Object"));
+	consoleClass->AppendParent(new TypeName(new string("Object")));
 
 	return consoleClass;
 }
@@ -1437,7 +1480,7 @@ int Class::IndexOfConstant(Constant* constant)
 	}
 
 	constantTable.push_back(constant);
-	return constantTable.size() - 1;
+	return index;
 }
 
 void Class::CreateRTLClasses(AbstractNamespaceMember* outer)
@@ -1512,7 +1555,7 @@ Constant* Class::AppendMethofRefConstant(Class* owner, MethodTable* methodTable)
 {
 	Constant* classConst = AppendClassConstant(owner);
 	Constant* nameAndTypeConst = AppendNameAndTypeConstant(methodTable->GetName(), methodTable->GetDescriptor());
-	Constant* constant = new Constant(Constant::t_FIELD_REF, IndexOfConstant(classConst), IndexOfConstant(nameAndTypeConst));
+	Constant* constant = new Constant(Constant::t_METHOD_REF, IndexOfConstant(classConst), IndexOfConstant(nameAndTypeConst));
 	int index = IndexOfConstant(constant);
 	return constantTable[index];
 }

@@ -52,6 +52,7 @@ public:
 	Constant(Type type, int firstRef, int secondRef);
 
 	bool operator== (const Constant& other) const;
+	string ToCSV();
 };
 
 enum AccessModifier
@@ -102,7 +103,7 @@ class Class : public AbstractNamespaceMember
 {
 private:
 	int id;
-	vector<Constant*> constantTable;
+	vector<Constant*> constantTable = vector<Constant*>{new Constant(Constant::t_INTEGER, 0)};
 	bool isStatic = false;
 	bool isAbstract = false;
 	AccessModifier accessModifier = e_NONE;

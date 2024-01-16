@@ -439,6 +439,10 @@ void Expression::DetermineDataType(Class* owner, MethodTable* methodInfo)
 	{
 	case Expression::t_INT_LITER:
 		dataType = new DataType(DataType::t_INT, NULL, false, owner);
+		if (this->intLiteral < -128 || this->intLiteral > 127)
+		{
+			owner->AppendIntegerConstant(this->intLiteral);
+		}
 		break;
 	case Expression::t_CHAR_LITER:
 		dataType = new DataType(DataType::t_CHAR, NULL, false, owner);
@@ -448,6 +452,7 @@ void Expression::DetermineDataType(Class* owner, MethodTable* methodInfo)
 		break;
 	case Expression::t_STRING_LITER:
 		dataType = new DataType(DataType::t_STRING, NULL, false, owner);
+		owner->AppendStringConstant(this->name);
 		break;
 	case Expression::t_ID:
 		dataType = GetDataTypeOfId(owner, methodInfo);
@@ -662,6 +667,8 @@ DataType* Expression::GetDataTypeOfId(Class* owner, MethodTable* methodInfo)
 
 		CheckErrorsOfFieldAccess(owner, methodInfo);
 
+		owner->AppendFieldRefConstant(owner, fieldInfo);
+
 		return fieldInfo->GetType();
 	}
 
@@ -788,6 +795,8 @@ DataType* Expression::GetDataTypeOfMemberAccess(Class* owner, MethodTable* metho
 
 			CheckErrorsOfFieldAccess(owner, methodInfo);
 
+			owner->AppendFieldRefConstant(this->left->dataType->classType, fieldInfo);
+
 			return fieldInfo->GetType();
 		}
 
@@ -844,6 +853,8 @@ DataType* Expression::GetDataTypeOfObjectCreation(Class* owner, MethodTable* met
 	}
 
 	CheckErrorsOfObjectCreation(owner, dType->classType);
+	
+	owner->AppendMethofRefConstant(dType->classType, dType->classType->GetMethod("<init>"));
 
 	return dType;
 }
@@ -1143,6 +1154,8 @@ void Expression::CheckErrorsOfInvokation(Class* owner, MethodTable* methodInfo)
 	default:
 		break;
 	}
+
+	owner->AppendMethofRefConstant(this->left->dataType->classType, invoketedMethod);
 }
 
 void Expression::CheckErrorsOfFieldAccess(Class* owner, MethodTable* methodInfo)
