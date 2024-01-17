@@ -2325,6 +2325,11 @@ void main(int argc, char** argv)
 			}
 		}
 		cl->WriteTablesFile();
+
+		if (cl->GetOuterMember()->GetFullName() != ".global/System")
+		{
+			cl->WriteClassFile();
+		}
 	}
 
 	dotStr = "digraph tree{ rankdir=\"LR\"\n" + *Programm::main->ToDOT() + "}";

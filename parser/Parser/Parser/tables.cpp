@@ -858,6 +858,85 @@ string Constant::ToCSV()
 	return "";
 }
 
+int Constant::ToByteCode(vector<char>* byteCode)
+{
+	int size = byteCode->size();
+	char* byteArr;
+	switch (type)
+	{
+	case Constant::t_UTF8:
+		byteCode->push_back(0x01);
+		byteArr = IntToByteCode(utf8->length());
+		byteCode->push_back(byteArr[2]);
+		byteCode->push_back(byteArr[3]);
+		for (auto c : *utf8)
+		{
+			byteCode->push_back(c);
+		}
+		break;
+	case Constant::t_INTEGER:
+		byteCode->push_back(0x03);
+		byteArr = IntToByteCode(integer);
+		for (int i = 0; i < 4; i++)
+		{
+			byteCode->push_back(byteArr[i]);
+		}
+		break;
+	case Constant::t_STRING:
+		byteCode->push_back(0x08);
+		byteArr = IntToByteCode(firstRef);
+		byteCode->push_back(byteArr[2]);
+		byteCode->push_back(byteArr[3]);
+		break;
+	case Constant::t_NAME_AND_TYPE:
+		byteCode->push_back(0x0c);
+		byteArr = IntToByteCode(firstRef);
+		byteCode->push_back(byteArr[2]);
+		byteCode->push_back(byteArr[3]);
+		byteArr = IntToByteCode(secondRef);
+		byteCode->push_back(byteArr[2]);
+		byteCode->push_back(byteArr[3]);
+		break;
+	case Constant::t_CLASS:
+		byteCode->push_back(0x07);
+		byteArr = IntToByteCode(firstRef);
+		byteCode->push_back(byteArr[2]);
+		byteCode->push_back(byteArr[3]);
+		break;
+	case Constant::t_FIELD_REF:
+		byteCode->push_back(0x09);
+		byteArr = IntToByteCode(firstRef);
+		byteCode->push_back(byteArr[2]);
+		byteCode->push_back(byteArr[3]);
+		byteArr = IntToByteCode(secondRef);
+		byteCode->push_back(byteArr[2]);
+		byteCode->push_back(byteArr[3]);
+		break;
+	case Constant::t_METHOD_REF:
+		byteCode->push_back(0x0a);
+		byteArr = IntToByteCode(firstRef);
+		byteCode->push_back(byteArr[2]);
+		byteCode->push_back(byteArr[3]);
+		byteArr = IntToByteCode(secondRef);
+		byteCode->push_back(byteArr[2]);
+		byteCode->push_back(byteArr[3]);
+		break;
+	default:
+		break;
+	}
+	return byteCode->size() - size;
+}
+
+char* Constant::IntToByteCode(int integer)
+{
+	char* bytes = new char[4];
+	for (int i = 0; i < 4; i++)
+	{
+		bytes[3 - i] = (integer >> (i * 8));
+	}
+	return bytes;
+}
+
 DataType::DataType(Type type, Class* classType, bool isArray, Class* namespaceMember)
 {
 	this->type = type;
@@ -1483,6 +1562,47 @@ int Class::IndexOfConstant(Constant* constant)
 	return index;
 }
 
+void Class::AppendConstatntToByteCode()
+{
+	char* size = Constant::IntToByteCode(constantTable.size());
+	byteCode.push_back(size[2]);
+	byteCode.push_back(size[3]);
+
+	for (int i = 1; i < constantTable.size(); i++)
+	{
+		constantTable[i]->ToByteCode(&byteCode);
+	}
+}
+
+void Class::AppendClassInformationToByteCode()
+{
+	byteCode.push_back(IsAbstract() ? 0x04 : 0x00);
+	byteCode.push_back(0x21);
+
+	char* classConstant = Constant::IntToByteCode(IndexOfConstant(AppendClassConstant(this)));
+	byteCode.push_back(classConstant[2]);
+	byteCode.push_back(classConstant[3]);
+
+	char* parentConstant = Constant::IntToByteCode(IndexOfConstant(AppendClassConstant(parent)));
+	byteCode.push_back(parentConstant[2]);
+	byteCode.push_back(parentConstant[3]);
+
+	byteCode.push_back(0x00);
+	byteCode.push_back(0x00);
+}
+
+void Class::AppendFieldsTableToByteCode()
+{
+	byteCode.push_back(0x00);
+	byteCode.push_back(0x00);
+}
+
+void Class::AppendMethodsTableToByteCode()
+{
+	byteCode.push_back(0x00);
+	byteCode.push_back(0x00);
+}
+
 void Class::CreateRTLClasses(AbstractNamespaceMember* outer)
 {
 	AbstractNamespaceMember* system = new Namespace(new string("System"), outer);
@@ -1558,4 +1678,33 @@ Constant* Class::AppendMethofRefConstant(Class* owner, MethodTable* methodTable)
 	Constant* constant = new Constant(Constant::t_METHOD_REF, IndexOfConstant(classConst), IndexOfConstant(nameAndTypeConst));
 	int index = IndexOfConstant(constant);
 	return constantTable[index];
+}
+
+void Class::WriteClassFile()
+{
+	byteCode.push_back(0xca);
+	byteCode.push_back(0xfe);
+	byteCode.push_back(0xba);
+	byteCode.push_back(0xbe);
+
+	byteCode.push_back(0x00);
+	byteCode.push_back(0x00);
+	byteCode.push_back(0x00);
+	byteCode.push_back(0x3e);
+
+	AppendConstatntToByteCode();
+	AppendClassInformationToByteCode();
+	AppendFieldsTableToByteCode();
+	AppendMethodsTableToByteCode();
+
+	byteCode.push_back(0x00);
+	byteCode.push_back(0x00);
+
+	ofstream file;
+	file.open(GetOuterMember()->GetFullName() + "/" + *GetName() + ".class", std::ios::binary);
+	for (char c : byteCode)
+	{
+		file << c;
+	}
+	file.close();
 }

@@ -5,6 +5,7 @@
 #include <map>
 #include <filesystem>
 #include <fstream>
+#include <bitset>
 using namespace std;
 
 class FieldTable;
@@ -53,6 +54,9 @@ public:
 
 	bool operator== (const Constant& other) const;
 	string ToCSV();
+	int ToByteCode(vector<char>* byteCode);
+
+	static char* IntToByteCode(int integer);
 };
 
 enum AccessModifier
@@ -118,6 +122,8 @@ private:
 	AbstractNamespaceMember* outerMember = NULL;
 	vector<Class*> innerMembers;
 
+	vector<char> byteCode = vector<char>();
+
 	void AppendField(Field* field);
 	void AppendMethod(Method* method);
 	void AppendMethod(string* name, DataType* returnType, vector<Variable*> params);
@@ -141,6 +147,11 @@ private:
 	static void FillConsoleClass(AbstractNamespaceMember* outer);
 
 	int IndexOfConstant(Constant* constant);
+
+	void AppendConstatntToByteCode();
+	void AppendClassInformationToByteCode();
+	void AppendFieldsTableToByteCode();
+	void AppendMethodsTableToByteCode();
 
 public:
 	Class(string* name, AbstractNamespaceMember* outer, ClassDeclaration* decl);
@@ -190,6 +201,8 @@ public:
 	Constant* AppendNameAndTypeConstant(string* name, string* descriptor);
 	Constant* AppendFieldRefConstant(Class* owner, FieldTable* fieldInfo);
 	Constant* AppendMethofRefConstant(Class* owner, MethodTable* methodTable);
+
+	void WriteClassFile();
 };
 
 class DataType
