@@ -1579,11 +1579,11 @@ void Class::AppendClassInformationToByteCode()
 	byteCode.push_back(IsAbstract() ? 0x04 : 0x00);
 	byteCode.push_back(0x21);
 
-	char* classConstant = Constant::IntToByteCode(IndexOfConstant(AppendClassConstant(this)));
+	char* classConstant = Constant::IntToByteCode(AppendClassConstant(this));
 	byteCode.push_back(classConstant[2]);
 	byteCode.push_back(classConstant[3]);
 
-	char* parentConstant = Constant::IntToByteCode(IndexOfConstant(AppendClassConstant(parent)));
+	char* parentConstant = Constant::IntToByteCode(AppendClassConstant(parent));
 	byteCode.push_back(parentConstant[2]);
 	byteCode.push_back(parentConstant[3]);
 
@@ -1623,61 +1623,61 @@ void Class::CreateRTLClasses(AbstractNamespaceMember* outer)
 	FillConsoleClass(system);
 }
 
-Constant* Class::AppendUtf8Constant(string* utf8)
+int Class::AppendUtf8Constant(string* utf8)
 {
 	Constant* constant = new Constant(Constant::t_UTF8, utf8);
 	int index = IndexOfConstant(constant);
-	return constantTable[index];
+	return index;
 }
 
-Constant* Class::AppendIntegerConstant(int integer)
+int Class::AppendIntegerConstant(int integer)
 {
 	Constant* constant = new Constant(Constant::t_INTEGER, integer);
 	int index = IndexOfConstant(constant);
-	return constantTable[index];
+	return index;
 }
 
-Constant* Class::AppendStringConstant(string* utf8)
+int Class::AppendStringConstant(string* utf8)
 {
-	Constant* utf8Const = AppendUtf8Constant(utf8);
-	Constant* constant = new Constant(Constant::t_STRING, IndexOfConstant(utf8Const), -1);
+	int utf8Const = AppendUtf8Constant(utf8);
+	Constant* constant = new Constant(Constant::t_STRING, utf8Const, -1);
 	int index = IndexOfConstant(constant);
-	return constantTable[index];
+	return index;
 }
 
-Constant* Class::AppendClassConstant(Class* classInfo)
+int Class::AppendClassConstant(Class* classInfo)
 {
-	Constant* utf8Const = AppendUtf8Constant(new string(classInfo->GetFullName()));
-	Constant* constant = new Constant(Constant::t_CLASS, IndexOfConstant(utf8Const), -1);
+	int utf8Const = AppendUtf8Constant(new string(classInfo->GetFullName()));
+	Constant* constant = new Constant(Constant::t_CLASS, utf8Const, -1);
 	int index = IndexOfConstant(constant);
-	return constantTable[index];
+	return index;
 }
 
-Constant* Class::AppendNameAndTypeConstant(string* name, string* descriptor)
+int Class::AppendNameAndTypeConstant(string* name, string* descriptor)
 {
-	Constant* utf8Name = AppendUtf8Constant(name);
-	Constant* utf8Type = AppendUtf8Constant(descriptor);
-	Constant* constant = new Constant(Constant::t_NAME_AND_TYPE, IndexOfConstant(utf8Name), IndexOfConstant(utf8Type));
+	int utf8Name = AppendUtf8Constant(name);
+	int utf8Type = AppendUtf8Constant(descriptor);
+	Constant* constant = new Constant(Constant::t_NAME_AND_TYPE, utf8Name, utf8Type);
 	int index = IndexOfConstant(constant);
-	return constantTable[index];
+	return index;
 }
 
-Constant* Class::AppendFieldRefConstant(Class* owner, FieldTable* fieldInfo)
+int Class::AppendFieldRefConstant(Class* owner, FieldTable* fieldInfo)
 {
-	Constant* classConst = AppendClassConstant(owner);
-	Constant* nameAndTypeConst = AppendNameAndTypeConstant(fieldInfo->GetName(), new string(fieldInfo->GetType()->ToDescriptor()));
-	Constant* constant = new Constant(Constant::t_FIELD_REF, IndexOfConstant(classConst), IndexOfConstant(nameAndTypeConst));
+	int classConst = AppendClassConstant(owner);
+	int nameAndTypeConst = AppendNameAndTypeConstant(fieldInfo->GetName(), new string(fieldInfo->GetType()->ToDescriptor()));
+	Constant* constant = new Constant(Constant::t_FIELD_REF, classConst, nameAndTypeConst);
 	int index = IndexOfConstant(constant);
-	return constantTable[index];
+	return index;
 }
 
-Constant* Class::AppendMethofRefConstant(Class* owner, MethodTable* methodTable)
+int Class::AppendMethofRefConstant(Class* owner, MethodTable* methodTable)
 {
-	Constant* classConst = AppendClassConstant(owner);
-	Constant* nameAndTypeConst = AppendNameAndTypeConstant(methodTable->GetName(), methodTable->GetDescriptor());
-	Constant* constant = new Constant(Constant::t_METHOD_REF, IndexOfConstant(classConst), IndexOfConstant(nameAndTypeConst));
+	int classConst = AppendClassConstant(owner);
+	int nameAndTypeConst = AppendNameAndTypeConstant(methodTable->GetName(), methodTable->GetDescriptor());
+	Constant* constant = new Constant(Constant::t_METHOD_REF, classConst, nameAndTypeConst);
 	int index = IndexOfConstant(constant);
-	return constantTable[index];
+	return index;
 }
 
 void Class::WriteClassFile()

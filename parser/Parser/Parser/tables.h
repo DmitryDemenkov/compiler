@@ -194,13 +194,13 @@ public:
 
 	static void CreateRTLClasses(AbstractNamespaceMember* outer);
 
-	Constant* AppendUtf8Constant(string* utf8);
-	Constant* AppendIntegerConstant(int integer);
-	Constant* AppendStringConstant(string* utf8);
-	Constant* AppendClassConstant(Class* classInfo);
-	Constant* AppendNameAndTypeConstant(string* name, string* descriptor);
-	Constant* AppendFieldRefConstant(Class* owner, FieldTable* fieldInfo);
-	Constant* AppendMethofRefConstant(Class* owner, MethodTable* methodTable);
+	int AppendUtf8Constant(string* utf8);
+	int AppendIntegerConstant(int integer);
+	int AppendStringConstant(string* utf8);
+	int AppendClassConstant(Class* classInfo);
+	int AppendNameAndTypeConstant(string* name, string* descriptor);
+	int AppendFieldRefConstant(Class* owner, FieldTable* fieldInfo);
+	int AppendMethofRefConstant(Class* owner, MethodTable* methodTable);
 
 	void WriteClassFile();
 };
