@@ -213,7 +213,7 @@ void Class::AppendField(Field* field)
 		case Modifier::t_PROTECTED: newField->SetAccessModifier(e_PROTECTED); break;
 		case Modifier::t_PUBLIC:	newField->SetAccessModifier(e_PUBLIC);	  break;
 		case Modifier::t_STATIC:	newField->SetStatic(true); break;
-		default: 
+		default:
 			string err = "Illigal modifier \"" + modifier->GetName() + "\" of class \"" + GetFullName() + "\"";
 			throw std::exception(err.c_str());
 		}
@@ -257,9 +257,9 @@ void Class::AppendMethod(Method* method)
 		case Modifier::t_ABSTRACT:  newMethod->SetAbstract(true); break;
 		case Modifier::t_VIRTUAL:   newMethod->SetVirtual(true);  break;
 		case Modifier::t_OVERRIDE:  newMethod->SetOverride(true); break;
-		default: 
+		default:
 			string err = "Illigal modifier \"" + modifier->GetName() + "\" of method \"" +
-							*method->identifier + "\" in class \"" + GetFullName() + "\"";
+				*method->identifier + "\" in class \"" + GetFullName() + "\"";
 			throw std::exception(err.c_str());
 		}
 	}
@@ -313,7 +313,7 @@ void Class::AppendConstructor(Constructor* constructor)
 		case Modifier::t_PRIVATE:   newConstructor->SetAccessModifier(e_PRIVATE);   break;
 		case Modifier::t_PROTECTED: newConstructor->SetAccessModifier(e_PROTECTED); break;
 		case Modifier::t_PUBLIC:	newConstructor->SetAccessModifier(e_PUBLIC);	break;
-		default: 
+		default:
 			string err = "Illigal constructor modifier \"" + modifier->GetName() + "\" of class \"" + GetFullName() + "\"";
 			throw std::exception(err.c_str());
 		}
@@ -358,7 +358,7 @@ void Class::AppdendDefaultConstructor()
 
 	if (decl != NULL)
 	{
-		ClassMemberList::Append(decl->classMemberList, 
+		ClassMemberList::Append(decl->classMemberList,
 			new Constructor(NULL, GetName(), NULL, ClassMember::t_NULL, newConstructor->GetBody()));
 	}
 
@@ -428,20 +428,20 @@ void Class::CheckOverridingMethods()
 			MethodTable* parentMethod = parent->GetMethod(*method.second->GetName());
 			if (parentMethod == NULL)
 			{
-				string err = "No overriding method \"" + *method.second->GetName() 
-							 + "\" in class \"" + GetFullName() + "\"";
+				string err = "No overriding method \"" + *method.second->GetName()
+					+ "\" in class \"" + GetFullName() + "\"";
 				throw std::exception(err.c_str());
 			}
 			if (!parentMethod->IsAbstract() && !parentMethod->IsVirtual() && !parentMethod->IsOverride())
 			{
 				string err = "Method \"" + *method.second->GetName()
-							 + "\" in class \"" + GetFullName() + "\" couldn't be overrided";
+					+ "\" in class \"" + GetFullName() + "\" couldn't be overrided";
 				throw std::exception(err.c_str());
 			}
 			if (method.second->GetAccessModifier() != parentMethod->GetAccessModifier())
 			{
 				string err = "Access modifier of method \"" + *method.second->GetName()
-							 + "\" in class \"" + GetFullName() + "\" couldn't be changed";
+					+ "\" in class \"" + GetFullName() + "\" couldn't be changed";
 				throw std::exception(err.c_str());
 			}
 
@@ -453,7 +453,7 @@ void Class::CheckOverridingMethods()
 					+ "\" with such params set in parents of class \"" + GetFullName() + "\"";
 				throw std::exception(err.c_str());
 			}
-						
+
 			for (int i = 0; i < currentParams.size(); i++)
 			{
 				if (!(*currentParams[i]->type == *parentParams[i]->type))
@@ -744,7 +744,7 @@ string* Class::ToDOT()
 
 string Class::ToString()
 {
-	string str = GetFullName() + "," + GetAccessModifierName(accessModifier) 
+	string str = GetFullName() + "," + GetAccessModifierName(accessModifier)
 		+ "," + to_string(IsStatic()) + "," + to_string(IsAbstract());
 
 	if (parent != NULL)
@@ -1118,8 +1118,46 @@ DataType* FieldTable::GetType()
 
 string FieldTable::ToString()
 {
-	return *GetName() + "," + GetType()->ToDescriptor() 
+	return *GetName() + "," + GetType()->ToDescriptor()
 		+ "," + GetAccessModifierName(GetAccessModifier()) + "," + to_string(IsStatic());
+}
+
+void FieldTable::ToByteCode(Class* owner, vector<char>* byteCode)
+{
+	char accessFlag = 0x00;
+	switch (accessModifier)
+	{
+	case e_PRIVATE:
+		accessFlag = 0x02;
+		break;
+	case e_PROTECTED:
+		accessFlag = 0x04;
+		break;
+	case e_PUBLIC:
+		accessFlag = 0x01;
+		break;
+	default:
+		break;
+	}
+
+	if (IsStatic())
+	{
+		accessFlag += 0x08;
+	}
+
+	byteCode->push_back(0x00);
+	byteCode->push_back(accessFlag);
+
+	char* nameConst = Constant::IntToByteCode(owner->AppendUtf8Constant(name));
+	byteCode->push_back(nameConst[2]);
+	byteCode->push_back(nameConst[3]);
+
+	char* descConst = Constant::IntToByteCode(owner->AppendUtf8Constant(new string(type->ToDescriptor())));
+	byteCode->push_back(descConst[2]);
+	byteCode->push_back(descConst[3]);
+
+	byteCode->push_back(0x00);
+	byteCode->push_back(0x00);
 }
 
 string GetAccessModifierName(AccessModifier modifier)
@@ -1405,7 +1443,7 @@ string* MethodTable::GetDescriptor()
 
 Class* Class::CreateObjectClass(AbstractNamespaceMember* outer)
 {
-	Class* objectClass = new Class(new string("Object"), outer,	NULL);
+	Class* objectClass = new Class(new string("Object"), outer, NULL);
 	objectClass->SetAccesModifier(e_PUBLIC);
 
 	return objectClass;
@@ -1593,8 +1631,14 @@ void Class::AppendClassInformationToByteCode()
 
 void Class::AppendFieldsTableToByteCode()
 {
-	byteCode.push_back(0x00);
-	byteCode.push_back(0x00);
+	char* fieldCount = Constant::IntToByteCode(fields.size());
+	byteCode.push_back(fieldCount[2]);
+	byteCode.push_back(fieldCount[3]);
+
+	for (auto field : fields)
+	{
+		field.second->ToByteCode(this, &byteCode);
+	}
 }
 
 void Class::AppendMethodsTableToByteCode()

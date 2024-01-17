@@ -254,6 +254,8 @@ public:
 	string* GetName();
 	DataType* GetType();
 	string ToString();
+
+	void ToByteCode(Class* owner, vector<char>* byteCode);
 };
 
 class Variable
