@@ -386,6 +386,8 @@ public:
     static StatementList* Append(StatementList *statements, Statement* statement);
 
     string* ToDOT();
+
+    int ToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
 };
 
 class IfStatement : public Statement

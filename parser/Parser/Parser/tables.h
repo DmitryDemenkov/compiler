@@ -308,6 +308,11 @@ public:
 
 	bool CompareArgsTypes(ArgumentList* args);
 	int GetParamIndex(string* name);
+	int GetLocalsCount();
+	int GetLocalIndex(string* name);
+
 	string ToString();
 	string* GetDescriptor();
+
+	void ToByteCode(Class* owner, vector<char>* byteCode);
 };

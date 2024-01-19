@@ -2022,6 +2022,11 @@ string* StatementList::ToDOT()
 	return dotStr;
 }
 
+int StatementList::ToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode)
+{
+	return 0;
+}
+
 IfStatement::IfStatement(Expression* expression,
 	Statement* main, Statement* alternative) : Statement(Statement::t_IF)
 {

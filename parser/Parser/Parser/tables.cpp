@@ -1450,6 +1450,32 @@ int MethodTable::GetParamIndex(string* name)
 	return -1;
 }
 
+int MethodTable::GetLocalsCount()
+{
+	int count = IsStatic() ? 0 : 1;
+	count += params.size() + localVariables.size();
+	return count;
+}
+
+int MethodTable::GetLocalIndex(string* name)
+{
+	int index = GetParamIndex(name);
+	for (int i = 0; i < localVariables.size() && index == -1; i++)
+	{
+		if (*localVariables[i]->name == *name)
+		{
+			index = i + params.size();
+		}
+	}
+
+	if (!IsStatic())
+	{
+		index++;
+	}
+
+	return index;
+}
+
 string MethodTable::ToString()
 {
 	string str = *GetName() + "," + *GetDescriptor() + ","
@@ -1468,6 +1494,92 @@ string* MethodTable::GetDescriptor()
 	}
 	*descriptor += ")" + GetReturnValue()->ToDescriptor();
 	return descriptor;
+}
+
+void MethodTable::ToByteCode(Class* owner, vector<char>* byteCode)
+{
+	char accessFlag = 0x00;
+	switch (accessModifier)
+	{
+	case e_PRIVATE:
+		accessFlag = 0x02;
+		break;
+	case e_PROTECTED:
+		accessFlag = 0x04;
+		break;
+	case e_PUBLIC:
+		accessFlag = 0x01;
+		break;
+	default:
+		break;
+	}
+
+	if (IsStatic())
+	{
+		accessFlag += 0x08;
+	}
+
+	byteCode->push_back(IsAbstract() ? 0x04 : 0x00);
+	byteCode->push_back(accessFlag);
+
+	char* nameConst = Constant::IntToByteCode(owner->AppendUtf8Constant(name));
+	byteCode->push_back(nameConst[2]);
+	byteCode->push_back(nameConst[3]);
+
+	char* descConst = Constant::IntToByteCode(owner->AppendUtf8Constant(GetDescriptor()));
+	byteCode->push_back(descConst[2]);
+	byteCode->push_back(descConst[3]);
+
+	char* atributesCount = Constant::IntToByteCode(IsAbstract() ? 0 : 1);
+	byteCode->push_back(atributesCount[2]);
+	byteCode->push_back(atributesCount[3]);
+
+	char* atributeConst = Constant::IntToByteCode(owner->AppendUtf8Constant(new string("Code")));
+	byteCode->push_back(atributeConst[2]);
+	byteCode->push_back(atributeConst[3]);
+
+	int atributeLenthIndex = byteCode->size();
+	byteCode->push_back(0x00);
+	byteCode->push_back(0x00);
+	byteCode->push_back(0x00);
+	byteCode->push_back(0x00);
+
+	byteCode->push_back(0x04);
+	byteCode->push_back(0x00);
+
+	char* localsCount = Constant::IntToByteCode(GetLocalsCount());
+	byteCode->push_back(localsCount[2]);
+	byteCode->push_back(localsCount[3]);
+
+	int codeLenthIndex = byteCode->size();
+	byteCode->push_back(0x00);
+	byteCode->push_back(0x00);
+	byteCode->push_back(0x00);
+	byteCode->push_back(0x00);
+
+	int codeLenth = 0;
+	if (body != NULL)
+	{
+		codeLenth = body->ToByteCode(owner, this, byteCode);
+	}
+
+	char* atributeLenth = Constant::IntToByteCode(codeLenth + 12);
+	byteCode->operator[](atributeLenthIndex) = atributeLenth[0];
+	byteCode->operator[](atributeLenthIndex + 1) = atributeLenth[1];
+	byteCode->operator[](atributeLenthIndex + 2) = atributeLenth[2];
+	byteCode->operator[](atributeLenthIndex + 3) = atributeLenth[3];
+
+	char* codeLenthBytes = Constant::IntToByteCode(codeLenth);
+	byteCode->operator[](codeLenthIndex) = codeLenthBytes[0];
+	byteCode->operator[](codeLenthIndex + 1) = codeLenthBytes[1];
+	byteCode->operator[](codeLenthIndex + 2) = codeLenthBytes[2];
+	byteCode->operator[](codeLenthIndex + 3) = codeLenthBytes[3];
+
+	byteCode->push_back(0x00);
+	byteCode->push_back(0x00);
+
+	byteCode->push_back(0x00);
+	byteCode->push_back(0x00);
 }
 
 Class* Class::CreateObjectClass(AbstractNamespaceMember* outer)
@@ -1672,8 +1784,14 @@ void Class::AppendFieldsTableToByteCode()
 
 void Class::AppendMethodsTableToByteCode()
 {
-	byteCode.push_back(0x00);
-	byteCode.push_back(0x00);
+	char* methodCount = Constant::IntToByteCode(methods.size());
+	byteCode.push_back(methodCount[2]);
+	byteCode.push_back(methodCount[3]);
+
+	for (auto method : methods)
+	{
+		method.second->ToByteCode(this, &byteCode);
+	}
 }
 
 void Class::CreateRTLClasses(AbstractNamespaceMember* outer)
