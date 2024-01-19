@@ -987,7 +987,7 @@ string DataType::ToDescriptor()
 	case DataType::t_INT:
 	case DataType::t_BOOL:
 	case DataType::t_CHAR:     str = "I"; break;
-	case DataType::t_STRING:   str = "L.global/String;"; break;
+	case DataType::t_STRING:   str = "Ljava/lang/String;"; break;
 	case DataType::t_TYPENAME: str = "L" + classType->GetFullName() + ";"; break;
 	case DataType::t_VOID:	   str = "V"; break;
 	default: break;

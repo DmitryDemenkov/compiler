@@ -2310,7 +2310,7 @@ void main(int argc, char** argv)
 		}
 	}
 
-	std::filesystem::remove_all(".global");
+	std::filesystem::remove_all("global");
 	for (auto cl : classes)
 	{
 		for (auto md : cl->GetAllMethods())
@@ -2326,7 +2326,7 @@ void main(int argc, char** argv)
 		}
 		cl->WriteTablesFile();
 
-		if (cl->GetOuterMember()->GetFullName() != ".global/System")
+		if (cl->GetOuterMember()->GetFullName() != "global/System")
 		{
 			cl->WriteClassFile();
 		}
