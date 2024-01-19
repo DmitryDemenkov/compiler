@@ -1345,9 +1345,38 @@ void MethodTable::Semantic(Class* owner)
 {
 	if (body != NULL)
 	{
+		bool hasReturn = false;
 		for (auto stmt : *body->statements)
 		{
+			hasReturn = hasReturn || stmt->type == Statement::t_RETURN;
 			stmt->Semantic(owner, this);
+		}
+
+		if (!hasReturn && owner->GetOuterMember()->GetFullName() != "global/System")
+		{
+			if (this->returnValue->type == DataType::t_VOID)
+			{
+				body = StatementList::Append(body, new ReturnStatement());
+			}
+			else
+			{
+				string err = "There is not return value in " + *this->name + 
+					" method of class " + owner->GetFullName();
+				throw std::exception(err.c_str());
+			}
+		}
+	}
+	else if (owner->GetOuterMember()->GetFullName() != "global/System")
+	{
+		if (this->returnValue->type == DataType::t_VOID)
+		{
+			body = new StatementList(new ReturnStatement());
+		}
+		else
+		{
+			string err = "There is not return value in " + *this->name +
+				" method of class " + owner->GetFullName();
+			throw std::exception(err.c_str());
 		}
 	}
 }
