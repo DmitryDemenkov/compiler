@@ -306,6 +306,7 @@ public:
 
 	void Semantic(Class* owner);
 
+	vector<Expression*> SortArguments(ArgumentList* args);
 	bool CompareArgsTypes(ArgumentList* args);
 	int GetParamIndex(string* name);
 	int GetLocalsCount();

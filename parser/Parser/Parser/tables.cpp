@@ -1381,13 +1381,8 @@ void MethodTable::Semantic(Class* owner)
 	}
 }
 
-bool MethodTable::CompareArgsTypes(ArgumentList* args)
+vector<Expression*> MethodTable::SortArguments(ArgumentList* args)
 {
-	if (args == NULL)
-	{
-		return params.size() == 0;
-	}
-
 	vector<Expression*> sortedArgs = vector<Expression*>(params.size(), NULL);
 	int lastArgIndex = 0;
 	for (auto arg : *args->arguments)
@@ -1423,7 +1418,17 @@ bool MethodTable::CompareArgsTypes(ArgumentList* args)
 		}
 		lastArgIndex++;
 	}
+	return sortedArgs;
+}
 
+bool MethodTable::CompareArgsTypes(ArgumentList* args)
+{
+	if (args == NULL)
+	{
+		return params.size() == 0;
+	}
+
+	vector<Expression*> sortedArgs = SortArguments(args);
 	for (int i = 0; i < params.size(); i++)
 	{
 		if (sortedArgs[i] == NULL)

@@ -174,7 +174,8 @@ public:
         t_ASSIGNMENT,
 
         t_CLASS,
-        t_OBJECT
+        t_OBJECT,
+        t_LOCALVAR
     };
 
     int id;
@@ -208,6 +209,8 @@ public:
 
     void DetermineDataType(Class* owner, MethodTable* methodInfo);
 
+    int ToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
+
 private:
     string* GetName();
 
@@ -227,6 +230,10 @@ private:
     void CheckErrorsOfClassesAccess(Class* owner, Class* classInfo);
     void CheckErrorsOfObjectCreation(Class* owner, Class* classInfo);
     void CheckErrorsOfArrayCreation(Class* owner, DataType* arrayType);
+
+    int ThisToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
+    int LiteralToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
+    int InvokationToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
 };
 
 class ObjectCreation : public Expression
@@ -342,6 +349,8 @@ private:
     void CheckForeachStmtError(Class* owner, MethodTable* methodInfo);
     void CheckReturnStmtError(Class* owner, MethodTable* methodInfo);
 
+    int ReturnToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
+
 public:
     enum Type
     {
@@ -374,6 +383,8 @@ public:
     virtual string* ToDOT();
 
     void Semantic(Class* owner, MethodTable* methodInfo);
+
+    int ToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
 };
 
 class StatementList

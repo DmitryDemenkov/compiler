@@ -136,6 +136,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\bison\classes.h" />
     <ClInclude Include="..\..\bison\_tab.h" />
+    <ClInclude Include="bytecode.h" />
     <ClInclude Include="tables.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

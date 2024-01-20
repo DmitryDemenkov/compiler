@@ -1,4 +1,5 @@
 #include "classes.h"
+#include "../Parser/Parser/bytecode.h";
 
 int maxId = 0;
 
@@ -602,6 +603,91 @@ void Expression::DetermineDataType(Class* owner, MethodTable* methodInfo)
 	}
 }
 
+int Expression::ToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode)
+{
+	int oldSize = byteCode->size();
+	switch (type)
+	{
+	case Expression::t_INT_LITER:
+	case Expression::t_CHAR_LITER:
+	case Expression::t_BOOL_LITER:
+	case Expression::t_STRING_LITER:
+		LiteralToByteCode(owner, methodInfo, byteCode);
+		break;
+	case Expression::t_ID:
+		break;
+	case Expression::t_SIMPLE_TYPE:
+		break;
+	case Expression::t_THIS:
+	case Expression::t_BASE:
+		ThisToByteCode(owner, methodInfo, byteCode);
+		break;
+	case Expression::t_OBJ_CREATION:
+		break;
+	case Expression::t_ARR_CREATION:
+		break;
+	case Expression::t_ELEMENT_ACCESS:
+		break;
+	case Expression::t_MEMBER_ACCESS:
+		break;
+	case Expression::t_INVOCATION:
+		InvokationToByteCode(owner, methodInfo, byteCode);
+		break;
+	case Expression::t_UNMINUS:
+		break;
+	case Expression::t_NOT:
+		break;
+	case Expression::t_SIMPLE_TYPE_CAST:
+		break;
+	case Expression::t_ARRAY_CAST:
+		break;
+	case Expression::t_TYPENAME_CAST:
+		break;
+	case Expression::t_MUL:
+		break;
+	case Expression::t_DIV:
+		break;
+	case Expression::t_MOD:
+		break;
+	case Expression::t_SUM:
+		break;
+	case Expression::t_SUB:
+		break;
+	case Expression::t_LESS:
+		break;
+	case Expression::t_GREATER:
+		break;
+	case Expression::t_LESS_EQUAL:
+		break;
+	case Expression::t_GREATER_EQUAL:
+		break;
+	case Expression::t_IS:
+		break;
+	case Expression::t_AS:
+		break;
+	case Expression::t_EQUALITY:
+		break;
+	case Expression::t_INEQUALITY:
+		break;
+	case Expression::t_AND:
+		break;
+	case Expression::t_OR:
+		break;
+	case Expression::t_ASSIGNMENT:
+		break;
+	case Expression::t_CLASS:
+		break;
+	case Expression::t_OBJECT:
+		break;
+	case Expression::t_LOCALVAR:
+		break;
+	default:
+		break;
+	}
+
+	return byteCode->size() - oldSize;
+}
+
 string* Expression::GetName()
 {
 	switch (type)
@@ -610,6 +696,7 @@ string* Expression::GetName()
 	case Expression::t_CHAR_LITER: return new string("\'" + string(1, charLiteral) + "\'");
 	case Expression::t_BOOL_LITER: return new string(to_string(boolLiteral));
 	case Expression::t_STRING_LITER: return new string("\\\"" + *name + "\\\"");
+	case Expression::t_LOCALVAR:
 	case Expression::t_ID: return name;
 	case Expression::t_INVOCATION: return name;
 	case Expression::t_SIMPLE_TYPE: return simpleType->GetName();
@@ -646,7 +733,11 @@ string* Expression::GetName()
 DataType* Expression::GetDataTypeOfId(Class* owner, MethodTable* methodInfo)
 {
 	Variable* localVar = methodInfo->GetLocalVariable(this->name);
-	if (localVar != NULL) { return localVar->type; }
+	if (localVar != NULL) 
+	{
+		this->type = t_LOCALVAR;
+		return localVar->type; 
+	}
 
 	FieldTable* fieldInfo = owner->GetField(*this->name);
 	if (fieldInfo != NULL)
@@ -1269,6 +1360,76 @@ void Expression::CheckErrorsOfArrayCreation(Class* owner, DataType* arrayType)
 	}
 }
 
+int Expression::ThisToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode)
+{
+	byteCode->push_back(ByteCode::aload);
+	byteCode->push_back(0x00);
+	return 2;
+}
+
+int Expression::LiteralToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode)
+{
+	char* constIndex;
+	int oldSize = byteCode->size();
+	switch (type)
+	{
+	case Expression::t_INT_LITER:
+		break;
+	case Expression::t_CHAR_LITER:
+		break;
+	case Expression::t_BOOL_LITER:
+		break;
+	case Expression::t_STRING_LITER:
+		constIndex = Constant::IntToByteCode(owner->AppendStringConstant(name));
+		byteCode->push_back(ByteCode::ldc_w);
+		byteCode->push_back(constIndex[2]);
+		byteCode->push_back(constIndex[3]);
+		break;
+	default:
+		break;
+	}
+	return byteCode->size() - oldSize;
+}
+
+int Expression::InvokationToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode)
+{
+	int oldSize = byteCode->size();
+	if (this->left->type != t_CLASS)
+	{
+		this->left->ToByteCode(owner, methodInfo, byteCode);
+	}
+
+	MethodTable* invokatedMethod = this->left->dataType->classType->GetMethod(*this->name);
+
+	if (this->argumentList != NULL)
+	{
+		vector<Expression*> sortedArgs = invokatedMethod->SortArguments(this->argumentList);
+		for (auto arg : sortedArgs)
+		{
+			arg->ToByteCode(owner, methodInfo, byteCode);
+		}
+	}
+
+	if (invokatedMethod->IsStatic())
+	{
+		byteCode->push_back(ByteCode::invokestatic);
+	}
+	else if (*invokatedMethod->GetName() == "<init>")
+	{
+		byteCode->push_back(ByteCode::invokespecial);
+	}
+	else
+	{
+		byteCode->push_back(ByteCode::invokevirtual);
+	}
+
+	char* methodRef = Constant::IntToByteCode(owner->AppendMethofRefConstant(left->dataType->classType, invokatedMethod));
+	byteCode->push_back(methodRef[2]);
+	byteCode->push_back(methodRef[3]);
+
+	return byteCode->size() - oldSize;
+}
+
 ObjectCreation::ObjectCreation(SimpleType* simpleType,
 	ArgumentList* argumentList, MemberInitializerList* objInit) : Expression(Expression::t_OBJ_CREATION)
 {
@@ -1878,6 +2039,17 @@ void Statement::CheckReturnStmtError(Class* owner, MethodTable* methodInfo)
 	}
 }
 
+int Statement::ReturnToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode)
+{
+	int oldSize = byteCode->size();
+	if (expressions != NULL)
+	{
+		expressions->expressions->front()->ToByteCode(owner, methodInfo, byteCode);
+	}
+	byteCode->push_back(ByteCode::return_);
+	return byteCode->size() - oldSize;
+}
+
 Statement::Statement(Type type, Expression* expression)
 {
 	this->id = ++maxId;
@@ -1994,6 +2166,39 @@ void Statement::Semantic(Class* owner, MethodTable* methodInfo)
 	}
 }
 
+int Statement::ToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode)
+{
+	int oldSize = byteCode->size();
+	switch (type)
+	{
+	case Statement::t_EMPTY:
+		break;
+	case Statement::t_EXPRESSION:
+		expressions->expressions->front()->ToByteCode(owner, methodInfo, byteCode);
+		break;
+	case Statement::t_DECLARATOR:
+		break;
+	case Statement::t_IF:
+		break;
+	case Statement::t_WHILE:
+		break;
+	case Statement::t_DO:
+		break;
+	case Statement::t_FOR:
+		break;
+	case Statement::t_FOREACH:
+		break;
+	case Statement::t_RETURN:
+		ReturnToByteCode(owner, methodInfo, byteCode);
+		break;
+	case Statement::t_BLOCK:
+		break;
+	default:
+		break;
+	}
+	return byteCode->size() - oldSize;
+}
+
 StatementList::StatementList(Statement* statement)
 {
 	this->id = statement->id;
@@ -2024,7 +2229,12 @@ string* StatementList::ToDOT()
 
 int StatementList::ToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode)
 {
-	return 0;
+	int oldSize = byteCode->size();
+	for (auto stmt : *statements)
+	{
+		stmt->ToByteCode(owner, methodInfo, byteCode);
+	}
+	return byteCode->size() - oldSize;
 }
 
 IfStatement::IfStatement(Expression* expression,
