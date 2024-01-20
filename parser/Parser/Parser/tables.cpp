@@ -1897,7 +1897,8 @@ void Class::WriteClassFile()
 	byteCode.push_back(0x00);
 
 	ofstream file;
-	file.open(GetOuterMember()->GetFullName() + "/" + *GetName() + ".class", std::ios::binary);
+	std::filesystem::create_directories("out/" + GetOuterMember()->GetFullName());
+	file.open("out/" + GetOuterMember()->GetFullName() + "/" + *GetName() + ".class", std::ios::binary);
 	for (char c : byteCode)
 	{
 		file << c;

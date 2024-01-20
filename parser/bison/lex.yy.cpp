@@ -2311,6 +2311,7 @@ void main(int argc, char** argv)
 	}
 
 	std::filesystem::remove_all("global");
+	std::filesystem::remove_all("out");
 	for (auto cl : classes)
 	{
 		for (auto md : cl->GetAllMethods())
@@ -2330,6 +2331,16 @@ void main(int argc, char** argv)
 		{
 			cl->WriteClassFile();
 		}
+	}
+
+	try {
+		std::filesystem::copy("./System", "out/global/System",
+			std::filesystem::copy_options::update_existing
+			| std::filesystem::copy_options::overwrite_existing
+			| std::filesystem::copy_options::recursive);
+	}
+	catch (const std::filesystem::filesystem_error& e) {
+		cerr << e.what() << endl;
 	}
 
 	dotStr = "digraph tree{ rankdir=\"LR\"\n" + *Programm::main->ToDOT() + "}";
