@@ -19,6 +19,8 @@ enum ByteCode
 	idiv		  = 0x6c,
 	irem		  = 0x70,
 	ineg		  = 0x74,
+	ifeq          = 0x99,
+	ifne          = 0x9a,
 	if_icmpeq     = 0x9f,
 	if_icmpne     = 0xa0,
 	if_icmplt     = 0xa1,

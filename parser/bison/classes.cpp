@@ -656,10 +656,13 @@ int Expression::ToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* 
 		ComprasionToByteCode(owner, methodInfo, byteCode);
 		break;
 	case Expression::t_NOT:
+		NotToByteCode(owner, methodInfo, byteCode);
 		break;
 	case Expression::t_AND:
+		AndToByteCode(owner, methodInfo, byteCode);
 		break;
 	case Expression::t_OR:
+		OrToByteCode(owner, methodInfo, byteCode);
 		break;
 	case Expression::t_ASSIGNMENT:
 		AssigmentToByteCode(owner, methodInfo, byteCode);
@@ -1562,6 +1565,89 @@ int Expression::ComprasionToByteCode(Class* owner, MethodTable* methodInfo, vect
 	byteCode->push_back(0x04);
 
 	byteCode->push_back(ByteCode::iconst_1);
+
+	return byteCode->size() - oldSize;
+}
+
+int Expression::NotToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode)
+{
+	int oldSize = byteCode->size();
+
+	left->ToByteCode(owner, methodInfo, byteCode);
+
+	byteCode->push_back(ByteCode::ifne);
+	byteCode->push_back(0x00);
+	byteCode->push_back(0x07);
+
+	byteCode->push_back(ByteCode::iconst_1);
+
+	byteCode->push_back(ByteCode::goto_);
+	byteCode->push_back(0x00);
+	byteCode->push_back(0x04);
+
+	byteCode->push_back(ByteCode::iconst_0);
+
+	return byteCode->size() - oldSize;
+}
+
+int Expression::AndToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode)
+{
+	int oldSize = byteCode->size();
+
+	left->ToByteCode(owner, methodInfo, byteCode);
+
+	byteCode->push_back(ByteCode::ifeq);
+	int firstEqIndex = byteCode->size();
+	byteCode->push_back(0x00);
+	byteCode->push_back(0x00);
+
+	int rightSize = right->ToByteCode(owner, methodInfo, byteCode);
+	char* rightSizeBytes = Constant::IntToByteCode(rightSize + 10);
+	byteCode->operator[](firstEqIndex) = rightSizeBytes[2];
+	byteCode->operator[](firstEqIndex + 1) = rightSizeBytes[3];
+
+	byteCode->push_back(ByteCode::ifeq);
+	byteCode->push_back(0x00);
+	byteCode->push_back(0x07);
+
+	byteCode->push_back(ByteCode::iconst_1);
+
+	byteCode->push_back(ByteCode::goto_);
+	byteCode->push_back(0x00);
+	byteCode->push_back(0x04);
+
+	byteCode->push_back(ByteCode::iconst_0);
+
+	return byteCode->size() - oldSize;
+}
+
+int Expression::OrToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode)
+{
+	int oldSize = byteCode->size();
+
+	left->ToByteCode(owner, methodInfo, byteCode);
+
+	byteCode->push_back(ByteCode::ifne);
+	int firstEqIndex = byteCode->size();
+	byteCode->push_back(0x00);
+	byteCode->push_back(0x00);
+
+	int rightSize = right->ToByteCode(owner, methodInfo, byteCode);
+	char* rightSizeBytes = Constant::IntToByteCode(rightSize + 6);
+	byteCode->operator[](firstEqIndex) = rightSizeBytes[2];
+	byteCode->operator[](firstEqIndex + 1) = rightSizeBytes[3];
+
+	byteCode->push_back(ByteCode::ifeq);
+	byteCode->push_back(0x00);
+	byteCode->push_back(0x07);
+
+	byteCode->push_back(ByteCode::iconst_1);
+
+	byteCode->push_back(ByteCode::goto_);
+	byteCode->push_back(0x00);
+	byteCode->push_back(0x04);
+
+	byteCode->push_back(ByteCode::iconst_0);
 
 	return byteCode->size() - oldSize;
 }

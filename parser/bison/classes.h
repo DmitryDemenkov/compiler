@@ -238,6 +238,9 @@ private:
     int AssigmentToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
     int ArithmeticToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
     int ComprasionToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
+    int NotToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
+    int AndToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
+    int OrToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
 };
 
 class ObjectCreation : public Expression
