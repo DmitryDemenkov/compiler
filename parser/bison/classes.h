@@ -234,6 +234,8 @@ private:
     int ThisToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
     int LiteralToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
     int InvokationToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
+    int LocalToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
+    int AssigmentToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
 };
 
 class ObjectCreation : public Expression
@@ -324,6 +326,8 @@ public:
     void Semantic(Class* owner, MethodTable* methodInfo);
 
     string* ToDOT();
+
+    int ToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
 };
 
 class VarDeclaratorList
@@ -337,6 +341,8 @@ public:
     static VarDeclaratorList* Append(VarDeclaratorList* declarators, string* identifier, Expression* expression = NULL);
 
     string* ToDOT();
+
+    int ToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
 };
 
 class Statement

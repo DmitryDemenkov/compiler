@@ -674,12 +674,14 @@ int Expression::ToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* 
 	case Expression::t_OR:
 		break;
 	case Expression::t_ASSIGNMENT:
+		AssigmentToByteCode(owner, methodInfo, byteCode);
 		break;
 	case Expression::t_CLASS:
 		break;
 	case Expression::t_OBJECT:
 		break;
 	case Expression::t_LOCALVAR:
+		LocalToByteCode(owner, methodInfo, byteCode);
 		break;
 	default:
 		break;
@@ -1374,10 +1376,34 @@ int Expression::LiteralToByteCode(Class* owner, MethodTable* methodInfo, vector<
 	switch (type)
 	{
 	case Expression::t_INT_LITER:
+		if (intLiteral < -128 || intLiteral > 127)
+		{
+			constIndex = Constant::IntToByteCode(owner->AppendIntegerConstant(intLiteral));
+			byteCode->push_back(ByteCode::ldc_w);
+			byteCode->push_back(constIndex[2]);
+			byteCode->push_back(constIndex[3]);
+		}
+		else
+		{
+			constIndex = Constant::IntToByteCode(intLiteral);
+			byteCode->push_back(ByteCode::bipush);
+			byteCode->push_back(constIndex[3]);
+		}
 		break;
 	case Expression::t_CHAR_LITER:
+		constIndex = Constant::IntToByteCode(charLiteral);
+		byteCode->push_back(ByteCode::bipush);
+		byteCode->push_back(constIndex[3]);
 		break;
 	case Expression::t_BOOL_LITER:
+		if (boolLiteral)
+		{
+			byteCode->push_back(ByteCode::iconst_1);
+		}
+		else
+		{
+			byteCode->push_back(ByteCode::iconst_0);
+		}
 		break;
 	case Expression::t_STRING_LITER:
 		constIndex = Constant::IntToByteCode(owner->AppendStringConstant(name));
@@ -1410,7 +1436,7 @@ int Expression::InvokationToByteCode(Class* owner, MethodTable* methodInfo, vect
 		}
 	}
 
-	if (invokatedMethod->IsStatic())
+	if (invokatedMethod->IsStatic() || left->dataType->type != DataType::t_TYPENAME)
 	{
 		byteCode->push_back(ByteCode::invokestatic);
 	}
@@ -1427,6 +1453,42 @@ int Expression::InvokationToByteCode(Class* owner, MethodTable* methodInfo, vect
 	byteCode->push_back(methodRef[2]);
 	byteCode->push_back(methodRef[3]);
 
+	return byteCode->size() - oldSize;
+}
+
+int Expression::LocalToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode)
+{
+	int localIndex = methodInfo->GetLocalIndex(name);
+	if (dataType->type == DataType::t_STRING || dataType->type == DataType::t_TYPENAME)
+	{
+		byteCode->push_back(ByteCode::aload);
+	}
+	else
+	{
+		byteCode->push_back(ByteCode::iload);
+	}
+	byteCode->push_back(Constant::IntToByteCode(localIndex)[3]);
+	return 2;
+}
+
+int Expression::AssigmentToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode)
+{
+	int oldSize = byteCode->size();
+
+	right->ToByteCode(owner, methodInfo, byteCode);
+	if (left->type == t_LOCALVAR)
+	{
+		int localIndex = methodInfo->GetLocalIndex(left->name);
+		if (left->dataType->type == DataType::t_STRING || left->dataType->type == DataType::t_TYPENAME)
+		{
+			byteCode->push_back(ByteCode::astore);
+		}
+		else
+		{
+			byteCode->push_back(ByteCode::istore);
+		}
+		byteCode->push_back(Constant::IntToByteCode(localIndex)[3]);
+	}
 	return byteCode->size() - oldSize;
 }
 
@@ -1731,7 +1793,7 @@ void VarDeclarator::Semantic(Class* owner, MethodTable* methodInfo)
 		case DataType::t_CHAR:
 			initializer = new Expression(Expression::t_CHAR_LITER, 0); break;
 		case DataType::t_STRING:
-			initializer = new Expression(Expression::t_STRING_LITER, ""); break;
+			initializer = new Expression(Expression::t_STRING_LITER, new string("")); break;
 		default: break;
 		}
 	}
@@ -1786,6 +1848,28 @@ string* VarDeclarator::ToDOT()
 	return dotStr;
 }
 
+int VarDeclarator::ToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode)
+{
+	int oldSize = byteCode->size();
+
+	if (initializer != NULL)
+	{
+		initializer->ToByteCode(owner, methodInfo, byteCode);
+		int localIndex = methodInfo->GetLocalIndex(identifier);
+		if (dataType->type == DataType::t_STRING || dataType->type == DataType::t_TYPENAME)
+		{
+			byteCode->push_back(ByteCode::astore);
+		}
+		else
+		{
+			byteCode->push_back(ByteCode::istore);
+		}
+		byteCode->push_back(Constant::IntToByteCode(localIndex)[3]);
+	}
+
+	return byteCode->size() - oldSize;
+}
+
 VarDeclaratorList::VarDeclaratorList(VarDeclarator* declarator, Expression* expression)
 {
 	declarator->initializer = expression;
@@ -1827,6 +1911,18 @@ string* VarDeclaratorList::ToDOT()
 		previous = *i;
 	}
 	return dotStr;
+}
+
+int VarDeclaratorList::ToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode)
+{
+	int oldSize = byteCode->size();
+
+	for (auto decl : *declarators)
+	{
+		decl->ToByteCode(owner, methodInfo, byteCode);
+	}
+
+	return byteCode->size() - oldSize;
 }
 
 void Statement::CheckIfStmtError(Class* owner, MethodTable* methodInfo)
@@ -2177,6 +2273,7 @@ int Statement::ToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* b
 		expressions->expressions->front()->ToByteCode(owner, methodInfo, byteCode);
 		break;
 	case Statement::t_DECLARATOR:
+		declarators->ToByteCode(owner, methodInfo, byteCode);
 		break;
 	case Statement::t_IF:
 		break;
