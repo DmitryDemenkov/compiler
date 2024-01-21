@@ -641,8 +641,6 @@ int Expression::ToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* 
 	case Expression::t_SUB:
 		ArithmeticToByteCode(owner, methodInfo, byteCode);
 		break;
-	case Expression::t_NOT:
-		break;
 	case Expression::t_SIMPLE_TYPE_CAST:
 		break;
 	case Expression::t_ARRAY_CAST:
@@ -650,20 +648,14 @@ int Expression::ToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* 
 	case Expression::t_TYPENAME_CAST:
 		break;
 	case Expression::t_LESS:
-		break;
 	case Expression::t_GREATER:
-		break;
 	case Expression::t_LESS_EQUAL:
-		break;
 	case Expression::t_GREATER_EQUAL:
-		break;
-	case Expression::t_IS:
-		break;
-	case Expression::t_AS:
-		break;
 	case Expression::t_EQUALITY:
-		break;
 	case Expression::t_INEQUALITY:
+		ComprasionToByteCode(owner, methodInfo, byteCode);
+		break;
+	case Expression::t_NOT:
 		break;
 	case Expression::t_AND:
 		break;
@@ -671,6 +663,10 @@ int Expression::ToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* 
 		break;
 	case Expression::t_ASSIGNMENT:
 		AssigmentToByteCode(owner, methodInfo, byteCode);
+		break;
+	case Expression::t_IS:
+		break;
+	case Expression::t_AS:
 		break;
 	case Expression::t_CLASS:
 		break;
@@ -1521,6 +1517,51 @@ int Expression::ArithmeticToByteCode(Class* owner, MethodTable* methodInfo, vect
 	default:
 		break;
 	}
+
+	return byteCode->size() - oldSize;
+}
+
+int Expression::ComprasionToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode)
+{
+	int oldSize = byteCode->size();
+
+	left->ToByteCode(owner, methodInfo, byteCode);
+	right->ToByteCode(owner, methodInfo, byteCode);
+
+	switch (type)
+	{
+	case Expression::t_LESS:
+		byteCode->push_back(ByteCode::if_icmplt);
+		break;
+	case Expression::t_GREATER:
+		byteCode->push_back(ByteCode::if_icmpgt);
+		break;
+	case Expression::t_LESS_EQUAL:
+		byteCode->push_back(ByteCode::if_icmple);
+		break;
+	case Expression::t_GREATER_EQUAL:
+		byteCode->push_back(ByteCode::if_icmpge);
+		break;
+	case Expression::t_EQUALITY:
+		byteCode->push_back(ByteCode::if_icmpeq);
+		break;
+	case Expression::t_INEQUALITY:
+		byteCode->push_back(ByteCode::if_icmpne);
+		break;
+	default:
+		break;
+	}
+
+	byteCode->push_back(0x00);
+	byteCode->push_back(0x07);
+
+	byteCode->push_back(ByteCode::iconst_0);
+
+	byteCode->push_back(ByteCode::goto_);
+	byteCode->push_back(0x00);
+	byteCode->push_back(0x04);
+
+	byteCode->push_back(ByteCode::iconst_1);
 
 	return byteCode->size() - oldSize;
 }

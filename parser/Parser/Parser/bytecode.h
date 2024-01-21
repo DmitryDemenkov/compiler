@@ -18,5 +18,12 @@ enum ByteCode
 	imul		  = 0x68,
 	idiv		  = 0x6c,
 	irem		  = 0x70,
-	ineg		  = 0x74
+	ineg		  = 0x74,
+	if_icmpeq     = 0x9f,
+	if_icmpne     = 0xa0,
+	if_icmplt     = 0xa1,
+	if_icmpge     = 0xa2,
+	if_icmpgt     = 0xa3,
+	if_icmple     = 0xa4,
+	goto_         = 0xa7
 };
