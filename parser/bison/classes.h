@@ -236,6 +236,7 @@ private:
     int InvokationToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
     int LocalToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
     int AssigmentToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
+    int ArithmeticToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
 };
 
 class ObjectCreation : public Expression

@@ -634,6 +634,12 @@ int Expression::ToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* 
 		InvokationToByteCode(owner, methodInfo, byteCode);
 		break;
 	case Expression::t_UNMINUS:
+	case Expression::t_MUL:
+	case Expression::t_DIV:
+	case Expression::t_MOD:
+	case Expression::t_SUM:
+	case Expression::t_SUB:
+		ArithmeticToByteCode(owner, methodInfo, byteCode);
 		break;
 	case Expression::t_NOT:
 		break;
@@ -642,16 +648,6 @@ int Expression::ToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* 
 	case Expression::t_ARRAY_CAST:
 		break;
 	case Expression::t_TYPENAME_CAST:
-		break;
-	case Expression::t_MUL:
-		break;
-	case Expression::t_DIV:
-		break;
-	case Expression::t_MOD:
-		break;
-	case Expression::t_SUM:
-		break;
-	case Expression::t_SUB:
 		break;
 	case Expression::t_LESS:
 		break;
@@ -1489,6 +1485,43 @@ int Expression::AssigmentToByteCode(Class* owner, MethodTable* methodInfo, vecto
 		}
 		byteCode->push_back(Constant::IntToByteCode(localIndex)[3]);
 	}
+	return byteCode->size() - oldSize;
+}
+
+int Expression::ArithmeticToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode)
+{
+	int oldSize = byteCode->size();
+
+	left->ToByteCode(owner, methodInfo, byteCode);
+	if (type != t_UNMINUS)
+	{
+		right->ToByteCode(owner, methodInfo, byteCode);
+	}
+
+	switch (type)
+	{
+	case Expression::t_UNMINUS:
+		byteCode->push_back(ByteCode::ineg);
+		break;
+	case Expression::t_MUL:
+		byteCode->push_back(ByteCode::imul);
+		break;
+	case Expression::t_DIV:
+		byteCode->push_back(ByteCode::idiv);
+		break;
+	case Expression::t_MOD:
+		byteCode->push_back(ByteCode::irem);
+		break;
+	case Expression::t_SUM:
+		byteCode->push_back(ByteCode::iadd);
+		break;
+	case Expression::t_SUB:
+		byteCode->push_back(ByteCode::isub);
+		break;
+	default:
+		break;
+	}
+
 	return byteCode->size() - oldSize;
 }
 

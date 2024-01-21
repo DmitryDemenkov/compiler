@@ -12,5 +12,11 @@ enum ByteCode
 	invokespecial = 0xb7, 
 	invokestatic  = 0xb8,
 	istore        = 0x36,
-	astore        = 0x3a
+	astore        = 0x3a,
+	iadd          = 0x60,
+	isub		  = 0x64,
+	imul		  = 0x68,
+	idiv		  = 0x6c,
+	irem		  = 0x70,
+	ineg		  = 0x74
 };
