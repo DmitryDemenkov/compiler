@@ -280,6 +280,8 @@ private:
 	vector<Variable*> localVariables;
 	StatementList* body = NULL;
 
+	string* constDescriptor = NULL;
+
 public:
 	MethodTable(string* name, DataType* dataType);
 	void SetStatic(bool value);
@@ -314,6 +316,7 @@ public:
 
 	string ToString();
 	string* GetDescriptor();
+	void SetConstDescriptor(string* str);
 
 	void ToByteCode(Class* owner, vector<char>* byteCode);
 };

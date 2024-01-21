@@ -1492,6 +1492,8 @@ string MethodTable::ToString()
 
 string* MethodTable::GetDescriptor()
 {
+	if (constDescriptor != NULL) { return constDescriptor; }
+
 	string* descriptor = new string("(");
 	for (auto param : params)
 	{
@@ -1499,6 +1501,11 @@ string* MethodTable::GetDescriptor()
 	}
 	*descriptor += ")" + GetReturnValue()->ToDescriptor();
 	return descriptor;
+}
+
+void MethodTable::SetConstDescriptor(string* str)
+{
+	constDescriptor = str;
 }
 
 void MethodTable::ToByteCode(Class* owner, vector<char>* byteCode)
@@ -1672,6 +1679,15 @@ void Class::FillStringClass(AbstractNamespaceMember* outer)
 {
 	Class* stringClass = (Class*)outer->GetInnerMember(new string("String"));
 	stringClass->AppdendDefaultConstructor();
+
+	DataType* toStringReturn = new DataType(DataType::t_STRING, NULL, false, stringClass);
+	vector<Variable*> toStringParamSet = vector<Variable*>();
+
+	stringClass->AppendMethod(new string("ToString"), toStringReturn, toStringParamSet);
+	MethodTable* toStringMethod = stringClass->methods["ToString"];
+	toStringMethod->SetAccessModifier(e_PUBLIC);
+	toStringMethod->SetOverride(true);
+	toStringMethod->SetConstDescriptor(new string("(Ljava/lang/String;)Ljava/lang/String;"));
 }
 
 void Class::FillIntClass(AbstractNamespaceMember* outer)
@@ -1690,18 +1706,45 @@ void Class::FillIntClass(AbstractNamespaceMember* outer)
 	MethodTable* equalsMethod = intClass->methods["Parse"];
 	equalsMethod->SetAccessModifier(e_PUBLIC);
 	equalsMethod->SetStatic(true);
+
+	DataType* toStringReturn = new DataType(DataType::t_STRING, NULL, false, intClass);
+	vector<Variable*> toStringParamSet = vector<Variable*>();
+
+	intClass->AppendMethod(new string("ToString"), toStringReturn, toStringParamSet);
+	MethodTable* toStringMethod = intClass->methods["ToString"];
+	toStringMethod->SetAccessModifier(e_PUBLIC);
+	toStringMethod->SetOverride(true);
+	toStringMethod->SetConstDescriptor(new string("(I)Ljava/lang/String;"));
 }
 
 void Class::FillCharClass(AbstractNamespaceMember* outer)
 {
 	Class* charClass = (Class*)outer->GetInnerMember(new string("Char"));
 	charClass->AppdendDefaultConstructor();
+
+	DataType* toStringReturn = new DataType(DataType::t_STRING, NULL, false, charClass);
+	vector<Variable*> toStringParamSet = vector<Variable*>();
+
+	charClass->AppendMethod(new string("ToString"), toStringReturn, toStringParamSet);
+	MethodTable* toStringMethod = charClass->methods["ToString"];
+	toStringMethod->SetAccessModifier(e_PUBLIC);
+	toStringMethod->SetOverride(true);
+	toStringMethod->SetConstDescriptor(new string("(I)Ljava/lang/String;"));
 }
 
 void Class::FillBoolClass(AbstractNamespaceMember* outer)
 {
 	Class* boolClass = (Class*)outer->GetInnerMember(new string("Bool"));
 	boolClass->AppdendDefaultConstructor();
+
+	DataType* toStringReturn = new DataType(DataType::t_STRING, NULL, false, boolClass);
+	vector<Variable*> toStringParamSet = vector<Variable*>();
+
+	boolClass->AppendMethod(new string("ToString"), toStringReturn, toStringParamSet);
+	MethodTable* toStringMethod = boolClass->methods["ToString"];
+	toStringMethod->SetAccessModifier(e_PUBLIC);
+	toStringMethod->SetOverride(true);
+	toStringMethod->SetConstDescriptor(new string("(I)Ljava/lang/String;"));
 }
 
 void Class::FillConsoleClass(AbstractNamespaceMember* outer)
