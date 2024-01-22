@@ -9,6 +9,8 @@ enum ByteCode
 	aload         = 0x19,
 	pop           = 0x57,
 	dup           = 0x59,
+	ireturn       = 0xac,
+	areturn       = 0xb0,
 	return_       = 0xb1,
 	invokevirtual = 0xb6,
 	invokespecial = 0xb7, 

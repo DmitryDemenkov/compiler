@@ -164,6 +164,11 @@ string* Argument::ToDOT()
 void Argument::DetermineDataType(Class* owner, MethodTable* methodInfo)
 {
 	this->expression->DetermineDataType(owner, methodInfo);
+	if (this->expression->dataType == NULL)
+	{
+		string err = "There is no such identifier \"" + this->expression->typeName->ToString() + "\"";
+		throw std::exception(err.c_str());
+	}
 }
 
 ArgumentList::ArgumentList(Argument* argument)
@@ -2302,8 +2307,19 @@ int Statement::ReturnToByteCode(Class* owner, MethodTable* methodInfo, vector<ch
 	if (expressions != NULL)
 	{
 		expressions->expressions->front()->ToByteCode(owner, methodInfo, byteCode);
+		if (expressions->expressions->front()->dataType->type == DataType::t_STRING || expressions->expressions->front()->dataType->type == DataType::t_TYPENAME)
+		{
+			byteCode->push_back(ByteCode::areturn);
+		}
+		else
+		{
+			byteCode->push_back(ByteCode::ireturn);
+		}
 	}
-	byteCode->push_back(ByteCode::return_);
+	else
+	{
+		byteCode->push_back(ByteCode::return_);
+	}
 	return byteCode->size() - oldSize;
 }
 
