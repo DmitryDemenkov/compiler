@@ -361,6 +361,7 @@ private:
     void CheckReturnStmtError(Class* owner, MethodTable* methodInfo);
 
     int ReturnToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
+    int IfToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
 
 public:
     enum Type

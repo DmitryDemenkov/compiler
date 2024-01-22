@@ -2323,6 +2323,46 @@ int Statement::ReturnToByteCode(Class* owner, MethodTable* methodInfo, vector<ch
 	return byteCode->size() - oldSize;
 }
 
+int Statement::IfToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode)
+{
+	int oldSize = byteCode->size();
+	
+	expressions->expressions->front()->ToByteCode(owner, methodInfo, byteCode);
+	byteCode->push_back(ByteCode::ifeq);
+	int ifIndex = byteCode->size();
+	byteCode->push_back(0x00);
+	byteCode->push_back(0x00);
+
+	auto stmtIter = statements->statements->begin();
+	Statement* ifStmt = *stmtIter; stmtIter++;
+	Statement* elseStmt = NULL;
+	if (stmtIter != statements->statements->end())
+	{
+		elseStmt = *stmtIter;
+	}
+
+	int ifStmtSize = ifStmt->ToByteCode(owner, methodInfo, byteCode);
+	char* ifStmtBytes = Constant::IntToByteCode(ifStmtSize + 6);
+	byteCode->operator[](ifIndex) = ifStmtBytes[2];
+	byteCode->operator[](ifIndex + 1) = ifStmtBytes[3];
+
+	byteCode->push_back(ByteCode::goto_);
+	int elseIndex = byteCode->size();
+	byteCode->push_back(0x00);
+	byteCode->push_back(0x00);
+
+	int elseStmtSize = 0;
+	if (elseStmt != NULL)
+	{
+		elseStmtSize = elseStmt->ToByteCode(owner, methodInfo, byteCode);
+	}
+	char* elseStmtBytes = Constant::IntToByteCode(elseStmtSize + 3);
+	byteCode->operator[](elseIndex) = elseStmtBytes[2];
+	byteCode->operator[](elseIndex + 1) = elseStmtBytes[3];
+
+	return byteCode->size() - oldSize;
+}
+
 Statement::Statement(Type type, Expression* expression)
 {
 	this->id = ++maxId;
@@ -2457,6 +2497,7 @@ int Statement::ToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* b
 		declarators->ToByteCode(owner, methodInfo, byteCode);
 		break;
 	case Statement::t_IF:
+		IfToByteCode(owner, methodInfo, byteCode);
 		break;
 	case Statement::t_WHILE:
 		break;
@@ -2470,6 +2511,10 @@ int Statement::ToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* b
 		ReturnToByteCode(owner, methodInfo, byteCode);
 		break;
 	case Statement::t_BLOCK:
+		for (auto stmt : *statements->statements)
+		{
+			stmt->ToByteCode(owner, methodInfo, byteCode);
+		}
 		break;
 	default:
 		break;
