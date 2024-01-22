@@ -1471,6 +1471,7 @@ int Expression::AssigmentToByteCode(Class* owner, MethodTable* methodInfo, vecto
 	int oldSize = byteCode->size();
 
 	right->ToByteCode(owner, methodInfo, byteCode);
+	byteCode->push_back(ByteCode::dup);
 	if (left->type == t_LOCALVAR)
 	{
 		int localIndex = methodInfo->GetLocalIndex(left->name);
@@ -2431,6 +2432,10 @@ int Statement::ToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* b
 		break;
 	case Statement::t_EXPRESSION:
 		expressions->expressions->front()->ToByteCode(owner, methodInfo, byteCode);
+		if (expressions->expressions->front()->type == Expression::t_ASSIGNMENT)
+		{
+			byteCode->push_back(ByteCode::pop);
+		}
 		break;
 	case Statement::t_DECLARATOR:
 		declarators->ToByteCode(owner, methodInfo, byteCode);

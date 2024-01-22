@@ -7,6 +7,8 @@ enum ByteCode
 	ldc_w         = 0x13,
 	iload         = 0x15,
 	aload         = 0x19,
+	pop           = 0x57,
+	dup           = 0x59,
 	return_       = 0xb1,
 	invokevirtual = 0xb6,
 	invokespecial = 0xb7, 
