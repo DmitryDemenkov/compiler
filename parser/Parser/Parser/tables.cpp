@@ -381,7 +381,8 @@ void Class::AppendFieldInitializers(MethodTable* constructor, ArgumentList* args
 		if (!field->IsStatic() && field->GetInitializer() != NULL)
 		{
 			Expression* fieldName = new Expression(Expression::t_ID, field->GetName());
-			Expression* initExpr = new Expression(Expression::t_ASSIGNMENT, fieldName, field->GetInitializer());
+			Expression* fieldAccess = new Expression(Expression::t_MEMBER_ACCESS, new Expression(Expression::t_THIS), fieldName);
+			Expression* initExpr = new Expression(Expression::t_ASSIGNMENT, fieldAccess, field->GetInitializer());
 			Statement* fieldInit = new Statement(Statement::t_EXPRESSION, initExpr);
 
 			if (constructor->GetBody() != NULL)
