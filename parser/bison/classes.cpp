@@ -95,6 +95,19 @@ string TypeName::ToString()
 	return str;
 }
 
+TypeName* TypeName::FromClass(Class* classInfo)
+{
+	TypeName* tName = new TypeName(classInfo->GetName());
+	AbstractNamespaceMember* member = classInfo->GetOuterMember();
+	while (member != NULL)
+	{
+		tName->identifiers->push_front(member->GetName());
+		member = member->GetOuterMember();
+	}
+	tName->identifiers->pop_front();
+	return tName;
+}
+
 ArrayType::ArrayType(SimpleType* simpleType)
 {
 	this->id = ++maxId;
@@ -314,6 +327,10 @@ void MemberInitializer::DetermineDataType(Class* owner, MethodTable* methodInfo,
 
 	owner->AppendFieldRefConstant(creatingClass, fieldInfo);
 
+	if (this->objectInitializer != NULL)
+	{
+		this->expression = new ObjectCreation(TypeName::FromClass(this->dataType->classType), NULL, objectInitializer);
+	}
 	if (this->expression != NULL)
 	{
 		this->expression->DetermineDataType(owner, methodInfo);
@@ -328,10 +345,21 @@ void MemberInitializer::DetermineDataType(Class* owner, MethodTable* methodInfo,
 			throw std::exception(err.c_str());
 		}
 	}
-	if (this->objectInitializer != NULL)
-	{
-		this->objectInitializer->DetermineDataType(owner, methodInfo, this->dataType->classType);
-	}
+}
+
+int MemberInitializer::ToByteCode(Class* owner, MethodTable* methodInfo, Class* creatingClass, vector<char>* byteCode)
+{
+	int oldSize = byteCode->size();
+
+	expression->ToByteCode(owner, methodInfo, byteCode);
+	FieldTable* fieldInfo = creatingClass->GetField(*identifier);
+	char* fieldRef = Constant::IntToByteCode(owner->AppendFieldRefConstant(creatingClass, fieldInfo));
+
+	byteCode->push_back(ByteCode::putfield);
+	byteCode->push_back(fieldRef[2]);
+	byteCode->push_back(fieldRef[3]);
+
+	return byteCode->size() - oldSize;
 }
 
 MemberInitializerList::MemberInitializerList(MemberInitializer* memberInitializer)
@@ -1767,6 +1795,15 @@ int Expression::ObjectCreationToByteCode(Class* owner, MethodTable* methodInfo, 
 	byteCode->push_back(ByteCode::invokespecial);
 	byteCode->push_back(construcRef[2]);
 	byteCode->push_back(construcRef[3]);
+
+	if (objInitializer != NULL)
+	{
+		for (auto init : *objInitializer->initializers)
+		{
+			byteCode->push_back(ByteCode::dup);
+			init->ToByteCode(owner, methodInfo, dataType->classType, byteCode);
+		}
+	}
 
 	return byteCode->size() - oldSize;
 }

@@ -47,6 +47,8 @@ public:
 
     string* ToDOT();
     string ToString();
+
+    static TypeName* FromClass(Class* classInfo);
 };
 
 class ArrayType
@@ -119,6 +121,8 @@ public:
     string* ToDOT();
 
     void DetermineDataType(Class* owner, MethodTable* methodInfo, Class* creatingClass);
+
+    int ToByteCode(Class* owner, MethodTable* methodInfo, Class* creatingClass, vector<char>* byteCode);
 };
 
 class MemberInitializerList
