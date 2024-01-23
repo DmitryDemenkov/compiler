@@ -679,6 +679,7 @@ int Expression::ToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* 
 	case Expression::t_CLASS:
 		break;
 	case Expression::t_OBJECT:
+		ObjectToByteCode(owner, methodInfo, byteCode);
 		break;
 	case Expression::t_LOCALVAR:
 		LocalToByteCode(owner, methodInfo, byteCode);
@@ -1475,10 +1476,10 @@ int Expression::AssigmentToByteCode(Class* owner, MethodTable* methodInfo, vecto
 {
 	int oldSize = byteCode->size();
 
-	right->ToByteCode(owner, methodInfo, byteCode);
-	byteCode->push_back(ByteCode::dup);
 	if (left->type == t_LOCALVAR)
 	{
+		right->ToByteCode(owner, methodInfo, byteCode);
+		byteCode->push_back(ByteCode::dup);
 		int localIndex = methodInfo->GetLocalIndex(left->name);
 		if (left->dataType->type == DataType::t_STRING || left->dataType->type == DataType::t_TYPENAME)
 		{
@@ -1489,6 +1490,26 @@ int Expression::AssigmentToByteCode(Class* owner, MethodTable* methodInfo, vecto
 			byteCode->push_back(ByteCode::istore);
 		}
 		byteCode->push_back(Constant::IntToByteCode(localIndex)[3]);
+	}
+	else if (left->type == t_OBJECT)
+	{
+		FieldTable* field = left->left->dataType->classType->GetField(*left->right->name);
+		char* fieldRef = Constant::IntToByteCode(owner->AppendFieldRefConstant(owner, field));
+		if (field->IsStatic())
+		{
+			right->ToByteCode(owner, methodInfo, byteCode);
+			byteCode->push_back(ByteCode::dup);
+			byteCode->push_back(ByteCode::putstatic);
+		}
+		else
+		{
+			left->left->ToByteCode(owner, methodInfo, byteCode);
+			right->ToByteCode(owner, methodInfo, byteCode);
+			byteCode->push_back(ByteCode::dup_x1);
+			byteCode->push_back(ByteCode::putfield);
+		}
+		byteCode->push_back(fieldRef[2]);
+		byteCode->push_back(fieldRef[3]);
 	}
 	return byteCode->size() - oldSize;
 }
@@ -1654,6 +1675,32 @@ int Expression::OrToByteCode(Class* owner, MethodTable* methodInfo, vector<char>
 	byteCode->push_back(0x04);
 
 	byteCode->push_back(ByteCode::iconst_0);
+
+	return byteCode->size() - oldSize;
+}
+
+int Expression::ObjectToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode)
+{
+	int oldSize = byteCode->size();
+	if (this->left->type != t_CLASS)
+	{
+		this->left->ToByteCode(owner, methodInfo, byteCode);
+	}
+
+	FieldTable* field = this->left->dataType->classType->GetField(*this->name);
+
+	if (field->IsStatic())
+	{
+		byteCode->push_back(ByteCode::getstatic);
+	}
+	else
+	{
+		byteCode->push_back(ByteCode::getfield);
+	}
+
+	char* fieldRef = Constant::IntToByteCode(owner->AppendFieldRefConstant(left->dataType->classType, field));
+	byteCode->push_back(fieldRef[2]);
+	byteCode->push_back(fieldRef[3]);
 
 	return byteCode->size() - oldSize;
 }
