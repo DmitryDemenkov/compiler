@@ -10,6 +10,7 @@ enum ByteCode
 	pop           = 0x57,
 	dup           = 0x59,
 	dup_x1        = 0x5a,
+	new_          = 0xbb,
 	ireturn       = 0xac,
 	areturn       = 0xb0,
 	return_       = 0xb1,

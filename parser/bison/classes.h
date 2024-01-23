@@ -99,6 +99,9 @@ public:
 
 class MemberInitializer
 {
+private:
+    void CheckFieldAccess(Class* owner, MethodTable* methodInfo, Class* creatingClass, FieldTable* field);
+
 public:
     int id;
     string* identifier = NULL;
@@ -242,6 +245,7 @@ private:
     int AndToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
     int OrToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
     int ObjectToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
+    int ObjectCreationToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
 };
 
 class ObjectCreation : public Expression

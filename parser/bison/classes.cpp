@@ -199,6 +199,41 @@ string* ArgumentList::ToDOT()
 	return dotStr;
 }
 
+void MemberInitializer::CheckFieldAccess(Class* owner, MethodTable* methodInfo, Class* creatingClass, FieldTable* field)
+{
+	if (field == NULL)
+	{
+		string err = "Field \"" + *identifier + "\" does not exist in class \"" + creatingClass->GetFullName() + "\"";
+		throw std::exception(err.c_str());
+	}
+
+	if (field->IsStatic())
+	{
+		string err = "Static fields should be invoked on class";
+		throw std::exception(err.c_str());
+	}
+
+	switch (field->GetAccessModifier())
+	{
+	case AccessModifier::e_PRIVATE:
+		if (creatingClass->GetFullName() != owner->GetFullName())
+		{
+			string err = "Field access are not allown";
+			throw std::exception(err.c_str());
+		}
+		break;
+	case AccessModifier::e_PROTECTED:
+		if (!owner->InstanceOf(creatingClass))
+		{
+			string err = "Field access are not allown";
+			throw std::exception(err.c_str());
+		}
+		break;
+	default:
+		break;
+	}
+}
+
 MemberInitializer::MemberInitializer(string* identifier, Expression* expression)
 {
 	this->id = ++maxId;
@@ -274,12 +309,10 @@ string* MemberInitializer::ToDOT()
 void MemberInitializer::DetermineDataType(Class* owner, MethodTable* methodInfo, Class* creatingClass)
 {
 	FieldTable* fieldInfo = creatingClass->GetField(*identifier);
-	if (fieldInfo == NULL)
-	{
-		string err = "Field \"" + *identifier + "\" does not exist in class \"" + creatingClass->GetFullName() + "\"";
-		throw std::exception(err.c_str());
-	}
+	CheckFieldAccess(owner, methodInfo, creatingClass, fieldInfo);
 	this->dataType = fieldInfo->GetType();
+
+	owner->AppendFieldRefConstant(creatingClass, fieldInfo);
 
 	if (this->expression != NULL)
 	{
@@ -287,6 +320,11 @@ void MemberInitializer::DetermineDataType(Class* owner, MethodTable* methodInfo,
 		if (this->expression->dataType == NULL)
 		{
 			string err = "There is no such identifier \"" + this->expression->typeName->ToString() + "\"";
+			throw std::exception(err.c_str());
+		}
+		if (!(*fieldInfo->GetType() == *expression->dataType))
+		{
+			string err = "it is not possible to convert " + *expression->dataType->ToString() + " to " + *fieldInfo->GetType()->ToString();
 			throw std::exception(err.c_str());
 		}
 	}
@@ -628,6 +666,7 @@ int Expression::ToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* 
 		ThisToByteCode(owner, methodInfo, byteCode);
 		break;
 	case Expression::t_OBJ_CREATION:
+		ObjectCreationToByteCode(owner, methodInfo, byteCode);
 		break;
 	case Expression::t_ARR_CREATION:
 		break;
@@ -1687,7 +1726,7 @@ int Expression::ObjectToByteCode(Class* owner, MethodTable* methodInfo, vector<c
 		this->left->ToByteCode(owner, methodInfo, byteCode);
 	}
 
-	FieldTable* field = this->left->dataType->classType->GetField(*this->name);
+	FieldTable* field = this->left->dataType->classType->GetField(*this->right->name);
 
 	if (field->IsStatic())
 	{
@@ -1701,6 +1740,33 @@ int Expression::ObjectToByteCode(Class* owner, MethodTable* methodInfo, vector<c
 	char* fieldRef = Constant::IntToByteCode(owner->AppendFieldRefConstant(left->dataType->classType, field));
 	byteCode->push_back(fieldRef[2]);
 	byteCode->push_back(fieldRef[3]);
+
+	return byteCode->size() - oldSize;
+}
+
+int Expression::ObjectCreationToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode)
+{
+	int oldSize = byteCode->size();
+	
+	byteCode->push_back(ByteCode::new_);
+	char* classRef = Constant::IntToByteCode(owner->AppendClassConstant(dataType->classType));
+	byteCode->push_back(classRef[2]);
+	byteCode->push_back(classRef[3]);
+
+	byteCode->push_back(ByteCode::dup);
+	MethodTable* constructor = dataType->classType->GetMethod("<init>");
+	if (argumentList != NULL)
+	{
+		vector<Expression*> sortedArgs = constructor->SortArguments(argumentList);
+		for (auto arg : sortedArgs)
+		{
+			arg->ToByteCode(owner, methodInfo, byteCode);
+		}
+	}
+	char* construcRef = Constant::IntToByteCode(owner->AppendMethofRefConstant(dataType->classType, constructor));
+	byteCode->push_back(ByteCode::invokespecial);
+	byteCode->push_back(construcRef[2]);
+	byteCode->push_back(construcRef[3]);
 
 	return byteCode->size() - oldSize;
 }
