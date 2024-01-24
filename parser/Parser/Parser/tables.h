@@ -131,6 +131,7 @@ private:
 	void AppdendDefaultConstructor();
 	void AppendParent(TypeName* parentName);
 	void AppendFieldInitializers(MethodTable* constructor, ArgumentList* args);
+	void AppendStaticInitializer(FieldTable* fieldInfo);
 
 	static Class* CreateObjectClass(AbstractNamespaceMember* outer);
 	static Class* CreateStringClass(AbstractNamespaceMember* outer);

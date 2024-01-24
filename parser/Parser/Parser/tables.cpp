@@ -408,6 +408,10 @@ void Class::AppendFieldInitializers(MethodTable* constructor, ArgumentList* args
 				constructor->SetBody(body);
 			}
 		}
+		else if (field->GetInitializer() != NULL)
+		{
+			AppendStaticInitializer(field);
+		}
 	}
 
 	TypeName* baseName = new TypeName(new string("<init>"));
@@ -427,6 +431,34 @@ void Class::AppendFieldInitializers(MethodTable* constructor, ArgumentList* args
 	{
 		StatementList* body = new StatementList(baseInit);
 		constructor->SetBody(body);
+	}
+}
+
+void Class::AppendStaticInitializer(FieldTable* fieldInfo)
+{
+	if (methods.count("<clinit>") == 0)
+	{
+		AppendMethod(new string("<clinit>"), 
+			new DataType(DataType::t_VOID, NULL, false, this), 
+			vector<Variable*>());
+		methods["<clinit>"]->SetStatic(true);
+	}
+
+	MethodTable* clinit = methods["<clinit>"];
+	Expression* fieldName = new Expression(Expression::t_ID, fieldInfo->GetName());
+	Expression* initExpr = new Expression(Expression::t_ASSIGNMENT, fieldName, fieldInfo->GetInitializer());
+	Statement* fieldInit = new Statement(Statement::t_EXPRESSION, initExpr);
+
+	if (clinit->GetBody() != NULL)
+	{
+		StatementList* body = clinit->GetBody();
+		body->statements->push_back(fieldInit);
+		clinit->SetBody(body);
+	}
+	else
+	{
+		StatementList* body = new StatementList(fieldInit);
+		clinit->SetBody(body);
 	}
 }
 
