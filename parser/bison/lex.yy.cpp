@@ -2302,9 +2302,11 @@ void main(int argc, char** argv)
 			return;
 		}
 	}
+
+	TypeName* className;
 	if (mainClass != NULL)
 	{
-		TypeName* className = TypeName::FromClass(mainClass);
+		className = TypeName::FromClass(mainClass);
 		className->identifiers->push_front(new string("global"));
 		cout << className->ToString() << endl;
 	}
@@ -2364,6 +2366,10 @@ void main(int argc, char** argv)
 	catch (const std::filesystem::filesystem_error& e) {
 		cerr << e.what() << endl;
 	}
+
+	string jarCreation = "jar cvfe " + *mainClass->GetName() + ".jar " +
+		className->ToString() + " -C out .";
+	system(jarCreation.c_str());
 
 	dotStr = "digraph tree{ rankdir=\"LR\"\n" + *Programm::main->ToDOT() + "}";
 	file.open("tree.gv");
