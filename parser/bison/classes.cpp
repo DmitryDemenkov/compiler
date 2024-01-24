@@ -1389,6 +1389,12 @@ void Expression::CheckErrorsOfObjectCreation(Class* owner, Class* classInfo)
 {
 	if (classInfo != NULL)
 	{
+		if (classInfo->IsAbstract())
+		{
+			string err = "Invalid creation of abstract class \"" + classInfo->GetFullName() + "\"";
+			throw std::exception(err.c_str());
+		}
+
 		CheckErrorsOfClassesAccess(owner, classInfo);
 		MethodTable* constructor = classInfo->GetMethod("<init>");
 		if (constructor->CompareArgsTypes(this->argumentList) == false)
@@ -3331,7 +3337,7 @@ AbstractNamespaceMember* ClassDeclaration::CreateClassTable(AbstractNamespaceMem
 	}
 	if (current->GetAccessModifier() == e_NONE)
 	{
-		current->SetAccesModifier(e_PRIVATE);
+		current->SetAccesModifier(e_PUBLIC);
 	}
 
 	if (classMemberList != NULL)

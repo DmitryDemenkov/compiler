@@ -212,6 +212,7 @@ void Class::AppendField(Field* field)
 		case Modifier::t_PRIVATE:   newField->SetAccessModifier(e_PRIVATE);   break;
 		case Modifier::t_PROTECTED: newField->SetAccessModifier(e_PROTECTED); break;
 		case Modifier::t_PUBLIC:	newField->SetAccessModifier(e_PUBLIC);	  break;
+		case Modifier::t_INTERNAL:  newField->SetAccessModifier(e_INTERNAL);  break;
 		case Modifier::t_STATIC:	newField->SetStatic(true); break;
 		default:
 			string err = "Illigal modifier \"" + modifier->GetName() + "\" of class \"" + GetFullName() + "\"";
@@ -253,6 +254,7 @@ void Class::AppendMethod(Method* method)
 		case Modifier::t_PRIVATE:   newMethod->SetAccessModifier(e_PRIVATE);   break;
 		case Modifier::t_PROTECTED: newMethod->SetAccessModifier(e_PROTECTED); break;
 		case Modifier::t_PUBLIC:	newMethod->SetAccessModifier(e_PUBLIC);	  break;
+		case Modifier::t_INTERNAL:  newMethod->SetAccessModifier(e_INTERNAL); break;
 		case Modifier::t_STATIC:	newMethod->SetStatic(true);   break;
 		case Modifier::t_ABSTRACT:  newMethod->SetAbstract(true); break;
 		case Modifier::t_VIRTUAL:   newMethod->SetVirtual(true);  break;
@@ -358,8 +360,16 @@ void Class::AppdendDefaultConstructor()
 
 	if (decl != NULL)
 	{
-		ClassMemberList::Append(decl->classMemberList,
-			new Constructor(NULL, GetName(), NULL, ClassMember::t_NULL, newConstructor->GetBody()));
+		if (decl->classMemberList != NULL)
+		{
+			ClassMemberList::Append(decl->classMemberList,
+				new Constructor(NULL, GetName(), NULL, ClassMember::t_NULL, newConstructor->GetBody()));
+		}
+		else
+		{
+			decl->classMemberList = new ClassMemberList(
+				new Constructor(NULL, GetName(), NULL, ClassMember::t_NULL, newConstructor->GetBody()));
+		}
 	}
 
 	AppendUtf8Constant(newConstructor->GetName());
@@ -465,7 +475,7 @@ void Class::CheckOverridingMethods()
 				}
 			}
 		}
-		if (method.second->IsAbstract())
+		else if (method.second->IsAbstract())
 		{
 			if (!IsAbstract())
 			{
@@ -479,6 +489,37 @@ void Class::CheckOverridingMethods()
 					+ "\" in class \"" + GetFullName() + "\" could not have realisation";
 				throw std::exception(err.c_str());
 			}
+		}
+		else if (*method.second->GetName() != "<init>")
+		{
+			MethodTable* parentMethod = parent->GetMethod(*method.second->GetName());
+			if (parentMethod != NULL)
+			{
+				string err = "Method \"" + *method.second->GetName()
+					+ "\" in class \"" + GetFullName() + "\" should have \"override\" modifier";
+				throw std::exception(err.c_str());
+			}
+		}
+	}
+
+	if (!IsAbstract())
+	{
+		Class* curParent = parent;
+		while (curParent != NULL)
+		{
+			if (curParent->IsAbstract())
+			{
+				for (auto m : curParent->GetAllMethods())
+				{
+					if (m->IsAbstract() && !GetMethod(*m->GetName())->IsOverride())
+					{
+						string err = "Class \"" + GetFullName()
+							+ "\" does not have realization of \"" + *m->GetName() + "\" method";
+						throw std::exception(err.c_str());
+					}
+				}
+			}
+			curParent = curParent->parent;
 		}
 	}
 }
@@ -587,6 +628,11 @@ void Class::SetStatic(bool value)
 		string err = "Abstract class \"" + GetFullName() + "\" can not be static";
 		throw std::exception(err.c_str());
 	}
+	if (value)
+	{
+		string err = "Unsupported modifier \"static\" of class \"" + GetFullName() + "\"";
+		throw std::exception(err.c_str());
+	}
 	isStatic = value;
 }
 
@@ -627,6 +673,13 @@ void Class::SetAccesModifier(AccessModifier modifier)
 		string err = "Class \"" + GetFullName() + "\" can not be internal";
 		throw std::exception(err.c_str());
 	}
+
+	if (modifier == e_INTERNAL)
+	{
+		string err = "Unsupported modifier \"internal\" of class \"" + GetFullName() + "\"";
+		throw std::exception(err.c_str());
+	}
+
 	accessModifier = modifier;
 }
 
@@ -655,6 +708,7 @@ void Class::CreateTables()
 
 	if (decl->classMemberList == NULL)
 	{
+		AppdendDefaultConstructor();
 		return;
 	}
 
@@ -1082,6 +1136,11 @@ void FieldTable::SetAccessModifier(AccessModifier modifier)
 		string err = "Filed \"" + *GetName() + "\" can not have more than one acces modifier";
 		throw std::exception(err.c_str());
 	}
+	if (modifier == e_INTERNAL)
+	{
+		string err = "Unsupported modifier \"internal\" of field \"" + *GetName() + "\"";
+		throw std::exception(err.c_str());
+	}
 	this->accessModifier = modifier;
 }
 
@@ -1246,6 +1305,11 @@ void MethodTable::SetAccessModifier(AccessModifier modifier)
 		string err = "Method \"" + *GetName() + "\" can not have more than one access modifier";
 		throw std::exception(err.c_str());
 	}
+	if (modifier == e_INTERNAL)
+	{
+		string err = "Unsupported modifier \"internal\" of method \"" + *GetName() + "\"";
+		throw std::exception(err.c_str());
+	}
 	accessModifier = modifier;
 }
 
@@ -1367,7 +1431,7 @@ void MethodTable::Semantic(Class* owner)
 			}
 		}
 	}
-	else if (owner->GetOuterMember()->GetFullName() != "global/System")
+	else if (!IsAbstract() && owner->GetOuterMember()->GetFullName() != "global/System")
 	{
 		if (this->returnValue->type == DataType::t_VOID)
 		{
@@ -1546,6 +1610,11 @@ void MethodTable::ToByteCode(Class* owner, vector<char>* byteCode)
 	char* atributesCount = Constant::IntToByteCode(IsAbstract() ? 0 : 1);
 	byteCode->push_back(atributesCount[2]);
 	byteCode->push_back(atributesCount[3]);
+
+	if (IsAbstract())
+	{
+		return;
+	}
 
 	char* atributeConst = Constant::IntToByteCode(owner->AppendUtf8Constant(new string("Code")));
 	byteCode->push_back(atributeConst[2]);
