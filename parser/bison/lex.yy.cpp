@@ -2284,11 +2284,17 @@ void main(int argc, char** argv)
 			members.push(inner);
 		}
 	}
+
+	Class* mainClass = NULL;
 	for (auto cl : classes)
 	{
 		try
 		{
 			cl->CreateTables();
+			if (cl->IsMain())
+			{
+				mainClass = cl;
+			}
 		}
 		catch (std::exception err)
 		{
@@ -2296,6 +2302,18 @@ void main(int argc, char** argv)
 			return;
 		}
 	}
+	if (mainClass != NULL)
+	{
+		TypeName* className = TypeName::FromClass(mainClass);
+		className->identifiers->push_front(new string("global"));
+		cout << className->ToString() << endl;
+	}
+	else
+	{
+		cout << "There is no class contains Main method" << endl;
+		return;
+	}
+
 	for (auto cl : classes)
 	{
 		try
@@ -2311,7 +2329,6 @@ void main(int argc, char** argv)
 	}
 
 	std::filesystem::remove_all("global");
-	std::filesystem::remove_all("out");
 	for (auto cl : classes)
 	{
 		for (auto md : cl->GetAllMethods())
@@ -2323,10 +2340,15 @@ void main(int argc, char** argv)
 			catch (std::exception err)
 			{
 				cout << err.what() << endl;
+				return;
 			}
 		}
 		cl->WriteTablesFile();
+	}
 
+	std::filesystem::remove_all("out");
+	for (auto cl : classes)
+	{
 		if (cl->GetOuterMember()->GetFullName() != "global/System")
 		{
 			cl->WriteClassFile();

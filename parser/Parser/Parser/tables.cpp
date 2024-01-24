@@ -283,6 +283,8 @@ void Class::AppendMethod(Method* method)
 	AppendUtf8Constant(newMethod->GetName());
 	AppendUtf8Constant(newMethod->GetDescriptor());
 
+	AppendMainMethod(newMethod);
+
 	methods[*newMethod->GetName()] = newMethod;
 }
 
@@ -582,6 +584,37 @@ void Class::AppendMethod(string* name, DataType* returnType, vector<Variable*> p
 	methods[*name] = newMethod;
 }
 
+void Class::AppendMainMethod(MethodTable* methodInfo)
+{
+	if (*methodInfo->GetName() != "Main" || !methodInfo->IsStatic())
+	{
+		return;
+	}
+
+	if (*methodInfo->GetDescriptor() != "([Ljava/lang/String;)V")
+	{
+		return;
+	}
+
+	string* mainName = new string("main");
+	DataType* mainReturn = new DataType(DataType::t_VOID, NULL, false, this);
+	Variable* mainParam = new Variable();
+	mainParam->name = new string("args");
+	mainParam->type = new DataType(DataType::t_STRING, NULL, true, this);
+	AppendMethod(mainName, mainReturn, vector<Variable*> { mainParam });
+	methods["main"]->SetStatic(true);
+	methods["main"]->SetAccessModifier(e_PUBLIC);
+
+	Argument* arg = new Argument(
+		new Expression(Expression::t_ID, mainParam->name));
+	Expression* invokation = new InvocationExpression(
+		new Expression(Expression::t_ID, new string("Main")), new ArgumentList(arg));
+	Statement* stmt = new Statement(Statement::t_EXPRESSION, invokation);
+	methods["main"]->SetBody(new StatementList(stmt));
+
+	isMain = true;
+}
+
 Class::Class(string* name, AbstractNamespaceMember* outer, ClassDeclaration* decl)
 {
 	this->id = ++maxTabelId;
@@ -718,6 +751,11 @@ void Class::SetAccesModifier(AccessModifier modifier)
 AccessModifier Class::GetAccessModifier()
 {
 	return accessModifier;
+}
+
+bool Class::IsMain()
+{
+	return isMain;
 }
 
 void Class::CreateTables()

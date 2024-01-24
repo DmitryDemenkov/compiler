@@ -111,6 +111,7 @@ private:
 	bool isStatic = false;
 	bool isAbstract = false;
 	AccessModifier accessModifier = e_NONE;
+	bool isMain = false;
 
 	string* name;
 	Class* parent = NULL;
@@ -127,6 +128,7 @@ private:
 	void AppendField(Field* field);
 	void AppendMethod(Method* method);
 	void AppendMethod(string* name, DataType* returnType, vector<Variable*> params);
+	void AppendMainMethod(MethodTable* methodInfo);
 	void AppendConstructor(Constructor* constructor);
 	void AppdendDefaultConstructor();
 	void AppendParent(TypeName* parentName);
@@ -172,6 +174,7 @@ public:
 	bool IsAbstract();
 	void SetAccesModifier(AccessModifier modifier);
 	AccessModifier GetAccessModifier();
+	bool IsMain();
 
 	void CreateTables();
 	void CheckOverridingMethods();
