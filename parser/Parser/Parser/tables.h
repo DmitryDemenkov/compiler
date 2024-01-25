@@ -205,6 +205,7 @@ public:
 	int AppendNameAndTypeConstant(string* name, string* descriptor);
 	int AppendFieldRefConstant(Class* owner, FieldTable* fieldInfo);
 	int AppendMethofRefConstant(Class* owner, MethodTable* methodTable);
+	int AppendJavaStringClassConstant();
 
 	void WriteClassFile();
 };

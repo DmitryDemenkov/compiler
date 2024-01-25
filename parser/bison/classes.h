@@ -250,6 +250,8 @@ private:
     int OrToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
     int ObjectToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
     int ObjectCreationToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
+    int ArrayCreationToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
+    int ElementAccessToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
 };
 
 class ObjectCreation : public Expression

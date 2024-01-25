@@ -2059,6 +2059,14 @@ int Class::AppendMethofRefConstant(Class* owner, MethodTable* methodTable)
 	return index;
 }
 
+int Class::AppendJavaStringClassConstant()
+{
+	int utf8Const = AppendUtf8Constant(new string("java/lang/String"));
+	Constant* constant = new Constant(Constant::t_CLASS, utf8Const, -1);
+	int index = IndexOfConstant(constant);
+	return index;
+}
+
 void Class::WriteClassFile()
 {
 	byteCode.push_back(0xca);

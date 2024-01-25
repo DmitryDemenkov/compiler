@@ -685,10 +685,6 @@ int Expression::ToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* 
 	case Expression::t_STRING_LITER:
 		LiteralToByteCode(owner, methodInfo, byteCode);
 		break;
-	case Expression::t_ID:
-		break;
-	case Expression::t_SIMPLE_TYPE:
-		break;
 	case Expression::t_THIS:
 	case Expression::t_BASE:
 		ThisToByteCode(owner, methodInfo, byteCode);
@@ -697,10 +693,10 @@ int Expression::ToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* 
 		ObjectCreationToByteCode(owner, methodInfo, byteCode);
 		break;
 	case Expression::t_ARR_CREATION:
+		ArrayCreationToByteCode(owner, methodInfo, byteCode);
 		break;
 	case Expression::t_ELEMENT_ACCESS:
-		break;
-	case Expression::t_MEMBER_ACCESS:
+		ElementAccessToByteCode(owner, methodInfo, byteCode);
 		break;
 	case Expression::t_INVOCATION:
 		InvokationToByteCode(owner, methodInfo, byteCode);
@@ -742,8 +738,6 @@ int Expression::ToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* 
 	case Expression::t_IS:
 		break;
 	case Expression::t_AS:
-		break;
-	case Expression::t_CLASS:
 		break;
 	case Expression::t_OBJECT:
 		ObjectToByteCode(owner, methodInfo, byteCode);
@@ -1049,6 +1043,15 @@ DataType* Expression::GetDataTypeOfArrayCreation(Class* owner, MethodTable* meth
 	}
 
 	DataType* dType = new DataType(type, classType, isArray, owner);
+
+	if (dType->type == DataType::t_TYPENAME)
+	{
+		owner->AppendClassConstant(dType->classType);
+	}
+	else if (dType->type == DataType::t_STRING)
+	{
+		owner->AppendJavaStringClassConstant();
+	}
 
 	if (this->left == NULL)
 	{
@@ -1533,7 +1536,7 @@ int Expression::InvokationToByteCode(Class* owner, MethodTable* methodInfo, vect
 int Expression::LocalToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode)
 {
 	int localIndex = methodInfo->GetLocalIndex(name);
-	if (dataType->type == DataType::t_STRING || dataType->type == DataType::t_TYPENAME)
+	if (dataType->isArray || dataType->type == DataType::t_STRING || dataType->type == DataType::t_TYPENAME)
 	{
 		byteCode->push_back(ByteCode::aload);
 	}
@@ -1554,7 +1557,7 @@ int Expression::AssigmentToByteCode(Class* owner, MethodTable* methodInfo, vecto
 		right->ToByteCode(owner, methodInfo, byteCode);
 		byteCode->push_back(ByteCode::dup);
 		int localIndex = methodInfo->GetLocalIndex(left->name);
-		if (left->dataType->type == DataType::t_STRING || left->dataType->type == DataType::t_TYPENAME)
+		if (left->dataType->isArray || left->dataType->type == DataType::t_STRING || left->dataType->type == DataType::t_TYPENAME)
 		{
 			byteCode->push_back(ByteCode::astore);
 		}
@@ -1583,6 +1586,21 @@ int Expression::AssigmentToByteCode(Class* owner, MethodTable* methodInfo, vecto
 		}
 		byteCode->push_back(fieldRef[2]);
 		byteCode->push_back(fieldRef[3]);
+	}
+	else if (left->type == t_ELEMENT_ACCESS)
+	{
+		left->left->ToByteCode(owner, methodInfo, byteCode);
+		left->argumentList->arguments->front()->expression->ToByteCode(owner, methodInfo, byteCode);
+		right->ToByteCode(owner, methodInfo, byteCode);
+		byteCode->push_back(ByteCode::dup_x2);
+		if (left->dataType->type == DataType::t_STRING || left->dataType->type == DataType::t_TYPENAME)
+		{
+			byteCode->push_back(ByteCode::aastore);
+		}
+		else
+		{
+			byteCode->push_back(ByteCode::iastore);
+		}
 	}
 	return byteCode->size() - oldSize;
 }
@@ -1809,6 +1827,75 @@ int Expression::ObjectCreationToByteCode(Class* owner, MethodTable* methodInfo, 
 			byteCode->push_back(ByteCode::dup);
 			init->ToByteCode(owner, methodInfo, dataType->classType, byteCode);
 		}
+	}
+
+	return byteCode->size() - oldSize;
+}
+
+int Expression::ArrayCreationToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode)
+{
+	int oldSize = byteCode->size();
+
+	this->left->ToByteCode(owner, methodInfo, byteCode);
+	if (this->dataType->type == DataType::t_STRING || this->dataType->type == DataType::t_TYPENAME)
+	{
+		char* classRef;
+		if (this->dataType->type == DataType::t_TYPENAME)
+		{
+			classRef = Constant::IntToByteCode(owner->AppendClassConstant(dataType->classType));
+		}
+		else
+		{
+			classRef = Constant::IntToByteCode(owner->AppendJavaStringClassConstant());
+		}
+		byteCode->push_back(ByteCode::anewarray);
+		byteCode->push_back(classRef[2]);
+		byteCode->push_back(classRef[3]);
+	}
+	else
+	{
+		byteCode->push_back(ByteCode::newarray);
+		byteCode->push_back(0x0a);
+	}
+
+	if (arrayInitializer != NULL)
+	{
+		int i = 0;
+		for (auto init : *arrayInitializer->expressions)
+		{
+			byteCode->push_back(ByteCode::dup);
+			char* index = Constant::IntToByteCode(i);
+			byteCode->push_back(ByteCode::bipush);
+			byteCode->push_back(index[3]);
+			init->ToByteCode(owner, methodInfo, byteCode);
+			if (this->dataType->type == DataType::t_STRING || this->dataType->type == DataType::t_TYPENAME)
+			{
+				byteCode->push_back(ByteCode::aastore);
+			}
+			else
+			{
+				byteCode->push_back(ByteCode::iastore);
+			}
+			i++;
+		}
+	}
+
+	return byteCode->size() - oldSize;
+}
+
+int Expression::ElementAccessToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode)
+{
+	int oldSize = byteCode->size();
+
+	left->ToByteCode(owner, methodInfo, byteCode);
+	argumentList->arguments->front()->expression->ToByteCode(owner, methodInfo, byteCode);
+	if (dataType->type == DataType::t_STRING || dataType->type == DataType::t_TYPENAME)
+	{
+		byteCode->push_back(ByteCode::aaload);
+	}
+	else
+	{
+		byteCode->push_back(ByteCode::iaload);
 	}
 
 	return byteCode->size() - oldSize;
@@ -2178,7 +2265,7 @@ int VarDeclarator::ToByteCode(Class* owner, MethodTable* methodInfo, vector<char
 	{
 		initializer->ToByteCode(owner, methodInfo, byteCode);
 		int localIndex = methodInfo->GetLocalIndex(identifier);
-		if (dataType->type == DataType::t_STRING || dataType->type == DataType::t_TYPENAME)
+		if (dataType->isArray || dataType->type == DataType::t_STRING || dataType->type == DataType::t_TYPENAME)
 		{
 			byteCode->push_back(ByteCode::astore);
 		}
