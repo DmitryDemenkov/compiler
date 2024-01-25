@@ -2629,6 +2629,21 @@ int Statement::WhileToByteCode(Class* owner, MethodTable* methodInfo, vector<cha
 	return byteCode->size() - oldSize;
 }
 
+int Statement::DoWhileToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode)
+{
+	int oldSize = byteCode->size();
+
+	int stmtSize = statements->statements->front()->ToByteCode(owner, methodInfo, byteCode);
+
+	int condSize = expressions->expressions->front()->ToByteCode(owner, methodInfo, byteCode);
+	byteCode->push_back(ByteCode::ifne);
+	char* ifDelta = Constant::IntToByteCode(-(stmtSize + condSize));
+	byteCode->push_back(ifDelta[2]);
+	byteCode->push_back(ifDelta[3]);
+
+	return byteCode->size() - oldSize;
+}
+
 Statement::Statement(Type type, Expression* expression)
 {
 	this->id = ++maxId;
@@ -2769,6 +2784,7 @@ int Statement::ToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* b
 		WhileToByteCode(owner, methodInfo, byteCode);
 		break;
 	case Statement::t_DO:
+		DoWhileToByteCode(owner, methodInfo, byteCode);
 		break;
 	case Statement::t_FOR:
 		break;
