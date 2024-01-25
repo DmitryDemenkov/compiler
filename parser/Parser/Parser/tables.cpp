@@ -1054,6 +1054,11 @@ int Constant::ToByteCode(vector<char>* byteCode)
 
 char* Constant::IntToByteCode(int integer)
 {
+	if (integer < 0)
+	{
+		integer = 65536 + integer;
+	}
+
 	char* bytes = new char[4];
 	for (int i = 0; i < 4; i++)
 	{
