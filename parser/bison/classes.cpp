@@ -2644,6 +2644,72 @@ int Statement::DoWhileToByteCode(Class* owner, MethodTable* methodInfo, vector<c
 	return byteCode->size() - oldSize;
 }
 
+int Statement::ForToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode)
+{
+	int oldSize = byteCode->size();
+
+	if (declarators != NULL)
+	{
+		for (auto decl : *declarators->declarators)
+		{
+			decl->ToByteCode(owner, methodInfo, byteCode);
+		}
+	}
+	else if (inits != NULL)
+	{
+		for (auto init : *inits->expressions)
+		{
+			init->ToByteCode(owner, methodInfo, byteCode);
+			byteCode->push_back(ByteCode::pop);
+		}
+	}
+
+	int condSize = 0;
+	if (expressions != NULL)
+	{
+		Expression* cond = expressions->expressions->front();
+		condSize = cond->ToByteCode(owner, methodInfo, byteCode);
+	}
+	else
+	{
+		byteCode->push_back(ByteCode::iconst_0);
+		condSize = 1;
+	}
+
+	byteCode->push_back(ByteCode::ifeq);
+	int ifIndex = byteCode->size();
+	byteCode->push_back(0x00);
+	byteCode->push_back(0x00);
+
+	int bodySize = 0;
+	if (statements != NULL)
+	{
+		Statement* body = statements->statements->front();
+		bodySize += body->ToByteCode(owner, methodInfo, byteCode);
+	}
+
+	if (incrs != NULL)
+	{
+		for (auto incr : *incrs->expressions)
+		{
+			bodySize += incr->ToByteCode(owner, methodInfo, byteCode);
+			byteCode->push_back(ByteCode::pop);
+			bodySize++;
+		}
+	}
+
+	char* gotoDelta = Constant::IntToByteCode(-(bodySize + condSize + 3));
+	byteCode->push_back(ByteCode::goto_);
+	byteCode->push_back(gotoDelta[2]);
+	byteCode->push_back(gotoDelta[3]);
+
+	char* ifDelta = Constant::IntToByteCode(bodySize + 6);
+	byteCode->operator[](ifIndex) = ifDelta[2];
+	byteCode->operator[](ifIndex + 1) = ifDelta[3];
+
+	return byteCode->size() - oldSize;
+}
+
 Statement::Statement(Type type, Expression* expression)
 {
 	this->id = ++maxId;
@@ -2787,6 +2853,7 @@ int Statement::ToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* b
 		DoWhileToByteCode(owner, methodInfo, byteCode);
 		break;
 	case Statement::t_FOR:
+		ForToByteCode(owner, methodInfo, byteCode);
 		break;
 	case Statement::t_FOREACH:
 		break;

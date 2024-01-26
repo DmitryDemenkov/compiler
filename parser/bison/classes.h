@@ -375,6 +375,7 @@ private:
     int IfToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
     int WhileToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
     int DoWhileToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
+    int ForToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
 
 public:
     enum Type
