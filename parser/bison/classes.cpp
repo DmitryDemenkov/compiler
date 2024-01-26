@@ -2506,6 +2506,14 @@ void Statement::CheckForeachStmtError(Class* owner, MethodTable* methodInfo)
 	VarDeclarator* decl = declarators->declarators->front();
 	decl->Semantic(owner, methodInfo);
 
+	VarDeclarator* index = new VarDeclarator(
+		new SimpleType(SimpleType::t_INT),
+		new string("<" + *decl->identifier + ">"),
+		new Expression(Expression::t_INT_LITER, 0)
+	);
+	index->Semantic(owner, methodInfo);
+	declarators->declarators->push_back(index);
+
 	Expression* iter = expressions->expressions->front();
 	iter->DetermineDataType(owner, methodInfo);
 	if (iter->dataType == NULL)
@@ -2526,6 +2534,44 @@ void Statement::CheckForeachStmtError(Class* owner, MethodTable* methodInfo)
 		throw std::exception(err.c_str());
 	}
 
+	Expression* cond = new Expression(
+		Expression::t_LESS,
+		new Expression(Expression::t_ID, new string("<" + *decl->identifier + ">")),
+		new Expression(Expression::t_MEMBER_ACCESS,
+			new Expression(Expression::t_ID, iter->name),
+			new Expression(Expression::t_ID, new string("Length"))
+		)
+	);
+	cond->DetermineDataType(owner, methodInfo);
+	expressions = new ExpressionList(cond);
+
+	ArgumentList* argIndex = new ArgumentList(
+		new Argument(new Expression(Expression::t_ID, new string("<" + *decl->identifier + ">")))
+	);
+	Expression* declInit = new Expression(
+		Expression::t_ASSIGNMENT,
+		new Expression(Expression::t_ID, new string(*decl->identifier)),
+		new ElementAccess(new Expression(Expression::t_ID, new string(*iter->name)), argIndex)
+	);
+	Statement* stmtDecl = new Statement(Statement::t_EXPRESSION, declInit);
+
+	StatementList* bodyList = new StatementList(stmtDecl);
+	if (statements != NULL)
+	{
+		bodyList = StatementList::Append(bodyList, statements->statements->front());
+	}
+
+	Expression* incrExpr = new Expression(
+		Expression::t_ASSIGNMENT,
+		new Expression(Expression::t_ID, new string("<" + *decl->identifier + ">")),
+		new Expression(Expression::t_SUM,
+			new Expression(Expression::t_ID, new string("<" + *decl->identifier + ">")),
+			new Expression(Expression::t_INT_LITER, 1)
+		)
+	);
+	bodyList = StatementList::Append(bodyList, new Statement(Statement::t_EXPRESSION, incrExpr));
+	statements = new StatementList(new Statement(Statement::t_BLOCK, bodyList));
+
 	if (statements != NULL)
 	{
 		for (auto stmt : *statements->statements)
@@ -2533,6 +2579,8 @@ void Statement::CheckForeachStmtError(Class* owner, MethodTable* methodInfo)
 			stmt->Semantic(owner, methodInfo);
 		}
 	}
+
+	this->type = Statement::t_FOR;
 }
 
 void Statement::CheckReturnStmtError(Class* owner, MethodTable* methodInfo)
@@ -2873,8 +2921,6 @@ int Statement::ToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* b
 		break;
 	case Statement::t_FOR:
 		ForToByteCode(owner, methodInfo, byteCode);
-		break;
-	case Statement::t_FOREACH:
 		break;
 	case Statement::t_RETURN:
 		ReturnToByteCode(owner, methodInfo, byteCode);
