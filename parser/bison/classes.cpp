@@ -655,6 +655,11 @@ void Expression::DetermineDataType(Class* owner, MethodTable* methodInfo)
 			string err = "There is no such identifier \"" + left->typeName->ToString() + "\"";
 			throw std::exception(err.c_str());
 		}
+		if (left->type == t_OBJECT && left->left->dataType->isArray)
+		{
+			string err = "Unsupported method access on array object";
+			throw std::exception(err.c_str());
+		}
 		right->DetermineDataType(owner, methodInfo);
 		if (right->dataType == NULL)
 		{
@@ -937,8 +942,14 @@ DataType* Expression::GetDataTypeOfMemberAccess(Class* owner, MethodTable* metho
 	}
 	else if (this->left->dataType->isArray)
 	{
-		string err = "Unsupported method access on array object";
-		throw std::exception(err.c_str());
+		if (*this->right->name != "Length")
+		{
+			string err = "Unsupported method access on array object";
+			throw std::exception(err.c_str());
+		}
+		this->type = t_OBJECT;
+		DataType* dType = new DataType(DataType::t_INT, NULL, false, owner);
+		return dType;
 	}
 	else
 	{
@@ -1773,6 +1784,14 @@ int Expression::OrToByteCode(Class* owner, MethodTable* methodInfo, vector<char>
 int Expression::ObjectToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode)
 {
 	int oldSize = byteCode->size();
+
+	if (this->left->dataType->isArray)
+	{
+		this->left->ToByteCode(owner, methodInfo, byteCode);
+		byteCode->push_back(ByteCode::arraylength);
+		return byteCode->size() - oldSize;
+	}
+
 	if (this->left->type != t_CLASS)
 	{
 		this->left->ToByteCode(owner, methodInfo, byteCode);

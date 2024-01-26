@@ -14,6 +14,7 @@ enum ByteCode
 	new_          = 0xbb,
 	newarray      = 0xbc,
 	anewarray	  = 0xbd,
+	arraylength   = 0xbe,
 	aastore       = 0x53,
 	iastore       = 0x4f,
 	aaload        = 0x32,
