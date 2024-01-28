@@ -715,10 +715,10 @@ int Expression::ToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* 
 		ArithmeticToByteCode(owner, methodInfo, byteCode);
 		break;
 	case Expression::t_SIMPLE_TYPE_CAST:
-		break;
 	case Expression::t_ARRAY_CAST:
-		break;
 	case Expression::t_TYPENAME_CAST:
+	case Expression::t_AS:
+		TypeCastToByteCode(owner, methodInfo, byteCode);
 		break;
 	case Expression::t_LESS:
 	case Expression::t_GREATER:
@@ -741,8 +741,6 @@ int Expression::ToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* 
 		AssigmentToByteCode(owner, methodInfo, byteCode);
 		break;
 	case Expression::t_IS:
-		break;
-	case Expression::t_AS:
 		break;
 	case Expression::t_OBJECT:
 		ObjectToByteCode(owner, methodInfo, byteCode);
@@ -1190,6 +1188,17 @@ DataType* Expression::GetDataTypeOfTypeCast(Class* owner, MethodTable* methodInf
 		throw std::exception(err.c_str());
 	}
 
+	CheckErrorsOfTypeCast(owner, dType);
+
+	if (dType->type == DataType::t_TYPENAME)
+	{
+		owner->AppendClassConstant(dType->classType);
+	}
+	else if (dType->type == DataType::t_STRING)
+	{
+		owner->AppendJavaStringClassConstant();
+	}
+
 	return dType;
 }
 
@@ -1447,6 +1456,35 @@ void Expression::CheckErrorsOfArrayCreation(Class* owner, DataType* arrayType)
 				throw std::exception(err.c_str());
 			}
 		}
+	}
+}
+
+void Expression::CheckErrorsOfTypeCast(Class* owner, DataType* castType)
+{
+	if (castType->type == DataType::t_VOID)
+	{
+		string err = "Unsuppotable type cast to void type";
+		throw std::exception(err.c_str());
+	}
+
+	if (castType->isArray)
+	{
+		string err = "Unsuppotable type cast to array type";
+		throw std::exception(err.c_str());
+	}
+
+	if (castType->type != DataType::t_TYPENAME &&
+		(this->left->dataType->type == DataType::t_TYPENAME || this->left->dataType->type == DataType::t_STRING))
+	{
+		string err = "It is not possible to convert " + *left->dataType->ToString() + " to " + *this->dataType->ToString();
+		throw std::exception(err.c_str());
+	}
+
+	if (this->left->dataType->type != DataType::t_TYPENAME &&
+		(castType->type == DataType::t_TYPENAME || castType->type == DataType::t_STRING))
+	{
+		string err = "It is not possible to convert " + *left->dataType->ToString() + " to " + *this->dataType->ToString();
+		throw std::exception(err.c_str());
 	}
 }
 
@@ -1915,6 +1953,29 @@ int Expression::ElementAccessToByteCode(Class* owner, MethodTable* methodInfo, v
 	else
 	{
 		byteCode->push_back(ByteCode::iaload);
+	}
+
+	return byteCode->size() - oldSize;
+}
+
+int Expression::TypeCastToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode)
+{
+	int oldSize = byteCode->size();
+
+	left->ToByteCode(owner, methodInfo, byteCode);
+	if (this->dataType->type == DataType::t_TYPENAME)
+	{
+		char* classRef = Constant::IntToByteCode(owner->AppendClassConstant(this->dataType->classType));
+		byteCode->push_back(ByteCode::checkcast);
+		byteCode->push_back(classRef[2]);
+		byteCode->push_back(classRef[3]);
+	}
+	else if (this->dataType->type == DataType::t_STRING)
+	{
+		char* classRef = Constant::IntToByteCode(owner->AppendJavaStringClassConstant());
+		byteCode->push_back(ByteCode::checkcast);
+		byteCode->push_back(classRef[2]);
+		byteCode->push_back(classRef[3]);
 	}
 
 	return byteCode->size() - oldSize;

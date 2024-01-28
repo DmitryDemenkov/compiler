@@ -237,6 +237,7 @@ private:
     void CheckErrorsOfClassesAccess(Class* owner, Class* classInfo);
     void CheckErrorsOfObjectCreation(Class* owner, Class* classInfo);
     void CheckErrorsOfArrayCreation(Class* owner, DataType* arrayType);
+    void CheckErrorsOfTypeCast(Class* owner, DataType* castType);
 
     int ThisToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
     int LiteralToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
@@ -252,6 +253,7 @@ private:
     int ObjectCreationToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
     int ArrayCreationToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
     int ElementAccessToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
+    int TypeCastToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
 };
 
 class ObjectCreation : public Expression

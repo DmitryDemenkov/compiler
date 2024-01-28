@@ -45,5 +45,6 @@ enum ByteCode
 	if_icmpge     = 0xa2,
 	if_icmpgt     = 0xa3,
 	if_icmple     = 0xa4,
-	goto_         = 0xa7
+	goto_         = 0xa7,
+	checkcast     = 0xc0
 };
