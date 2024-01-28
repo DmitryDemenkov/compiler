@@ -617,7 +617,7 @@ void Expression::DetermineDataType(Class* owner, MethodTable* methodInfo)
 			string err = "Unsupported \"is\" operator for simple types and arrays";
 			throw std::exception(err.c_str());
 		}
-		owner->FindClass(this->typeName);
+		owner->AppendClassConstant(owner->FindClass(this->typeName));
 		dataType = new DataType(DataType::t_BOOL, NULL, false, owner);
 
 		if (left->dataType->type != DataType::t_TYPENAME || left->dataType->isArray)
@@ -741,6 +741,7 @@ int Expression::ToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* 
 		AssigmentToByteCode(owner, methodInfo, byteCode);
 		break;
 	case Expression::t_IS:
+		IsToByteCode(owner, methodInfo, byteCode);
 		break;
 	case Expression::t_OBJECT:
 		ObjectToByteCode(owner, methodInfo, byteCode);
@@ -1977,6 +1978,20 @@ int Expression::TypeCastToByteCode(Class* owner, MethodTable* methodInfo, vector
 		byteCode->push_back(classRef[2]);
 		byteCode->push_back(classRef[3]);
 	}
+
+	return byteCode->size() - oldSize;
+}
+
+int Expression::IsToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode)
+{
+	int oldSize = byteCode->size();
+
+	left->ToByteCode(owner, methodInfo, byteCode);
+	Class* classType = owner->FindClass(this->typeName);
+	char* classRef = Constant::IntToByteCode(owner->AppendClassConstant(classType));
+	byteCode->push_back(ByteCode::instanceof);
+	byteCode->push_back(classRef[2]);
+	byteCode->push_back(classRef[3]);
 
 	return byteCode->size() - oldSize;
 }

@@ -254,6 +254,7 @@ private:
     int ArrayCreationToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
     int ElementAccessToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
     int TypeCastToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
+    int IsToByteCode(Class* owner, MethodTable* methodInfo, vector<char>* byteCode);
 };
 
 class ObjectCreation : public Expression
