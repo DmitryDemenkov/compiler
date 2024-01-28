@@ -1833,6 +1833,17 @@ void Class::FillStringClass(AbstractNamespaceMember* outer)
 	toStringMethod->SetAccessModifier(e_PUBLIC);
 	toStringMethod->SetOverride(true);
 	toStringMethod->SetConstDescriptor(new string("(Ljava/lang/String;)Ljava/lang/String;"));
+
+	DataType* splitReturn = new DataType(DataType::t_STRING, NULL, true, stringClass);
+	Variable* splitparam = new Variable();
+	splitparam->name = new string("sep");
+	splitparam->type = new DataType(DataType::t_STRING, NULL, false, stringClass);
+	vector<Variable*> splitparamParamSet = vector<Variable*> { splitparam };
+
+	stringClass->AppendMethod(new string("Split"), splitReturn, splitparamParamSet);
+	MethodTable* splitMethod = stringClass->methods["Split"];
+	splitMethod->SetAccessModifier(e_PUBLIC);
+	splitMethod->SetConstDescriptor(new string("(Ljava/lang/String;Ljava/lang/String;)[Ljava/lang/String;"));
 }
 
 void Class::FillIntClass(AbstractNamespaceMember* outer)
@@ -1897,6 +1908,18 @@ void Class::FillConsoleClass(AbstractNamespaceMember* outer)
 	Class* consoleClass = (Class*)outer->GetInnerMember(new string("Console"));
 	consoleClass->AppdendDefaultConstructor();
 
+	DataType* writeLineReturn = new DataType(DataType::t_VOID, NULL, false, consoleClass);
+	DataType* writeLineParamType = new DataType(DataType::t_STRING, NULL, false, consoleClass);
+	Variable* writeLineParam = new Variable();
+	writeLineParam->name = new string("str");
+	writeLineParam->type = writeLineParamType;
+	vector<Variable*> writeLineParamSet = vector<Variable*>{ writeLineParam };
+
+	consoleClass->AppendMethod(new string("WriteLine"), writeLineReturn, writeLineParamSet);
+	MethodTable* writeLineMethod = consoleClass->methods["WriteLine"];
+	writeLineMethod->SetAccessModifier(e_PUBLIC);
+	writeLineMethod->SetStatic(true);
+
 	DataType* writeReturn = new DataType(DataType::t_VOID, NULL, false, consoleClass);
 	DataType* writeParamType = new DataType(DataType::t_STRING, NULL, false, consoleClass);
 	Variable* writeParam = new Variable();
@@ -1904,8 +1927,8 @@ void Class::FillConsoleClass(AbstractNamespaceMember* outer)
 	writeParam->type = writeParamType;
 	vector<Variable*> writeParamSet = vector<Variable*>{ writeParam };
 
-	consoleClass->AppendMethod(new string("WriteLine"), writeReturn, writeParamSet);
-	MethodTable* writeMethod = consoleClass->methods["WriteLine"];
+	consoleClass->AppendMethod(new string("Write"), writeReturn, writeParamSet);
+	MethodTable* writeMethod = consoleClass->methods["Write"];
 	writeMethod->SetAccessModifier(e_PUBLIC);
 	writeMethod->SetStatic(true);
 
