@@ -1528,7 +1528,7 @@ int Expression::InvokationToByteCode(Class* owner, MethodTable* methodInfo, vect
 	{
 		byteCode->push_back(ByteCode::invokestatic);
 	}
-	else if (*invokatedMethod->GetName() == "<init>")
+	else if (*invokatedMethod->GetName() == "<init>" || this->left->type == t_BASE)
 	{
 		byteCode->push_back(ByteCode::invokespecial);
 	}
@@ -1581,7 +1581,7 @@ int Expression::AssigmentToByteCode(Class* owner, MethodTable* methodInfo, vecto
 	else if (left->type == t_OBJECT)
 	{
 		FieldTable* field = left->left->dataType->classType->GetField(*left->right->name);
-		char* fieldRef = Constant::IntToByteCode(owner->AppendFieldRefConstant(owner, field));
+		char* fieldRef = Constant::IntToByteCode(owner->AppendFieldRefConstant(left->left->dataType->classType, field));
 		if (field->IsStatic())
 		{
 			right->ToByteCode(owner, methodInfo, byteCode);
@@ -2617,7 +2617,7 @@ int Statement::ReturnToByteCode(Class* owner, MethodTable* methodInfo, vector<ch
 	if (expressions != NULL)
 	{
 		expressions->expressions->front()->ToByteCode(owner, methodInfo, byteCode);
-		if (expressions->expressions->front()->dataType->type == DataType::t_STRING || expressions->expressions->front()->dataType->type == DataType::t_TYPENAME)
+		if (expressions->expressions->front()->dataType->isArray || expressions->expressions->front()->dataType->type == DataType::t_STRING || expressions->expressions->front()->dataType->type == DataType::t_TYPENAME)
 		{
 			byteCode->push_back(ByteCode::areturn);
 		}
