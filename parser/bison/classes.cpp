@@ -668,6 +668,11 @@ void Expression::DetermineDataType(Class* owner, MethodTable* methodInfo)
 		}
 		dataType = this->right->dataType;
 
+		if (left->type != t_LOCALVAR && left->type != t_OBJECT && left->type != t_ELEMENT_ACCESS)
+		{
+			string err = "Invalid data type to assignment " + *left->dataType->ToString();
+			throw std::exception(err.c_str());
+		}
 		if (!(*left->dataType == *right->dataType))
 		{
 			string err = "it is not possible to convert " + *right->dataType->ToString() + " to " + *left->dataType->ToString();
@@ -1652,6 +1657,7 @@ int Expression::AssigmentToByteCode(Class* owner, MethodTable* methodInfo, vecto
 			byteCode->push_back(ByteCode::iastore);
 		}
 	}
+
 	return byteCode->size() - oldSize;
 }
 
