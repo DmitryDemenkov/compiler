@@ -957,6 +957,15 @@ DataType* Expression::GetDataTypeOfMemberAccess(Class* owner, MethodTable* metho
 	}
 	else
 	{
+		if (this->left->dataType->type == DataType::t_STRING && *this->right->name == "Length")
+		{
+			this->type = t_INVOCATION;
+			this->name = new string("Length");
+			this->right = NULL;
+			owner->AppendMethofRefConstant(this->left->dataType->classType, this->left->dataType->classType->GetMethod("Length"));
+			return new DataType(DataType::t_INT, NULL, false, owner);
+		}
+
 		FieldTable* fieldInfo = this->left->dataType->classType->GetField(*this->right->name);
 		if (fieldInfo != NULL)
 		{
@@ -1113,13 +1122,11 @@ DataType* Expression::GetDataTypeOfElementAccess(Class* owner, MethodTable* meth
 		string err = "There is no such identifier \"" + left->typeName->ToString() + "\"";
 		throw std::exception(err.c_str());
 	}
-	if (left->dataType->isArray == false)
+	if (left->dataType->isArray == false && left->dataType->type != DataType::t_STRING)
 	{
 		string err = "Invalid element access";
 		throw std::exception(err.c_str());
 	}
-
-	DataType* dType = new DataType(left->dataType->type, left->dataType->classType, false, owner);
 
 	if (argumentList == NULL)
 	{
@@ -1148,6 +1155,22 @@ DataType* Expression::GetDataTypeOfElementAccess(Class* owner, MethodTable* meth
 		}
 	}
 
+	if (!left->dataType->isArray && left->dataType->type == DataType::t_STRING)
+	{
+		this->type = t_INVOCATION;
+		this->name = new string("GetChar");
+		owner->AppendMethofRefConstant(left->dataType->classType, left->dataType->classType->GetMethod("GetChar"));
+	}
+
+	DataType* dType;
+	if (left->dataType->isArray)
+	{
+		dType = new DataType(left->dataType->type, left->dataType->classType, false, owner);
+	}
+	else
+	{
+		dType = new DataType(DataType::t_CHAR, NULL, false, owner);
+	}
 	return dType;
 }
 
@@ -1224,6 +1247,15 @@ DataType* Expression::GetDataTypeOfArithmetic(Class* owner, MethodTable* methodI
 		throw std::exception(err.c_str());
 	}
 
+	if (this->type == t_SUM && left->dataType->type == DataType::t_STRING && right->dataType->type == DataType::t_STRING)
+	{
+		this->type = t_INVOCATION;
+		this->argumentList = new ArgumentList(new Argument(right));
+		this->name = new string("Concat");
+		owner->AppendMethofRefConstant(left->dataType->classType, left->dataType->classType->GetMethod("Concat"));
+		return new DataType(DataType::t_STRING, NULL, false, owner);
+	}
+
 	if (left->dataType->type == DataType::t_INT && !left->dataType->isArray
 		&& right->dataType->type == DataType::t_CHAR && !right->dataType->isArray)
 	{
@@ -1263,6 +1295,20 @@ DataType* Expression::GetDataTypeOfComprasion(Class* owner, MethodTable* methodI
 	{
 		string err = "There is no such identifier \"" + right->typeName->ToString() + "\"";
 		throw std::exception(err.c_str());
+	}
+
+	if (left->dataType->type == DataType::t_STRING && right->dataType->type == DataType::t_STRING)
+	{
+		if (this->type == t_EQUALITY || this->type == t_INEQUALITY)
+		{
+			owner->AppendMethofRefConstant(left->dataType->classType, left->dataType->classType->GetMethod("CompareTo"));
+			left = new InvocationExpression(left, new ArgumentList(new Argument(right)));
+			left->name = new string("CompareTo");
+			left->dataType = new DataType(DataType::t_INT, NULL, false, owner);
+			right = new Expression(t_INT_LITER, 0);
+			right->DetermineDataType(owner, methodInfo);
+			return new DataType(DataType::t_BOOL, NULL, false, owner);
+		}
 	}
 
 	if (left->dataType->type == DataType::t_INT && !left->dataType->isArray

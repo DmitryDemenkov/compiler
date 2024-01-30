@@ -1844,6 +1844,69 @@ void Class::FillStringClass(AbstractNamespaceMember* outer)
 	MethodTable* splitMethod = stringClass->methods["Split"];
 	splitMethod->SetAccessModifier(e_PUBLIC);
 	splitMethod->SetConstDescriptor(new string("(Ljava/lang/String;Ljava/lang/String;)[Ljava/lang/String;"));
+
+	DataType* compareReturn = new DataType(DataType::t_INT, NULL, false, stringClass);
+	Variable* compareparam = new Variable();
+	compareparam->name = new string("strB");
+	compareparam->type = new DataType(DataType::t_STRING, NULL, false, stringClass);
+	vector<Variable*> compareparamParamSet = vector<Variable*>{ compareparam };
+
+	stringClass->AppendMethod(new string("CompareTo"), compareReturn, compareparamParamSet);
+	MethodTable* compareMethod = stringClass->methods["CompareTo"];
+	compareMethod->SetAccessModifier(e_PUBLIC);
+	compareMethod->SetConstDescriptor(new string("(Ljava/lang/String;Ljava/lang/String;)I"));
+
+	DataType* concatReturn = new DataType(DataType::t_STRING, NULL, false, stringClass);
+	Variable* concatparam = new Variable();
+	concatparam->name = new string("strB");
+	concatparam->type = new DataType(DataType::t_STRING, NULL, false, stringClass);
+	vector<Variable*> concatparamParamSet = vector<Variable*>{ concatparam };
+
+	stringClass->AppendMethod(new string("Concat"), concatReturn, concatparamParamSet);
+	MethodTable* concatMethod = stringClass->methods["Concat"];
+	concatMethod->SetAccessModifier(e_PUBLIC);
+	concatMethod->SetConstDescriptor(new string("(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"));
+
+	DataType* getCharReturn = new DataType(DataType::t_CHAR, NULL, false, stringClass);
+	Variable* getCharparam = new Variable();
+	getCharparam->name = new string("index");
+	getCharparam->type = new DataType(DataType::t_INT, NULL, false, stringClass);
+	vector<Variable*> getCharParamSet = vector<Variable*>{ getCharparam };
+
+	stringClass->AppendMethod(new string("GetChar"), getCharReturn, getCharParamSet);
+	MethodTable* getCharMethod = stringClass->methods["GetChar"];
+	getCharMethod->SetAccessModifier(e_PUBLIC);
+	getCharMethod->SetConstDescriptor(new string("(Ljava/lang/String;I)I"));
+
+	DataType* replaceReturn = new DataType(DataType::t_STRING, NULL, false, stringClass);
+	Variable* replaceparam = new Variable();
+	replaceparam->name = new string("oldStr");
+	replaceparam->type = new DataType(DataType::t_STRING, NULL, false, stringClass);
+	Variable* replaceparam2 = new Variable();
+	replaceparam2->name = new string("newStr");
+	replaceparam2->type = new DataType(DataType::t_STRING, NULL, false, stringClass);
+	vector<Variable*> replaceParamSet = vector<Variable*>{ replaceparam, replaceparam2 };
+
+	stringClass->AppendMethod(new string("Replace"), replaceReturn, replaceParamSet);
+	MethodTable* replaceMethod = stringClass->methods["Replace"];
+	replaceMethod->SetAccessModifier(e_PUBLIC);
+	replaceMethod->SetConstDescriptor(new string("(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"));
+
+	DataType* trimReturn = new DataType(DataType::t_STRING, NULL, false, stringClass);
+	vector<Variable*> trimParamSet = vector<Variable*>{ };
+
+	stringClass->AppendMethod(new string("Trim"), trimReturn, trimParamSet);
+	MethodTable* trimMethod = stringClass->methods["Trim"];
+	trimMethod->SetAccessModifier(e_PUBLIC);
+	trimMethod->SetConstDescriptor(new string("(Ljava/lang/String;)Ljava/lang/String;"));
+
+	DataType* lengthReturn = new DataType(DataType::t_INT, NULL, false, stringClass);
+	vector<Variable*> lengthParamSet = vector<Variable*>{ };
+
+	stringClass->AppendMethod(new string("Length"), lengthReturn, lengthParamSet);
+	MethodTable* lengthMethod = stringClass->methods["Length"];
+	lengthMethod->SetAccessModifier(e_PUBLIC);
+	lengthMethod->SetConstDescriptor(new string("(Ljava/lang/String;)I"));
 }
 
 void Class::FillIntClass(AbstractNamespaceMember* outer)
